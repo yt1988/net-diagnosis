@@ -1,0 +1,13 @@
+# Network Diagnosis · 1ms.dog
+
+> Free in-browser network diagnosis: when the internet lags, it tells which part of the path is at fault. It measures,
+> at once and from the visitor's own device, the nearest Cloudflare location, single-location cloud regions in Tokyo,
+> Frankfurt and Virginia, services the visitor picks, and UDP to public STUN servers (loss inferred from STUN
+> retransmission delays, validated against injected loss). Every 5 seconds it compares the paths: all worse = the
+> visitor's side (Wi-Fi, router, ISP); near fine, far worse = long-haul route; one service worse = that service;
+> UDP losing while HTTPS is fine = games and calls will stutter. With a proxy in mainland China, domestic sites stand
+> for the visitor's own line and Cloudflare through the proxy for the way to the proxy server. 20-second verdict,
+> then optional monitoring with an incident log. Nothing is sent to this site.
+
+- Page: https://diag.1ms.dog/ (also /zh-cn/)
+- Source code: https://github.com/yt1988/net-diagnosis

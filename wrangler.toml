@@ -1,0 +1,11 @@
+# Cloudflare Workers with static assets only: `npx wrangler deploy` uploads ./public. Every request is a static file
+# (free, not metered); nothing runs on the server, and the page never sends results anywhere.
+# No routes or custom domain here: on 1ms.dog the site routes the domain to this Worker (1ms-shell). To self-host,
+# bind your own domain in the dashboard, or set workers_dev = true to try it on workers.dev.
+name = "netdiag"
+compatibility_date = "2025-10-01"
+workers_dev = false
+preview_urls = false
+
+[assets]
+directory = "./public"

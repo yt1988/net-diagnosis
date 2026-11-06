@@ -1,0 +1,21 @@
+{
+  "name": "net-diagnosis",
+  "private": true,
+  "type": "module",
+  "description": "Network Diagnosis: when the internet lags, find which part of the path is at fault (device, Wi-Fi and ISP, long-haul route, proxy, or one service), measured in your browser",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node scripts/build.mjs --check && node --test \"test/*.test.mjs\"",
+    "dev": "wrangler dev --port 8804",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.10"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yt1988/net-diagnosis"
+  },
+  "homepage": "https://diag.1ms.dog"
+}
