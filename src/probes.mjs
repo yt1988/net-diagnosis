@@ -29,20 +29,27 @@ export async function https(url, timeout = 3000) {
 }
 
 // One ICE gathering against one STUN server: the time to each server-reflexive candidate is one UDP round trip per
-// local socket (IPv4, IPv6, other interfaces). → { answers: [ms, …], hosts }
+// local socket (IPv4, IPv6, other interfaces). → { answers: [ms, …], v6: [bool, …], pub4, pub6, hosts }
+// pub4 / pub6: the public address the server saw, only to notice when it changes (never shown or sent).
 export function stun(url, timeout = 3000) {
   return new Promise((resolve) => {
     let pc;
-    try { pc = new RTCPeerConnection({ iceServers: [{ urls: url }] }); } catch { resolve({ answers: [], hosts: 0, error: true }); return; }
+    try { pc = new RTCPeerConnection({ iceServers: [{ urls: url }] }); } catch { resolve({ answers: [], v6: [], hosts: 0, error: true }); return; }
     pc.createDataChannel('s');
-    const r = { answers: [], hosts: 0 };
+    const r = { answers: [], v6: [], hosts: 0, pub4: null, pub6: null };
     let t0 = 0;
     pc.onicecandidate = (e) => {
       const c = e.candidate;
       if (!c || !c.candidate || c.protocol === 'tcp') return;
       const type = c.type || (/ typ (\w+)/.exec(c.candidate) || [])[1];
       if (type === 'host') r.hosts++;
-      else if (type === 'srflx') r.answers.push(performance.now() - t0);
+      else if (type === 'srflx') {
+        const addr = c.address || c.candidate.split(' ')[4] || '';
+        const six = addr.includes(':');
+        r.answers.push(performance.now() - t0);
+        r.v6.push(six);
+        if (six) r.pub6 ??= addr; else r.pub4 ??= addr;
+      }
     };
     setTimeout(() => { pc.close(); resolve(r); }, timeout);
     pc.createOffer().then((o) => { t0 = performance.now(); return pc.setLocalDescription(o); }).catch(() => { pc.close(); resolve(r); });

@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  quantile, windowStats, stunLoss, statusOf, udpStatusOf, attribute, mos, mosLevel, gaming, Incidents, WINDOW_MS, proxyHint, confidence,
+  quantile, windowStats, stunLoss, statusOf, udpStatusOf, attribute, mos, mosLevel, gaming, Incidents, WINDOW_MS, proxyHint, confidence, bloatGrade, bloatLevel,
 } from '../src/lib.mjs';
 
 test('quantile and window stats', () => {
@@ -78,6 +78,11 @@ const scenarios = [
     { proxied: true, direct: [T('baidu', 'ok', 9)], near: [T('cf', 'bad', 300)], far: okFar.map((t) => ({ ...t, status: 'bad' })) }, 'proxy-entry'],
   ['proxy exit: domestic and the proxy hop fine, beyond it worse',
     { proxied: true, direct: [T('baidu', 'ok', 9)], near: [T('cf', 'ok', 60)], far: [T('tyo', 'bad'), T('fra', 'bad'), T('iad', 'bad')] }, 'proxy-exit'],
+  ['your side, router worse too → Wi-Fi or home network',
+    { near: [T('cf', 'bad')], far: okFar.map((t) => ({ ...t, status: 'bad' })), gw: { id: 'gw', status: 'bad', med: 120 } }, 'wifi'],
+  ['your side, router fine → the ISP connection',
+    { near: [T('cf', 'bad')], far: okFar.map((t) => ({ ...t, status: 'bad' })), gw: { id: 'gw', status: 'ok', med: 3 } }, 'access'],
+  ['IPv6 alone losing, IPv4 fine', { ipv6: { status: 'bad', lossPct: 9 }, ipv4: { status: 'ok', lossPct: 0 } }, 'ipv6'],
   ['proxied, but the line itself is bad: domestic worse too',
     { proxied: true, direct: [T('baidu', 'bad', 300)], near: [T('cf', 'bad', 400)], far: okFar }, 'local'],
 ];
@@ -88,6 +93,14 @@ for (const [name, patch, want] of scenarios) {
     assert.ok(v.conf >= 1 && v.conf <= 3);
   });
 }
+
+test('router thresholds and bufferbloat grades', () => {
+  const router = windowStats([3, 4, 3, 5, 4].map((ms) => ({ ms })));
+  assert.equal(statusOf(router, { floor: 3, lan: true }).status, 'ok');
+  assert.equal(statusOf(windowStats([90, 95, 92, 91, 93].map((ms) => ({ ms }))), { floor: 90, lan: true }).status, 'bad', 'a router 90 ms away is a Wi-Fi problem');
+  assert.equal(bloatGrade(3), 'A+'); assert.equal(bloatGrade(45), 'B'); assert.equal(bloatGrade(500), 'F');
+  assert.equal(bloatLevel('A'), 'good'); assert.equal(bloatLevel('C'), 'fair'); assert.equal(bloatLevel('F'), 'poor');
+});
 
 test('scores', () => {
   assert.ok(mos(30, 2, 0) > 4.3);

@@ -8,7 +8,7 @@
 <link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/{{css}}">
 </head>
-<body>
+<body data-sel="diag">
 <div class="app">
   <header class="top">
     <a class="brand" href="{{homeHref}}" aria-current="page">
@@ -34,38 +34,40 @@
 
   <main>
     <section class="hero card">
-      <div class="hero-top">
-        <div class="hero-h">
-          <h1>{{h1}}</h1>
-          <p class="lead" data-i="lead"></p>
-        </div>
-        <!-- the one action: Start / Stop, with the run's time and progress in the button itself -->
-        <div class="ctl">
-          <button class="go" id="go" type="button"><span class="go-t" id="goT" data-i="start"></span><span class="go-n" id="goN"></span></button>
-          <div class="ctl-opts">
-            <label class="tog" data-tip="{{a:monitor_tip}}"><input type="checkbox" id="mon"><span class="sw" aria-hidden="true"></span><span data-i="monitor"></span></label>
-            <label class="tog ntf" data-tip="{{a:notify_tip}}"><input type="checkbox" id="ntf"><span class="sw" aria-hidden="true"></span><span data-i="notify"></span></label>
-          </div>
-        </div>
+      <h1>{{h1}}</h1>
+      <p class="lead" data-i="lead"></p>
+      <!-- the two modes are the tool: a diagnosis, or monitoring that keeps going until Stop -->
+      <div class="modes" role="radiogroup" aria-label="{{a:mode_label}}">
+        <button type="button" role="radio" data-mode="diag" aria-checked="true"><b data-i="mode_diag"></b><span data-i="mode_diag_s"></span></button>
+        <button type="button" role="radio" data-mode="mon" aria-checked="false"><b data-i="mode_mon"></b><span data-i="mode_mon_s"></span></button>
+      </div>
+      <div class="go-row">
+        <button class="go" id="go" type="button"><span class="go-t" id="goT" data-i="start"></span><span class="go-n" id="goN"></span></button>
+        <button class="icon-btn bell" id="ntf" type="button" aria-pressed="false" aria-label="{{a:notify}}" data-tip="{{a:notify_tip}}">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 11.5V7a4 4 0 1 1 8 0v4.5l1.2 1.5H2.8zM6.5 14.2a1.6 1.6 0 0 0 3 0"/></svg>
+        </button>
       </div>
 
-      <!-- the verdict: one sentence, how sure and where it exits, 3 numbers, up to 4 pieces of evidence, what it means
-           for calls, games and pages, and what to try. Every part keeps its space, so nothing moves when it fills. -->
+      <!-- the verdict: one sentence, how sure and where it exits, 3 numbers, evidence, what it means for calls, games,
+           pages and a full line, and what to try. Every part keeps its space, so nothing moves when it fills. -->
       <div class="verdict" id="verdict" data-lv="idle" aria-live="polite">
         <p class="v-h" id="vH" data-i="v_idle"></p>
         <p class="v-sub"><span id="vState">&nbsp;</span><span class="v-exit" id="vExit"></span></p>
         <ul class="nums">
           <li data-c="near"><span data-i="k_near"></span><b>–</b></li>
           <li data-c="jitter"><span data-i="k_jitter"></span><b>–</b></li>
-          <li data-c="udp"><span data-i="k_udp"></span><b>–</b></li>
+          <li data-c="udp"><span data-i="k_udp"></span><b>–</b><button class="lnk sm" id="udpxBtn" type="button" data-tip="{{a:tip_udpx}}" data-i="udpx_btn"></button></li>
         </ul>
-        <ul class="ev" id="ev"></ul>
-        <ul class="fit">
-          <li data-s="call"><span class="fit-k" data-tip="{{a:tip_call}}" tabindex="0" data-i="sc_call"></span><b>–</b><em>&nbsp;</em></li>
-          <li data-s="game"><span class="fit-k" data-tip="{{a:tip_game}}" tabindex="0" data-i="sc_game"></span><b>–</b><em>&nbsp;</em></li>
-          <li data-s="page"><span class="fit-k" data-tip="{{a:tip_page}}" tabindex="0" data-i="sc_page"></span><b>–</b><em>&nbsp;</em></li>
-        </ul>
-        <div class="sug" id="sug" data-on=""><p class="sug-h" data-i="sug_h"></p><ul id="sugL"></ul></div>
+        <div class="v-body">
+          <ul class="ev" id="ev"></ul>
+          <ul class="fit">
+            <li data-s="call"><span class="fit-k" data-tip="{{a:tip_call}}" tabindex="0" data-i="sc_call"></span><b>–</b><em>&nbsp;</em></li>
+            <li data-s="game"><span class="fit-k" data-tip="{{a:tip_game}}" tabindex="0" data-i="sc_game"></span><b>–</b><em>&nbsp;</em></li>
+            <li data-s="page"><span class="fit-k" data-tip="{{a:tip_page}}" tabindex="0" data-i="sc_page"></span><b>–</b><em>&nbsp;</em></li>
+            <li data-s="load"><span class="fit-k" data-tip="{{a:tip_load}}" tabindex="0" data-i="sc_load"></span><b>–</b><em>&nbsp;</em><button class="lnk sm" id="loadBtn" type="button" data-i="load_btn"></button></li>
+          </ul>
+          <div class="sug" id="sug" data-on=""><p class="sug-h" data-i="sug_h"></p><ul id="sugL"></ul></div>
+        </div>
       </div>
     </section>
 
@@ -82,8 +84,8 @@
       </div>
       <ul class="lanes">{{lanes}}</ul>
       <div class="lanes-f">
-        <span class="svc-sum"><span class="m" data-i="svc_h"></span><span id="svcSum"></span></span>
-        <button class="lnk" id="svcBtn" type="button" aria-haspopup="dialog" aria-controls="svcs" data-i="svc_edit"></button>
+        <button class="lnk" id="gwBtn" type="button" data-tip="{{a:tip_gw}}" data-i="gw_add"></button>
+        <span class="note" id="gwMsg" aria-live="polite"></span>
       </div>
     </section>
 

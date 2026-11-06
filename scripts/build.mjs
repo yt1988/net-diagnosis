@@ -11,7 +11,7 @@ import { mkdir, readFile, readdir, writeFile, rm } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { build as bundle, transform } from 'esbuild';
-import { ORIGINS } from '../src/targets.mjs';
+import { ORIGINS, GATEWAYS } from '../src/targets.mjs';
 
 const SITE = (process.env.SITE_URL || 'https://diag.1ms.dog').replace(/\/+$/, '');
 const pub = new URL('../public/', import.meta.url), src = new URL('../src/', import.meta.url);
@@ -38,12 +38,14 @@ async function loadI18n() {
 // ORIGINS (the built-in hosts) is documentation for what the page measures by default.
 void ORIGINS;
 const cspOf = () => ["default-src 'self'", `script-src 'self' 'sha256-${sha(PREPAINT)}'`, "worker-src 'self'", "style-src 'self' 'unsafe-inline'", "font-src 'self'", "img-src 'self' data: https:",
-  "connect-src 'self' https:",
+  // https: any service; wss: rtc.1ms.dog's echo (src/rtc.mjs); http: the home router addresses (GATEWAYS), only
+  // reached after the visitor allows local network access
+  "connect-src 'self' https: wss://rtc.1ms.dog:2087 " + GATEWAYS.map((ip) => 'http://' + ip).join(' '),
   "manifest-src 'self'", "object-src 'none'", "base-uri 'none'", "form-action 'none'", "frame-ancestors 'none'"].join('; ');
 
 // strings only the build uses (the page already shows them); everything else goes to the browser
 const BUILD_ONLY = new Set(['name', 'seo_title', 'seo_desc', 'seo_kw', 'og_sub', 'h1', 'docs', 'lang_label', 'faq_h', 'lead']);
-const LANES = ['device', 'direct', 'near', 'far', 'udp', 'svc'];
+const LANES = ['device', 'gw', 'direct', 'near', 'far', 'udp', 'svc'];
 
 export async function build({ check = false } = {}) {
   const I = await loadI18n(), en = I.en;
@@ -103,7 +105,11 @@ export async function build({ check = false } = {}) {
     const helpC = docs.map(([q, a], i) => `<article data-hqb="${i}"${i ? ' hidden' : ''}><h3>${esc(q)}</h3>${a.split(/\n+/).map((p) => `<p>${esc(p)}</p>`).join('')}</article>`).join('');
     const langOpts = langs.map(([l]) => `<option value="${l}"${l === lang ? ' selected' : ''}>${esc(I[l].name)}</option>`).join('');
     const paths = Object.fromEntries(langs.map(([l, sl]) => [l, path(sl)]));
-    const lanes = LANES.map((k) => `<li data-lane="${k}"${k === 'direct' ? ' hidden' : ''}><span class="ln-k" data-tip="${esc(T('lane_tip_' + k))}" tabindex="0">${esc(T('lane_' + k))}</span><span class="ln-st" data-st="none">${esc(T('st_none'))}</span><span class="ln-v">&nbsp;</span><span class="ln-tl"></span></li>`).join('');
+    // a lane: its name (with the followed services' icons and an edit button on the services lane), its state now
+    // (the numbers in that word's tooltip), and the timeline; under them the time axis
+    const edit = `<span class="ln-ic" id="svcIcons"></span><button class="ln-edit" id="svcEdit" type="button" aria-haspopup="dialog" aria-controls="svcs" aria-label="${esc(T('svc_edit'))}" data-tip="${esc(T('svc_edit'))}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.5 2.5l3 3L6 13H3v-3z"/></svg></button>`;
+    const lanes = LANES.map((k) => `<li data-lane="${k}"${k === 'direct' || k === 'gw' ? ' hidden' : ''}><span class="ln-h"><span class="ln-k" data-tip="${esc(T('lane_tip_' + k).replace('{ip}', ''))}" tabindex="0">${esc(T('lane_' + k))}</span>${k === 'svc' ? edit : ''}</span><span class="ln-st" data-st="none" tabindex="0">${esc(T('st_none'))}</span><span class="ln-tl"></span></li>`).join('') +
+      `<li class="axis" aria-hidden="true"><span></span><span></span><span class="ax"><em>${esc(T('ax_past'))}</em><em>${esc(T('ax_now'))}</em></span></li>`;
 
     const html = tpl
       .replace(/(<(\w+)\b[^>]*\sdata-i="(\w+)"[^>]*>)([^<]*)(<\/\2>)/g, (m, open, tag, k, inner, close) => open + esc(T(k)) + close)

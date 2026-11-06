@@ -10,8 +10,34 @@ let timers = [], busy = new Set(), seen = new Set(), lags = [];
 
 function stop() { timers.forEach(clearInterval); timers = []; busy.clear(); }
 
+// Fill the line for `secs` (or until `maxBytes`): parallel downloads from Cloudflare's speed test, counted as they
+// arrive, while the probes above keep timing. → { type: 'load', bytes, ms }
+async function load(url, secs, maxBytes, streams = 4) {
+  const end = performance.now() + secs * 1000, t0 = performance.now();
+  let bytes = 0;
+  const ctl = new AbortController();
+  const one = async () => {
+    while (performance.now() < end && bytes < maxBytes) {
+      try {
+        const r = await fetch(`${url}?bytes=50000000&_=${Math.random().toString(36).slice(2)}`, { cache: 'no-store', credentials: 'omit', signal: ctl.signal });
+        const rd = r.body.getReader();
+        for (;;) {
+          const { value, done } = await rd.read();
+          if (done) break;
+          bytes += value.byteLength;
+          if (performance.now() >= end || bytes >= maxBytes) { ctl.abort(); break; }
+        }
+      } catch { if (ctl.signal.aborted) return; await new Promise((r) => setTimeout(r, 200)); }
+    }
+  };
+  setTimeout(() => ctl.abort(), secs * 1000 + 500);
+  await Promise.all(Array.from({ length: streams }, one));
+  self.postMessage({ type: 'load', bytes, ms: performance.now() - t0 });
+}
+
 self.onmessage = ({ data }) => {
   if (data.cmd === 'stop') { stop(); return; }
+  if (data.cmd === 'load') { load(data.url, data.secs, data.maxBytes); return; }
   if (data.cmd !== 'start') return;
   stop();
   for (const p of data.plan) {

@@ -68,7 +68,8 @@ export function stunLoss(probes, base = null) {
 // ok · warn · bad · down (nothing answered) · none (not measured). floor: the best this target has done this
 // session (its window minimum), which stands in for the path's own length. near: a target that should be close,
 // so a high round trip alone is a problem.
-export function statusOf(w, { floor = null, near = false } = {}) {
+// lan: the home router, which answers in a few ms when the Wi-Fi is fine.
+export function statusOf(w, { floor = null, near = false, lan = false } = {}) {
   if (!w || !w.n) return { status: 'none' };
   if (!w.ok) return { status: 'down', why: ['timeouts'] };
   const f = floor ?? w.min;
@@ -80,7 +81,8 @@ export function statusOf(w, { floor = null, near = false } = {}) {
   if (fail >= 0.2) bad('timeouts'); else if (fail > 0) warn('timeouts');
   if (spread > Math.max(60, f)) bad('jitter'); else if (spread > Math.max(30, f * 0.5)) warn('jitter');
   if (excess > Math.max(50, f * 0.6)) bad('slower'); else if (excess > Math.max(25, f * 0.3)) warn('slower');
-  if (near) { if (w.med > 150) bad('far'); else if (w.med > 80) warn('far'); }
+  if (lan) { if (w.med > 80) bad('far'); else if (w.med > 30) warn('far'); }
+  else if (near) { if (w.med > 150) bad('far'); else if (w.med > 80) warn('far'); }
   return { status, why: [...new Set(why)] };
 }
 
@@ -106,7 +108,21 @@ const isBad = (s) => s === 'bad' || s === 'down';
 // }
 // → { key, conf: 1 low · 2 medium · 3 high, evidence: [{ k, … }] }
 // keys: ok · offline · hidden · device · local · proxy-entry · proxy-exit · crossborder · service · udp · udp-slow · unknown
+// With the home router measured (s.gw), "your side" splits: the router worse too = Wi-Fi or the home network;
+// the router fine = the ISP connection beyond it.
 export function attribute(s) {
+  const v = attributePath(s);
+  if (v.key === 'local' && s.gw && s.gw.status !== 'none') {
+    if (isBad(s.gw.status)) return { key: 'wifi', conf: Math.max(v.conf, 2), evidence: [{ k: 'gw-bad', gw: [s.gw] }, ...v.evidence] };
+    if (s.gw.status === 'ok') return { key: 'access', conf: Math.max(v.conf, 2), evidence: [{ k: 'gw-ok', gw: [s.gw] }, ...v.evidence] };
+  }
+  if (v.key === 'ok' && s.ipv6 && s.ipv4 && isBad(s.ipv6.status) && s.ipv4.status === 'ok') {
+    return { key: 'ipv6', conf: s.ipv6.status === 'down' ? 3 : 2, evidence: [{ k: 'ipv6-bad', lossPct: s.ipv6.lossPct, status: s.ipv6.status }, { k: 'ipv4-ok', lossPct: s.ipv4.lossPct }] };
+  }
+  return v;
+}
+
+function attributePath(s) {
   const ev = [];
   const bads = (arr) => arr.filter((t) => isBad(t.status));
   const share = (arr) => (arr.length ? bads(arr).length / arr.length : 0);
@@ -196,6 +212,13 @@ export function gaming({ spikes, minutes, loss, jitter }) {
   const level = per10 <= 2 && (loss ?? 0) < 1 && (jitter ?? 0) < 15 ? 'good' : per10 <= 6 && (loss ?? 0) < 3 && (jitter ?? 0) < 30 ? 'fair' : 'poor';
   return { per10, level };
 }
+
+// Loaded latency: how much the round trip rises while the line is full (bufferbloat), graded on Waveform's scale
+export function bloatGrade(rise) {
+  if (rise == null) return null;
+  return rise < 5 ? 'A+' : rise < 30 ? 'A' : rise < 60 ? 'B' : rise < 200 ? 'C' : rise < 400 ? 'D' : 'F';
+}
+export const bloatLevel = (g) => (g == null ? null : g === 'A+' || g === 'A' ? 'good' : g === 'B' || g === 'C' ? 'fair' : 'poor');
 
 // Pages: setting up a connection (DNS, TCP, TLS, any proxy hop) to the nearest location
 export const pageLevel = (setupMs) => (setupMs == null ? null : setupMs < 250 ? 'good' : setupMs < 600 ? 'fair' : 'poor');
