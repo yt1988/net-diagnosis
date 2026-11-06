@@ -31,7 +31,7 @@ test('a long run keeps its worst moments when squeezed', () => {
 
 test('codes it cannot read are refused', () => {
   const c = encode(R);
-  for (const bad of ['', '1~bad', c.replace('~service~', '~nope~'), c.replace(/~[ndp]$/, '~z'), '2' + c.slice(1), c + '~x', c.replace('.ooo', '.oqo')])
+  for (const bad of ['', '1~bad', c.replace('~service~', '~nope~'), c.replace(/~[ndp]$/, '~z'), '2' + c.slice(1), c + '~x', c.replace('.owb.', '.oqb.')])
     assert.equal(decode(bad), null, bad);
 });
 
