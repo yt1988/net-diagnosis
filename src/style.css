@@ -44,7 +44,14 @@ body[data-run="on"] .go { background: linear-gradient(90deg, var(--ink) calc(var
 .verdict[data-lv="bad"] .v-h { color: var(--bad); }
 .verdict[data-lv="warn"] .v-h { color: var(--warn); }
 .verdict[data-lv="idle"] .v-h, .verdict[data-lv="run"] .v-h { color: var(--muted); font-weight: 600; }   /* same size as a verdict: the box keeps its height */
-.v-sub { margin-top: -10px; display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 14px; font-size: 12.5px; color: var(--muted); }
+.v-sub { margin-top: -10px; min-height: 32px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 14px; font-size: 12.5px; color: var(--muted); }
+/* share: right by the verdict, once there is one */
+.share-b { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 14px; border: 1px solid var(--ink); border-radius: 999px; background: var(--ink-soft); color: var(--ink); font: 600 13px var(--f-ui); cursor: pointer; }
+.share-b svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.share-b:hover { background: var(--ink); color: var(--ink-fg); }
+.share-b[hidden] { display: none; }
+/* someone else's result: no button to start, no timeline axis "now" */
+body[data-shared] .lanes .ln-edit { display: none; }
 .v-exit { overflow-wrap: anywhere; }
 .v-exit:empty { display: none; }
 .nums, .fit { list-style: none; margin: 0; padding: 0; display: grid; width: 100%; }
@@ -66,7 +73,11 @@ body[data-run="on"] .go { background: linear-gradient(90deg, var(--ink) calc(var
 .fit li[data-lv="fair"] b { color: var(--warn); }
 .fit li[data-lv="poor"] b { color: var(--bad); }
 .fit li .lnk { margin-top: -2px; }
-.fit li .lnk[hidden] + * { display: none; }
+.fit li .lnk[hidden] { display: none; }
+.lnk.xl { display: inline-flex; align-items: center; gap: 3px; text-decoration: none; }
+.lnk.xl svg { width: 11px; height: 11px; }
+.lnk.xl:hover { text-decoration: underline; }
+body[data-shared] #loadBtn, body[data-shared] #udpxBtn { display: none; }
 .sug[data-on=""] { visibility: hidden; }
 .sug-h { font-size: 12.5px; font-weight: 650; color: var(--ink); margin-bottom: 6px; }
 .sug ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; font-size: 13.5px; line-height: 1.55; }

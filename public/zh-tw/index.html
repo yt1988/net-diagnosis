@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="zh-TW" data-paths="{&quot;en&quot;:&quot;/&quot;,&quot;zh-CN&quot;:&quot;/zh-cn/&quot;,&quot;zh-TW&quot;:&quot;/zh-tw/&quot;,&quot;ja&quot;:&quot;/ja/&quot;,&quot;ko&quot;:&quot;/ko/&quot;,&quot;es&quot;:&quot;/es/&quot;,&quot;fr&quot;:&quot;/fr/&quot;,&quot;de&quot;:&quot;/de/&quot;,&quot;pt&quot;:&quot;/pt/&quot;,&quot;ru&quot;:&quot;/ru/&quot;}">
+<head>
+<meta charset="utf-8">
+<script>(function(){var d=document.documentElement,th=null,s=null;try{th=localStorage.getItem("netdiag:theme");s=localStorage.getItem("netdiag:lang")}catch(e){}if(th==="light"||th==="dark")d.setAttribute("data-theme",th);if(!d.hasAttribute("data-root"))return;var P=JSON.parse(d.getAttribute("data-paths")||"{}"),l=null;try{var q=new URLSearchParams(location.search).get("lang");if(P[q])l=q}catch(e){}if(!l&&P[s])l=s;for(var ls=navigator.languages||[navigator.language||"en"],i=0;!l&&!s&&i<ls.length;i++){var x=String(ls[i]).toLowerCase(),b=x.split("-")[0];l=b==="zh"?(/tw|hk|mo|hant/.test(x)?"zh-TW":"zh-CN"):P[b]?b:null}if(l&&l!=="en"&&P[l])location.replace(P[l]+location.search+location.hash)})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>網路診斷：網路卡卡的，是哪一段出問題？Wi‑Fi、寬頻、代理還是服務 · 1ms.dog</title>
+<meta name="description" content="在瀏覽器裡同時測近處、遠處、UDP 和常用服務，判斷卡頓出在裝置、Wi‑Fi 和寬頻、跨境線路、代理節點，還是某個服務。估算 UDP 掉包，看出 UDP 是否被限速，並替通話和遊戲打分。免安裝，手機也能用，不收集資料。">
+<meta name="keywords" content="網路診斷,網路卡頓檢測,掉包測試,抖動測試,UDP 掉包,網路延遲檢測,ping 測試,網路很慢">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="application-name" content="網路診斷">
+<meta name="theme-color" content="#f6f6f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1c1c1c" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://lag.1ms.dog/zh-tw/">
+<link rel="alternate" hreflang="en" href="https://lag.1ms.dog/">
+<link rel="alternate" hreflang="zh-CN" href="https://lag.1ms.dog/zh-cn/">
+<link rel="alternate" hreflang="zh-TW" href="https://lag.1ms.dog/zh-tw/">
+<link rel="alternate" hreflang="ja" href="https://lag.1ms.dog/ja/">
+<link rel="alternate" hreflang="ko" href="https://lag.1ms.dog/ko/">
+<link rel="alternate" hreflang="es" href="https://lag.1ms.dog/es/">
+<link rel="alternate" hreflang="fr" href="https://lag.1ms.dog/fr/">
+<link rel="alternate" hreflang="de" href="https://lag.1ms.dog/de/">
+<link rel="alternate" hreflang="pt" href="https://lag.1ms.dog/pt/">
+<link rel="alternate" hreflang="ru" href="https://lag.1ms.dog/ru/">
+<link rel="alternate" hreflang="x-default" href="https://lag.1ms.dog/">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="1ms.dog">
+<meta property="og:title" content="網路診斷：網路卡卡的，是哪一段出問題？Wi‑Fi、寬頻、代理還是服務 · 1ms.dog">
+<meta property="og:description" content="卡頓出在哪一段：裝置、Wi‑Fi 和寬頻、跨境線路、代理還是服務">
+<meta property="og:url" content="https://lag.1ms.dog/zh-tw/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://lag.1ms.dog/og/zh-tw.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="網路診斷：網路卡卡的，是哪一段出問題？Wi‑Fi、寬頻、代理還是服務 · 1ms.dog">
+<meta name="twitter:description" content="卡頓出在哪一段：裝置、Wi‑Fi 和寬頻、跨境線路、代理還是服務">
+<meta name="twitter:image" content="https://lag.1ms.dog/og/zh-tw.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"網路診斷 · 1ms.dog","url":"https://lag.1ms.dog/zh-tw/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"在瀏覽器裡同時測近處、遠處、UDP 和常用服務，判斷卡頓出在裝置、Wi‑Fi 和寬頻、跨境線路、代理節點，還是某個服務。估算 UDP 掉包，看出 UDP 是否被限速，並替通話和遊戲打分。免安裝，手機也能用，不收集資料。","inLanguage":"zh-TW","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"它怎麼判斷問題出在哪一段？","acceptedAnswer":{"@type":"Answer","text":"頁面同時測幾條路：最近的 Cloudflare 節點、東京、法蘭克福和維吉尼亞的雲端區域、你選的服務，以及向公共 STUN 伺服器送 UDP。每 5 秒比較一次：所有路同時變差，問題在你這一端（Wi‑Fi、路由器、寬頻）；近處正常只有遠處變差，問題在跨境或遠端線路；只有一個服務變差，是那個服務本身的問題；網頁正常但 UDP 掉包，遊戲和通話會卡。 每個結論都會列出依據和把握程度。"}},{"@type":"Question","name":"開著代理時還準嗎？","acceptedAnswer":{"@type":"Answer","text":"可以分開看。在中國大陸開著代理時，頁面用中國大陸網站（不經過代理）代表你自己的寬頻，用經代理到最近的 Cloudflare 節點代表到代理節點這一段，再用遠處的雲端區域代表節點之後的路。三者一比，就知道是寬頻、到節點的線路，還是節點之後的問題。代理軟體用 TUN 或 fake-ip 模式時，UDP 也可能被代理接管，結論會標出把握程度。"}},{"@type":"Question","name":"UDP 掉包是怎麼測的？","acceptedAnswer":{"@type":"Answer","text":"瀏覽器不能直接送 UDP 封包，所以頁面向公共 STUN 伺服器（Cloudflare、Google，中國大陸使用者還有小米和嗶哩嗶哩）詢問自己的對外位址，每問一次就是一次 UDP 來回。請求掉了，瀏覽器會在 250 毫秒後重送，回答就會晚一截；數出這樣的回答，就能估算掉包率。我們在伺服器上故意丟 2%、5%、10% 的封包驗證過，測出來分別是 1–2%、4–5%、8–9%。 每個伺服器每分鐘大約 80 個回答，所以準確的百分比需要幾分鐘以上的資料。"}},{"@type":"Question","name":"為什麼不能告訴我是第幾個節點？","acceptedAnswer":{"@type":"Answer","text":"網頁不能送 ICMP，也做不了 traceroute，所以只能把路徑分段判斷，沒辦法點名是哪一台路由器。分段判斷已經能回答大部分問題：是 Wi‑Fi 和寬頻、跨境線路、代理，還是對方的服務。"}},{"@type":"Question","name":"診斷和持續監控有什麼不同？","acceptedAnswer":{"@type":"Answer","text":"診斷測 2 分鐘，20 秒先給出初步結論，回答「現在卡不卡、卡在哪」。持續監控一直測到你按停止：每段路徑每 5 秒記一格，變差超過 10 秒就記成一個事件，斷線、網路類型和對外位址的變化也會記下來。問題時好時壞時，開著持續監控去做別的事，回來看事件紀錄，就知道是哪一段、什麼時候、持續多久。頁面放在背景也會繼續測。"}},{"@type":"Question","name":"「路由器」這一列是怎麼來的？","acceptedAnswer":{"@type":"Answer","text":"開始測量時，頁面會在幾個常見位址上找你家的路由器，找到就多一列「路由器」。這樣「你這一端」的問題就能再分成兩種：到路由器也變差，是 Wi‑Fi 或家裡的網路；路由器正常而外面變差，是寬頻線路。Chrome 會先問你是否允許這個頁面存取區域網路，允許後才會測；其他瀏覽器暫時不支援，就沒有這一列。"}},{"@type":"Question","name":"會上傳我的資料嗎？","acceptedAnswer":{"@type":"Answer","text":"不會。所有請求都從你的瀏覽器直接送往被測的網站和 STUN 伺服器，結果只留在這個頁面裡，關掉就沒了。 分享結果時，連結裡只有結論、數字和各段的狀態，不含 IP 位址；勾選後才會帶上國家和 Cloudflare 節點。"}}]}]}</script>
+<link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/app.452a252ccb.css">
+</head>
+<body data-sel="diag">
+<div class="app">
+  <header class="top">
+    <a class="brand" href="/zh-tw/" aria-current="page">
+      <span class="logo"><img class="logo-light" src="/assets/logo-light.svg" width="90" height="36" alt="1ms.dog" loading="lazy"><img class="logo-dark" src="/assets/logo-dark.svg" width="90" height="36" alt="1ms.dog" loading="lazy"></span>
+      <span class="brand-name" data-i="app_name">網路診斷</span>
+    </a>
+    <div class="top-acts">
+      <label class="sel"><span class="sr" data-i="lang_label">語言</span>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c2 2 2.8 4 2.8 6.5S10 12.5 8 14.5C6 12.5 5.2 10.5 5.2 8S6 3.5 8 1.5z"/></svg>
+        <select id="lang"><option value="en">English</option><option value="zh-CN">简体中文</option><option value="zh-TW" selected>繁體中文</option><option value="ja">日本語</option><option value="ko">한국어</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="pt">Português</option><option value="ru">Русский</option></select>
+      </label>
+      <button class="icon-btn" id="helpBtn" type="button" aria-haspopup="dialog" aria-controls="help"><span class="sr" data-i="faq_h">說明</span>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><path d="M6.3 6.2a1.8 1.8 0 1 1 2.5 1.7c-.5.2-.8.6-.8 1.1v.4M8 11.3v.1"/></svg>
+      </button>
+      <a class="icon-btn gh" href="https://github.com/yt1988/net-diagnosis" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7 0-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.4 7.4 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.7-3.6 3.9.3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2z"/></svg></a>
+      <button class="icon-btn" id="theme" type="button" aria-label="切換主題">
+        <svg class="i-sys" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="9" rx="1.5"/><path d="M5.5 14h5M8 11.5V14"/></svg>
+        <svg class="i-light" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1v1.6M8 13.4V15M1 8h1.6M13.4 8H15M3 3l1.1 1.1M11.9 11.9 13 13M3 13l1.1-1.1M11.9 4.1 13 3"/></svg>
+        <svg class="i-dark" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 9.8A5.8 5.8 0 0 1 6.2 2.5a5.8 5.8 0 1 0 7.3 7.3z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero card">
+      <h1>網路卡卡的，問題出在哪一段？</h1>
+      <p class="lead" data-i="lead">在你自己的瀏覽器裡，同時測近處、遠處、UDP 和常用服務，找出卡頓出在哪一段。</p>
+      <!-- the two modes are the tool: a diagnosis, or monitoring that keeps going until Stop -->
+      <div class="modes" role="radiogroup" aria-label="模式">
+        <button type="button" role="radio" data-mode="diag" aria-checked="true"><b data-i="mode_diag">診斷</b><span data-i="mode_diag_s">2 分鐘找出問題</span></button>
+        <button type="button" role="radio" data-mode="mon" aria-checked="false"><b data-i="mode_mon">持續監控</b><span data-i="mode_mon_s">出問題就記下來</span></button>
+      </div>
+      <div class="go-row">
+        <button class="go" id="go" type="button"><span class="go-t" id="goT" data-i="start">開始</span><span class="go-n" id="goN"></span></button>
+        <button class="icon-btn bell" id="ntf" type="button" aria-pressed="false" aria-label="通知" data-tip="出問題時跳出桌面通知">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 11.5V7a4 4 0 1 1 8 0v4.5l1.2 1.5H2.8zM6.5 14.2a1.6 1.6 0 0 0 3 0"/></svg>
+        </button>
+      </div>
+
+      <!-- the verdict: one sentence, how sure and where it exits, 3 numbers, evidence, what it means for calls, games,
+           pages and a full line, and what to try. Every part keeps its space, so nothing moves when it fills. -->
+      <div class="verdict" id="verdict" data-lv="idle" aria-live="polite">
+        <p class="v-h" id="vH" data-i="v_idle">按「開始」：測 2 分鐘，20 秒後先給出初步結論</p>
+        <p class="v-sub"><span id="vState">&nbsp;</span><span class="v-exit" id="vExit"></span><button class="share-b" id="shareBtn" type="button" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 10.5V2M5 4.8 8 2l3 2.8M3.5 8.5v5h9v-5"/></svg><span data-i="share">分享</span></button></p>
+        <ul class="nums">
+          <li data-c="near"><span data-i="k_near">近處延遲</span><b>–</b></li>
+          <li data-c="jitter"><span data-i="k_jitter">抖動</span><b>–</b></li>
+          <li data-c="udp"><span data-i="k_udp">UDP 掉包</span><b>–</b><button class="lnk sm" id="udpxBtn" type="button" data-tip="向 1ms.dog 在東京的測試伺服器連續送 20 秒 UDP 封包，分別算出去程和回程的掉包，再看 QUIC（HTTP/3 用的 UDP）能不能通。" data-i="udpx_btn">精確測一下（20 秒）</button></li>
+        </ul>
+        <div class="v-body">
+          <ul class="fit">
+            <li data-s="call"><span class="fit-k" data-tip="視訊通話品質評分（MOS），1 到 5 分，依延遲、抖動和掉包算出。4 分以上清楚流暢；3.6 到 4 分偶爾有雜音或延遲；3.6 分以下會卡頓、斷斷續續。" tabindex="0" data-i="sc_call">視訊通話</span><b>–</b><em>&nbsp;</em></li>
+            <li data-s="game"><span class="fit-k" data-tip="延遲比平常高出 100 ms 以上，或 UDP 封包要重送，就算卡一次。每 10 分鐘 2 次以內算好，6 次以上算差。" tabindex="0" data-i="sc_game">線上遊戲</span><b>–</b><em>&nbsp;</em></li>
+            <li data-s="page"><span class="fit-k" data-tip="開一個新網站時，建立連線（DNS、TCP、TLS）花的時間。250 ms 以內算好，600 ms 以上算差。" tabindex="0" data-i="sc_page">開網頁</span><b>–</b><em>&nbsp;</em></li>
+            <li data-s="load"><span class="fit-k" data-tip="同時下載 10 秒、把頻寬塞滿，看延遲漲多少（緩衝膨脹）。漲得多，家裡有人下載時，打遊戲、開會就會卡。會用掉一些流量，快的寬頻可能上百 MB。等級採用 Waveform 的標準：A+ 少於 5 ms，A 少於 30，B 少於 60，C 少於 200，D 少於 400，再多是 F。" tabindex="0" data-i="sc_load">滿載延遲</span><b>–</b><em>&nbsp;</em><button class="lnk sm" id="loadBtn" type="button" data-i="load_btn">測一下（10 秒）</button><a class="lnk sm xl" id="speedLnk" target="_blank" rel="noopener" hidden><span data-i="to_speed">測一下網速</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2.5h4.5V7M13.5 2.5 7.5 8.5M12 10v3.5H2.5V4H6"/></svg></a></li>
+          </ul>
+          <!-- why, and what to try: side by side, 3 lines each reserved, so the box keeps its height -->
+          <div class="v-two">
+            <div class="evc" id="evc" data-on=""><p class="sug-h" data-i="ev_h">依據</p><ul class="ev" id="ev"></ul></div>
+            <div class="sug" id="sug" data-on=""><p class="sug-h" data-i="sug_h">可以這樣做</p><ul id="sugL"></ul></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- every part of the path, one lane each: its state now and the last 6 minutes in 5-second windows -->
+    <section class="card lanes-c">
+      <div class="sec-h">
+        <h2 data-i="lanes_h">各段路徑</h2>
+        <ul class="legend" aria-hidden="true">
+          <li data-st="ok"><i></i><span data-i="st_ok">正常</span></li>
+          <li data-st="warn"><i></i><span data-i="st_warn">普通</span></li>
+          <li data-st="bad"><i></i><span data-i="st_bad">變差</span></li>
+          <li data-st="gap"><i></i><span data-i="st_gap">未測</span></li>
+        </ul>
+      </div>
+      <ul class="lanes"><li data-lane="device"><span class="ln-h"><span class="ln-k" data-tip="頁面計時器是否準時：裝置或瀏覽器太忙時，測出的數字不可信" tabindex="0">裝置</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="gw" hidden><span class="ln-h"><span class="ln-k" data-tip="你家的路由器 ：只隔著 Wi‑Fi 或網路線，正常時只要幾毫秒。它也變差，就是 Wi‑Fi 或家裡網路的問題" tabindex="0">路由器</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="direct" hidden><span class="ln-h"><span class="ln-k" data-tip="中國大陸網站（不經過代理）：代表你自己的寬頻" tabindex="0">中國大陸直連</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="near"><span class="ln-h"><span class="ln-k" data-tip="最近的 Cloudflare 節點：代表你的 Wi‑Fi、路由器和寬頻線路" tabindex="0">近處</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="far"><span class="ln-h"><span class="ln-k" data-tip="東京、法蘭克福、維吉尼亞的雲端區域：跨境和遠端線路" tabindex="0">遠處</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="udp"><span class="ln-h"><span class="ln-k" data-tip="向公共 STUN 伺服器詢問位址：UDP 來回和掉包，遊戲和通話用的就是 UDP" tabindex="0">UDP</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="svc"><span class="ln-h"><span class="ln-k" data-tip="你選的常用服務：只有它們變差，就是服務本身的問題" tabindex="0">常用服務</span><span class="ln-ic" id="svcIcons"></span><button class="ln-edit" id="svcEdit" type="button" aria-haspopup="dialog" aria-controls="svcs" aria-label="編輯常用服務" data-tip="編輯常用服務"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.5 2.5l3 3L6 13H3v-3z"/></svg></button></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li class="axis" aria-hidden="true"><span></span><span></span><span class="ax"><em>6 分鐘前</em><em>現在</em></span></li></ul>
+    </section>
+
+    <section class="card inc-c" id="incC" hidden>
+      <h2 data-i="inc_h">事件紀錄</h2>
+      <ol class="inc" id="inc"></ol>
+    </section>
+
+    <div data-ms-more></div>
+  </main>
+</div>
+
+<div class="scrim" id="svcs" hidden>
+  <div class="dialog svcs" role="dialog" aria-modal="true" aria-labelledby="svcsT">
+    <div class="dlg-h"><h2 id="svcsT" data-i="svc_h">常用服務</h2>
+      <button class="icon-btn" data-close type="button" aria-label="關閉"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
+    <div class="dlg-b">
+      <div class="chips" id="svcList"></div>
+      <form class="svc-add" id="svcForm" autocomplete="off">
+        <input id="svcIn" type="text" inputmode="url" placeholder="新增網站，例如 example.com" aria-label="新增網站，例如 example.com" spellcheck="false">
+        <button class="btn" type="submit" data-i="svc_add">新增</button>
+      </form>
+      <p class="err" id="svcErr" aria-live="polite"></p>
+      <p class="note" data-i="svc_note">點名稱選擇要測的服務。測的是網站的 favicon；少數網站要先經過應用伺服器才回傳它，測出的延遲會偏高。新增的網站只存在這個瀏覽器裡。</p>
+    </div>
+  </div>
+</div>
+<div class="scrim" id="help" hidden>
+  <div class="dialog help" role="dialog" aria-modal="true" aria-labelledby="helpT">
+    <div class="dlg-h"><h2 id="helpT" data-i="faq_h">說明</h2>
+      <button class="icon-btn" data-close type="button" aria-label="關閉"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
+    <div class="help-b">
+      <nav class="help-nav" id="helpNav" role="tablist"><button type="button" role="tab" data-hq="0" aria-selected="true">它怎麼判斷問題出在哪一段？</button><button type="button" role="tab" data-hq="1" aria-selected="false">開著代理時還準嗎？</button><button type="button" role="tab" data-hq="2" aria-selected="false">UDP 掉包是怎麼測的？</button><button type="button" role="tab" data-hq="3" aria-selected="false">為什麼不能告訴我是第幾個節點？</button><button type="button" role="tab" data-hq="4" aria-selected="false">診斷和持續監控有什麼不同？</button><button type="button" role="tab" data-hq="5" aria-selected="false">「路由器」這一列是怎麼來的？</button><button type="button" role="tab" data-hq="6" aria-selected="false">會上傳我的資料嗎？</button></nav>
+      <div class="help-pick">
+        <button class="icon-btn" type="button" data-hstep="-1" aria-label="上一則"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 4L6 8l4 4"/></svg></button>
+        <select id="helpSel" aria-labelledby="helpT"></select>
+        <button class="icon-btn" type="button" data-hstep="1" aria-label="下一則"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4"/></svg></button>
+      </div>
+      <div class="help-c" id="helpC"><article data-hqb="0"><h3>它怎麼判斷問題出在哪一段？</h3><p>頁面同時測幾條路：最近的 Cloudflare 節點、東京、法蘭克福和維吉尼亞的雲端區域、你選的服務，以及向公共 STUN 伺服器送 UDP。每 5 秒比較一次：所有路同時變差，問題在你這一端（Wi‑Fi、路由器、寬頻）；近處正常只有遠處變差，問題在跨境或遠端線路；只有一個服務變差，是那個服務本身的問題；網頁正常但 UDP 掉包，遊戲和通話會卡。</p><p>每個結論都會列出依據和把握程度。</p></article><article data-hqb="1" hidden><h3>開著代理時還準嗎？</h3><p>可以分開看。在中國大陸開著代理時，頁面用中國大陸網站（不經過代理）代表你自己的寬頻，用經代理到最近的 Cloudflare 節點代表到代理節點這一段，再用遠處的雲端區域代表節點之後的路。三者一比，就知道是寬頻、到節點的線路，還是節點之後的問題。代理軟體用 TUN 或 fake-ip 模式時，UDP 也可能被代理接管，結論會標出把握程度。</p></article><article data-hqb="2" hidden><h3>UDP 掉包是怎麼測的？</h3><p>瀏覽器不能直接送 UDP 封包，所以頁面向公共 STUN 伺服器（Cloudflare、Google，中國大陸使用者還有小米和嗶哩嗶哩）詢問自己的對外位址，每問一次就是一次 UDP 來回。請求掉了，瀏覽器會在 250 毫秒後重送，回答就會晚一截；數出這樣的回答，就能估算掉包率。我們在伺服器上故意丟 2%、5%、10% 的封包驗證過，測出來分別是 1–2%、4–5%、8–9%。</p><p>每個伺服器每分鐘大約 80 個回答，所以準確的百分比需要幾分鐘以上的資料。</p></article><article data-hqb="3" hidden><h3>為什麼不能告訴我是第幾個節點？</h3><p>網頁不能送 ICMP，也做不了 traceroute，所以只能把路徑分段判斷，沒辦法點名是哪一台路由器。分段判斷已經能回答大部分問題：是 Wi‑Fi 和寬頻、跨境線路、代理，還是對方的服務。</p></article><article data-hqb="4" hidden><h3>診斷和持續監控有什麼不同？</h3><p>診斷測 2 分鐘，20 秒先給出初步結論，回答「現在卡不卡、卡在哪」。持續監控一直測到你按停止：每段路徑每 5 秒記一格，變差超過 10 秒就記成一個事件，斷線、網路類型和對外位址的變化也會記下來。問題時好時壞時，開著持續監控去做別的事，回來看事件紀錄，就知道是哪一段、什麼時候、持續多久。頁面放在背景也會繼續測。</p></article><article data-hqb="5" hidden><h3>「路由器」這一列是怎麼來的？</h3><p>開始測量時，頁面會在幾個常見位址上找你家的路由器，找到就多一列「路由器」。這樣「你這一端」的問題就能再分成兩種：到路由器也變差，是 Wi‑Fi 或家裡的網路；路由器正常而外面變差，是寬頻線路。Chrome 會先問你是否允許這個頁面存取區域網路，允許後才會測；其他瀏覽器暫時不支援，就沒有這一列。</p></article><article data-hqb="6" hidden><h3>會上傳我的資料嗎？</h3><p>不會。所有請求都從你的瀏覽器直接送往被測的網站和 STUN 伺服器，結果只留在這個頁面裡，關掉就沒了。</p><p>分享結果時，連結裡只有結論、數字和各段的狀態，不含 IP 位址；勾選後才會帶上國家和 Cloudflare 節點。</p></article></div>
+    </div>
+  </div>
+</div>
+
+<script type="application/json" id="data">{"lang":"zh-TW","paths":{"en":"/","zh-CN":"/zh-cn/","zh-TW":"/zh-tw/","ja":"/ja/","ko":"/ko/","es":"/es/","fr":"/fr/","de":"/de/","pt":"/pt/","ru":"/ru/"},"worker":"/assets/w.f2f31b8fe6.js"}</script>
+<script src="/assets/l.zh-tw.811a0e01b6.js"></script>
+<script src="/assets/app.c5d9635b01.js"></script>
+</body>
+</html>

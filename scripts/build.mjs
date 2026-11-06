@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { build as bundle, transform } from 'esbuild';
 import { ORIGINS, GATEWAYS } from '../src/targets.mjs';
 
-const SITE = (process.env.SITE_URL || 'https://diag.1ms.dog').replace(/\/+$/, '');
+const SITE = (process.env.SITE_URL || 'https://lag.1ms.dog').replace(/\/+$/, '');
 const pub = new URL('../public/', import.meta.url), src = new URL('../src/', import.meta.url);
 // language, URL folder, og:locale; the first is the root
 export const LANGS = [['en', '', 'en_US'], ['zh-CN', 'zh-cn', 'zh_CN'], ['zh-TW', 'zh-tw', 'zh_TW'], ['ja', 'ja', 'ja_JP'], ['ko', 'ko', 'ko_KR'],
@@ -37,7 +37,7 @@ async function loadI18n() {
 // Any https host: visitors add their own services (timed through the site's favicon, which is also its icon).
 // ORIGINS (the built-in hosts) is documentation for what the page measures by default.
 void ORIGINS;
-const cspOf = () => ["default-src 'self'", `script-src 'self' 'sha256-${sha(PREPAINT)}'`, "worker-src 'self'", "style-src 'self' 'unsafe-inline'", "font-src 'self'", "img-src 'self' data: https:",
+const cspOf = () => ["default-src 'self'", `script-src 'self' 'sha256-${sha(PREPAINT)}'`, "worker-src 'self'", "style-src 'self' 'unsafe-inline'", "font-src 'self'", "img-src 'self' data: blob: https:",
   // https: any service; wss: rtc.1ms.dog's echo (src/rtc.mjs); http: the home router addresses (GATEWAYS), only
   // reached after the visitor allows local network access
   "connect-src 'self' https: wss://rtc.1ms.dog:2087 " + GATEWAYS.map((ip) => 'http://' + ip).join(' '),
@@ -96,8 +96,10 @@ export async function build({ check = false } = {}) {
       `<meta property="og:type" content="website">`, `<meta property="og:site_name" content="1ms.dog">`,
       `<meta property="og:title" content="${esc(T('seo_title'))}">`, `<meta property="og:description" content="${esc(T('og_sub'))}">`, `<meta property="og:url" content="${url}">`,
       `<meta property="og:locale" content="${locale}">`,
+      `<meta property="og:image" content="${SITE}/og/${lang.toLowerCase()}.png">`, '<meta property="og:image:width" content="1200">', '<meta property="og:image:height" content="630">',
       '<meta name="twitter:card" content="summary_large_image">',
       `<meta name="twitter:title" content="${esc(T('seo_title'))}">`, `<meta name="twitter:description" content="${esc(T('og_sub'))}">`,
+      `<meta name="twitter:image" content="${SITE}/og/${lang.toLowerCase()}.png">`,
       `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }).replace(/</g, '\\u003c')}</script>`,
     ].join('\n');
 
@@ -136,7 +138,8 @@ export async function build({ check = false } = {}) {
 > visitor's side (Wi-Fi, router, ISP); near fine, far worse = long-haul route; one service worse = that service;
 > UDP losing while HTTPS is fine = games and calls will stutter. With a proxy in mainland China, domestic sites stand
 > for the visitor's own line and Cloudflare through the proxy for the way to the proxy server. 20-second verdict,
-> then optional monitoring with an incident log. Nothing is sent to this site.
+> then optional monitoring with an incident log. Nothing is sent to this site. A result can be shared as a link
+> (/r/<code>) that holds the verdict, the numbers and each lane's states, never an address.
 
 - Page: ${SITE}/ (also ${langs.slice(1).map(([, s]) => '/' + s + '/').join(', ')})
 - Source code: https://github.com/yt1988/net-diagnosis
@@ -163,6 +166,11 @@ export async function build({ check = false } = {}) {
 /assets/fonts/*
   ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
+/assets/share/*
+  ! Cache-Control
+  Cache-Control: public, max-age=0, must-revalidate
+/og/*
+  Cache-Control: public, max-age=604800
 /llms.txt
   Access-Control-Allow-Origin: *
   Content-Type: text/plain; charset=utf-8

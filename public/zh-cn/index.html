@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN" data-paths="{&quot;en&quot;:&quot;/&quot;,&quot;zh-CN&quot;:&quot;/zh-cn/&quot;}">
+<html lang="zh-CN" data-paths="{&quot;en&quot;:&quot;/&quot;,&quot;zh-CN&quot;:&quot;/zh-cn/&quot;,&quot;zh-TW&quot;:&quot;/zh-tw/&quot;,&quot;ja&quot;:&quot;/ja/&quot;,&quot;ko&quot;:&quot;/ko/&quot;,&quot;es&quot;:&quot;/es/&quot;,&quot;fr&quot;:&quot;/fr/&quot;,&quot;de&quot;:&quot;/de/&quot;,&quot;pt&quot;:&quot;/pt/&quot;,&quot;ru&quot;:&quot;/ru/&quot;}">
 <head>
 <meta charset="utf-8">
 <script>(function(){var d=document.documentElement,th=null,s=null;try{th=localStorage.getItem("netdiag:theme");s=localStorage.getItem("netdiag:lang")}catch(e){}if(th==="light"||th==="dark")d.setAttribute("data-theme",th);if(!d.hasAttribute("data-root"))return;var P=JSON.parse(d.getAttribute("data-paths")||"{}"),l=null;try{var q=new URLSearchParams(location.search).get("lang");if(P[q])l=q}catch(e){}if(!l&&P[s])l=s;for(var ls=navigator.languages||[navigator.language||"en"],i=0;!l&&!s&&i<ls.length;i++){var x=String(ls[i]).toLowerCase(),b=x.split("-")[0];l=b==="zh"?(/tw|hk|mo|hant/.test(x)?"zh-TW":"zh-CN"):P[b]?b:null}if(l&&l!=="en"&&P[l])location.replace(P[l]+location.search+location.hash)})();</script>
@@ -14,24 +14,36 @@
 <meta name="application-name" content="网络诊断">
 <meta name="theme-color" content="#f6f6f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1c1c1c" media="(prefers-color-scheme: dark)">
-<link rel="canonical" href="https://diag.1ms.dog/zh-cn/">
-<link rel="alternate" hreflang="en" href="https://diag.1ms.dog/">
-<link rel="alternate" hreflang="zh-CN" href="https://diag.1ms.dog/zh-cn/">
-<link rel="alternate" hreflang="x-default" href="https://diag.1ms.dog/">
+<link rel="canonical" href="https://lag.1ms.dog/zh-cn/">
+<link rel="alternate" hreflang="en" href="https://lag.1ms.dog/">
+<link rel="alternate" hreflang="zh-CN" href="https://lag.1ms.dog/zh-cn/">
+<link rel="alternate" hreflang="zh-TW" href="https://lag.1ms.dog/zh-tw/">
+<link rel="alternate" hreflang="ja" href="https://lag.1ms.dog/ja/">
+<link rel="alternate" hreflang="ko" href="https://lag.1ms.dog/ko/">
+<link rel="alternate" hreflang="es" href="https://lag.1ms.dog/es/">
+<link rel="alternate" hreflang="fr" href="https://lag.1ms.dog/fr/">
+<link rel="alternate" hreflang="de" href="https://lag.1ms.dog/de/">
+<link rel="alternate" hreflang="pt" href="https://lag.1ms.dog/pt/">
+<link rel="alternate" hreflang="ru" href="https://lag.1ms.dog/ru/">
+<link rel="alternate" hreflang="x-default" href="https://lag.1ms.dog/">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="1ms.dog">
 <meta property="og:title" content="网络诊断：网卡了是哪一段的问题？Wi‑Fi、宽带、代理还是服务 · 1ms.dog">
 <meta property="og:description" content="卡顿出在哪一段：设备、Wi‑Fi 和宽带、跨境线路、代理还是服务">
-<meta property="og:url" content="https://diag.1ms.dog/zh-cn/">
+<meta property="og:url" content="https://lag.1ms.dog/zh-cn/">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lag.1ms.dog/og/zh-cn.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="网络诊断：网卡了是哪一段的问题？Wi‑Fi、宽带、代理还是服务 · 1ms.dog">
 <meta name="twitter:description" content="卡顿出在哪一段：设备、Wi‑Fi 和宽带、跨境线路、代理还是服务">
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"网络诊断 · 1ms.dog","url":"https://diag.1ms.dog/zh-cn/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"在浏览器里同时测近处、远处、UDP 和常用服务，判断卡顿出在设备、Wi‑Fi 和宽带、跨境线路、代理节点，还是某个服务。估算 UDP 丢包，识别 UDP 被限速，给出通话和游戏评分。免安装，手机也能用，不收集数据。","inLanguage":"zh-CN","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"它怎么判断问题出在哪一段？","acceptedAnswer":{"@type":"Answer","text":"页面同时测几条路：最近的 Cloudflare 节点、东京、法兰克福和弗吉尼亚的云区域、你选的服务，以及向公共 STUN 服务器发 UDP。每 5 秒比较一次：所有路同时变差，问题在你这一侧（Wi‑Fi、路由器、宽带）；近处正常只有远处变差，问题在跨境或远程线路；只有一个服务变差，是那个服务自己的问题；网页正常但 UDP 丢包，游戏和通话会卡。 每条结论都列出依据和把握程度。"}},{"@type":"Question","name":"开着代理时还准吗？","acceptedAnswer":{"@type":"Answer","text":"能分开看。在中国大陆开着代理时，页面拿国内网站（不经过代理）代表你自己的宽带，拿经代理到最近的 Cloudflare 节点代表到代理节点这一段，再拿远处的云区域代表节点之后的路。三者对比，就能看出是宽带、到节点的线路，还是节点之后的问题。代理软件用 TUN 或 fake-ip 模式时，UDP 也可能被代理接管，结论会标出把握程度。"}},{"@type":"Question","name":"UDP 丢包是怎么测的？","acceptedAnswer":{"@type":"Answer","text":"浏览器不能直接发 UDP 包，所以页面向公共 STUN 服务器（Cloudflare、Google，大陆用户还有小米和哔哩哔哩）问自己的公网地址，每问一次就是一次 UDP 往返。请求丢了，浏览器会在 250 毫秒后重发，回答就会晚一截；数出这样的回答，就能估算丢包率。我们在服务器上故意丢 2%、5%、10% 的包验证过，测出来分别是 1–2%、4–5%、8–9%。 每分钟每个服务器大约 80 个回答，所以准确的百分比要几分钟以上的数据。"}},{"@type":"Question","name":"为什么不能告诉我是第几跳？","acceptedAnswer":{"@type":"Answer","text":"网页不能发 ICMP，也做不了 traceroute，所以只能按路径分段判断，不能点名是哪一台路由器。分段判断已经能回答大多数问题：是 Wi‑Fi 和宽带、跨境线路、代理，还是对方的服务。"}},{"@type":"Question","name":"诊断和持续监控有什么不同？","acceptedAnswer":{"@type":"Answer","text":"诊断测 2 分钟，20 秒先给出初步结论，回答\"现在卡不卡、卡在哪\"。持续监控一直测到你按停止：每段路径每 5 秒记一格，变差超过 10 秒就记成一个事件，断网、网络类型和公网地址的变化也会记下来。问题时有时无时，开着持续监控去做别的事，回来看事件记录，就知道是哪一段、什么时候、持续多久。页面放在后台也会继续测。"}},{"@type":"Question","name":"「加入路由器」有什么用？","acceptedAnswer":{"@type":"Answer","text":"把家里的路由器也测进来，\"你这一侧\"的问题就能再分成两种：到路由器也变差，是 Wi‑Fi 或家里的网络；路由器正常而外面变差，是宽带接入。Chrome 会先问你是否允许这个页面访问本地网络，允许后才会测；其他浏览器暂时不支持。"}},{"@type":"Question","name":"会上传我的数据吗？","acceptedAnswer":{"@type":"Answer","text":"不会。所有请求都从你的浏览器直接发往被测的网站和 STUN 服务器，结果只留在这个页面里，关掉就没了。"}}]}]}</script>
+<meta name="twitter:image" content="https://lag.1ms.dog/og/zh-cn.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"网络诊断 · 1ms.dog","url":"https://lag.1ms.dog/zh-cn/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"在浏览器里同时测近处、远处、UDP 和常用服务，判断卡顿出在设备、Wi‑Fi 和宽带、跨境线路、代理节点，还是某个服务。估算 UDP 丢包，识别 UDP 被限速，给出通话和游戏评分。免安装，手机也能用，不收集数据。","inLanguage":"zh-CN","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"它怎么判断问题出在哪一段？","acceptedAnswer":{"@type":"Answer","text":"页面同时测几条路：最近的 Cloudflare 节点、东京、法兰克福和弗吉尼亚的云区域、你选的服务，以及向公共 STUN 服务器发 UDP。每 5 秒比较一次：所有路同时变差，问题在你这一侧（Wi‑Fi、路由器、宽带）；近处正常只有远处变差，问题在跨境或远程线路；只有一个服务变差，是那个服务自己的问题；网页正常但 UDP 丢包，游戏和通话会卡。 每条结论都列出依据和把握程度。"}},{"@type":"Question","name":"开着代理时还准吗？","acceptedAnswer":{"@type":"Answer","text":"能分开看。在中国大陆开着代理时，页面拿国内网站（不经过代理）代表你自己的宽带，拿经代理到最近的 Cloudflare 节点代表到代理节点这一段，再拿远处的云区域代表节点之后的路。三者对比，就能看出是宽带、到节点的线路，还是节点之后的问题。代理软件用 TUN 或 fake-ip 模式时，UDP 也可能被代理接管，结论会标出把握程度。"}},{"@type":"Question","name":"UDP 丢包是怎么测的？","acceptedAnswer":{"@type":"Answer","text":"浏览器不能直接发 UDP 包，所以页面向公共 STUN 服务器（Cloudflare、Google，大陆用户还有小米和哔哩哔哩）问自己的公网地址，每问一次就是一次 UDP 往返。请求丢了，浏览器会在 250 毫秒后重发，回答就会晚一截；数出这样的回答，就能估算丢包率。我们在服务器上故意丢 2%、5%、10% 的包验证过，测出来分别是 1–2%、4–5%、8–9%。 每分钟每个服务器大约 80 个回答，所以准确的百分比要几分钟以上的数据。"}},{"@type":"Question","name":"为什么不能告诉我是第几跳？","acceptedAnswer":{"@type":"Answer","text":"网页不能发 ICMP，也做不了 traceroute，所以只能按路径分段判断，不能点名是哪一台路由器。分段判断已经能回答大多数问题：是 Wi‑Fi 和宽带、跨境线路、代理，还是对方的服务。"}},{"@type":"Question","name":"诊断和持续监控有什么不同？","acceptedAnswer":{"@type":"Answer","text":"诊断测 2 分钟，20 秒先给出初步结论，回答\"现在卡不卡、卡在哪\"。持续监控一直测到你按停止：每段路径每 5 秒记一格，变差超过 10 秒就记成一个事件，断网、网络类型和公网地址的变化也会记下来。问题时有时无时，开着持续监控去做别的事，回来看事件记录，就知道是哪一段、什么时候、持续多久。页面放在后台也会继续测。"}},{"@type":"Question","name":"「路由器」这一行是怎么来的？","acceptedAnswer":{"@type":"Answer","text":"开始测量时，页面会在几个常见地址上找你家的路由器，找到就加一行「路由器」。这样「你这一侧」的问题就能再分成两种：到路由器也变差，是 Wi‑Fi 或家里的网络；路由器正常而外面变差，是宽带接入。Chrome 会先问你是否允许这个页面访问本地网络，允许后才会测；其他浏览器暂时不支持，就没有这一行。"}},{"@type":"Question","name":"会上传我的数据吗？","acceptedAnswer":{"@type":"Answer","text":"不会。所有请求都从你的浏览器直接发往被测的网站和 STUN 服务器，结果只留在这个页面里，关掉就没了。 分享结果时，链接里只有结论、数字和各段的状态，不含 IP 地址；勾选后才会带上国家和 Cloudflare 节点。"}}]}]}</script>
 <link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/app.12ad3f8fde.css">
+<link rel="stylesheet" href="/assets/app.452a252ccb.css">
 </head>
 <body data-sel="diag">
 <div class="app">
@@ -43,7 +55,7 @@
     <div class="top-acts">
       <label class="sel"><span class="sr" data-i="lang_label">语言</span>
         <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c2 2 2.8 4 2.8 6.5S10 12.5 8 14.5C6 12.5 5.2 10.5 5.2 8S6 3.5 8 1.5z"/></svg>
-        <select id="lang"><option value="en">English</option><option value="zh-CN" selected>简体中文</option></select>
+        <select id="lang"><option value="en">English</option><option value="zh-CN" selected>简体中文</option><option value="zh-TW">繁體中文</option><option value="ja">日本語</option><option value="ko">한국어</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="pt">Português</option><option value="ru">Русский</option></select>
       </label>
       <button class="icon-btn" id="helpBtn" type="button" aria-haspopup="dialog" aria-controls="help"><span class="sr" data-i="faq_h">帮助</span>
         <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><path d="M6.3 6.2a1.8 1.8 0 1 1 2.5 1.7c-.5.2-.8.6-.8 1.1v.4M8 11.3v.1"/></svg>
@@ -77,7 +89,7 @@
            pages and a full line, and what to try. Every part keeps its space, so nothing moves when it fills. -->
       <div class="verdict" id="verdict" data-lv="idle" aria-live="polite">
         <p class="v-h" id="vH" data-i="v_idle">点「开始」：测 2 分钟，20 秒后先给出初步结论</p>
-        <p class="v-sub"><span id="vState">&nbsp;</span><span class="v-exit" id="vExit"></span></p>
+        <p class="v-sub"><span id="vState">&nbsp;</span><span class="v-exit" id="vExit"></span><button class="share-b" id="shareBtn" type="button" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 10.5V2M5 4.8 8 2l3 2.8M3.5 8.5v5h9v-5"/></svg><span data-i="share">分享</span></button></p>
         <ul class="nums">
           <li data-c="near"><span data-i="k_near">近处延迟</span><b>–</b></li>
           <li data-c="jitter"><span data-i="k_jitter">抖动</span><b>–</b></li>
@@ -88,7 +100,7 @@
             <li data-s="call"><span class="fit-k" data-tip="视频通话质量评分（MOS），1 到 5 分，按延迟、抖动和丢包算出。4 分以上清晰流畅；3.6 到 4 分偶尔有杂音或延迟；3.6 分以下会卡顿、断续。" tabindex="0" data-i="sc_call">视频通话</span><b>–</b><em>&nbsp;</em></li>
             <li data-s="game"><span class="fit-k" data-tip="延迟比平时高出 100 ms 以上，或 UDP 包要重发，就算卡一次。每 10 分钟 2 次以内为好，6 次以上为差。" tabindex="0" data-i="sc_game">网络游戏</span><b>–</b><em>&nbsp;</em></li>
             <li data-s="page"><span class="fit-k" data-tip="打开一个新网站时，建立连接（DNS、TCP、TLS）用的时间。250 ms 以内为好，600 ms 以上为差。" tabindex="0" data-i="sc_page">打开网页</span><b>–</b><em>&nbsp;</em></li>
-            <li data-s="load"><span class="fit-k" data-tip="同时下载 10 秒、把带宽占满，看延迟涨多少（缓冲膨胀）。涨得多，家里有人下载时，打游戏、开会就会卡。会用掉一些流量，快的宽带可能上百 MB。等级用 Waveform 的标准：A+ 少于 5 ms，A 少于 30，B 少于 60，C 少于 200，D 少于 400，再多是 F。" tabindex="0" data-i="sc_load">满载延迟</span><b>–</b><em>&nbsp;</em><button class="lnk sm" id="loadBtn" type="button" data-i="load_btn">测一下（10 秒）</button></li>
+            <li data-s="load"><span class="fit-k" data-tip="同时下载 10 秒、把带宽占满，看延迟涨多少（缓冲膨胀）。涨得多，家里有人下载时，打游戏、开会就会卡。会用掉一些流量，快的宽带可能上百 MB。等级用 Waveform 的标准：A+ 少于 5 ms，A 少于 30，B 少于 60，C 少于 200，D 少于 400，再多是 F。" tabindex="0" data-i="sc_load">满载延迟</span><b>–</b><em>&nbsp;</em><button class="lnk sm" id="loadBtn" type="button" data-i="load_btn">测一下（10 秒）</button><a class="lnk sm xl" id="speedLnk" target="_blank" rel="noopener" hidden><span data-i="to_speed">测一下网速</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2.5h4.5V7M13.5 2.5 7.5 8.5M12 10v3.5H2.5V4H6"/></svg></a></li>
           </ul>
           <!-- why, and what to try: side by side, 3 lines each reserved, so the box keeps its height -->
           <div class="v-two">
@@ -142,19 +154,19 @@
     <div class="dlg-h"><h2 id="helpT" data-i="faq_h">帮助</h2>
       <button class="icon-btn" data-close type="button" aria-label="关闭"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
     <div class="help-b">
-      <nav class="help-nav" id="helpNav" role="tablist"><button type="button" role="tab" data-hq="0" aria-selected="true">它怎么判断问题出在哪一段？</button><button type="button" role="tab" data-hq="1" aria-selected="false">开着代理时还准吗？</button><button type="button" role="tab" data-hq="2" aria-selected="false">UDP 丢包是怎么测的？</button><button type="button" role="tab" data-hq="3" aria-selected="false">为什么不能告诉我是第几跳？</button><button type="button" role="tab" data-hq="4" aria-selected="false">诊断和持续监控有什么不同？</button><button type="button" role="tab" data-hq="5" aria-selected="false">「加入路由器」有什么用？</button><button type="button" role="tab" data-hq="6" aria-selected="false">会上传我的数据吗？</button></nav>
+      <nav class="help-nav" id="helpNav" role="tablist"><button type="button" role="tab" data-hq="0" aria-selected="true">它怎么判断问题出在哪一段？</button><button type="button" role="tab" data-hq="1" aria-selected="false">开着代理时还准吗？</button><button type="button" role="tab" data-hq="2" aria-selected="false">UDP 丢包是怎么测的？</button><button type="button" role="tab" data-hq="3" aria-selected="false">为什么不能告诉我是第几跳？</button><button type="button" role="tab" data-hq="4" aria-selected="false">诊断和持续监控有什么不同？</button><button type="button" role="tab" data-hq="5" aria-selected="false">「路由器」这一行是怎么来的？</button><button type="button" role="tab" data-hq="6" aria-selected="false">会上传我的数据吗？</button></nav>
       <div class="help-pick">
         <button class="icon-btn" type="button" data-hstep="-1" aria-label="上一条"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 4L6 8l4 4"/></svg></button>
         <select id="helpSel" aria-labelledby="helpT"></select>
         <button class="icon-btn" type="button" data-hstep="1" aria-label="下一条"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4"/></svg></button>
       </div>
-      <div class="help-c" id="helpC"><article data-hqb="0"><h3>它怎么判断问题出在哪一段？</h3><p>页面同时测几条路：最近的 Cloudflare 节点、东京、法兰克福和弗吉尼亚的云区域、你选的服务，以及向公共 STUN 服务器发 UDP。每 5 秒比较一次：所有路同时变差，问题在你这一侧（Wi‑Fi、路由器、宽带）；近处正常只有远处变差，问题在跨境或远程线路；只有一个服务变差，是那个服务自己的问题；网页正常但 UDP 丢包，游戏和通话会卡。</p><p>每条结论都列出依据和把握程度。</p></article><article data-hqb="1" hidden><h3>开着代理时还准吗？</h3><p>能分开看。在中国大陆开着代理时，页面拿国内网站（不经过代理）代表你自己的宽带，拿经代理到最近的 Cloudflare 节点代表到代理节点这一段，再拿远处的云区域代表节点之后的路。三者对比，就能看出是宽带、到节点的线路，还是节点之后的问题。代理软件用 TUN 或 fake-ip 模式时，UDP 也可能被代理接管，结论会标出把握程度。</p></article><article data-hqb="2" hidden><h3>UDP 丢包是怎么测的？</h3><p>浏览器不能直接发 UDP 包，所以页面向公共 STUN 服务器（Cloudflare、Google，大陆用户还有小米和哔哩哔哩）问自己的公网地址，每问一次就是一次 UDP 往返。请求丢了，浏览器会在 250 毫秒后重发，回答就会晚一截；数出这样的回答，就能估算丢包率。我们在服务器上故意丢 2%、5%、10% 的包验证过，测出来分别是 1–2%、4–5%、8–9%。</p><p>每分钟每个服务器大约 80 个回答，所以准确的百分比要几分钟以上的数据。</p></article><article data-hqb="3" hidden><h3>为什么不能告诉我是第几跳？</h3><p>网页不能发 ICMP，也做不了 traceroute，所以只能按路径分段判断，不能点名是哪一台路由器。分段判断已经能回答大多数问题：是 Wi‑Fi 和宽带、跨境线路、代理，还是对方的服务。</p></article><article data-hqb="4" hidden><h3>诊断和持续监控有什么不同？</h3><p>诊断测 2 分钟，20 秒先给出初步结论，回答&quot;现在卡不卡、卡在哪&quot;。持续监控一直测到你按停止：每段路径每 5 秒记一格，变差超过 10 秒就记成一个事件，断网、网络类型和公网地址的变化也会记下来。问题时有时无时，开着持续监控去做别的事，回来看事件记录，就知道是哪一段、什么时候、持续多久。页面放在后台也会继续测。</p></article><article data-hqb="5" hidden><h3>「加入路由器」有什么用？</h3><p>把家里的路由器也测进来，&quot;你这一侧&quot;的问题就能再分成两种：到路由器也变差，是 Wi‑Fi 或家里的网络；路由器正常而外面变差，是宽带接入。Chrome 会先问你是否允许这个页面访问本地网络，允许后才会测；其他浏览器暂时不支持。</p></article><article data-hqb="6" hidden><h3>会上传我的数据吗？</h3><p>不会。所有请求都从你的浏览器直接发往被测的网站和 STUN 服务器，结果只留在这个页面里，关掉就没了。</p></article></div>
+      <div class="help-c" id="helpC"><article data-hqb="0"><h3>它怎么判断问题出在哪一段？</h3><p>页面同时测几条路：最近的 Cloudflare 节点、东京、法兰克福和弗吉尼亚的云区域、你选的服务，以及向公共 STUN 服务器发 UDP。每 5 秒比较一次：所有路同时变差，问题在你这一侧（Wi‑Fi、路由器、宽带）；近处正常只有远处变差，问题在跨境或远程线路；只有一个服务变差，是那个服务自己的问题；网页正常但 UDP 丢包，游戏和通话会卡。</p><p>每条结论都列出依据和把握程度。</p></article><article data-hqb="1" hidden><h3>开着代理时还准吗？</h3><p>能分开看。在中国大陆开着代理时，页面拿国内网站（不经过代理）代表你自己的宽带，拿经代理到最近的 Cloudflare 节点代表到代理节点这一段，再拿远处的云区域代表节点之后的路。三者对比，就能看出是宽带、到节点的线路，还是节点之后的问题。代理软件用 TUN 或 fake-ip 模式时，UDP 也可能被代理接管，结论会标出把握程度。</p></article><article data-hqb="2" hidden><h3>UDP 丢包是怎么测的？</h3><p>浏览器不能直接发 UDP 包，所以页面向公共 STUN 服务器（Cloudflare、Google，大陆用户还有小米和哔哩哔哩）问自己的公网地址，每问一次就是一次 UDP 往返。请求丢了，浏览器会在 250 毫秒后重发，回答就会晚一截；数出这样的回答，就能估算丢包率。我们在服务器上故意丢 2%、5%、10% 的包验证过，测出来分别是 1–2%、4–5%、8–9%。</p><p>每分钟每个服务器大约 80 个回答，所以准确的百分比要几分钟以上的数据。</p></article><article data-hqb="3" hidden><h3>为什么不能告诉我是第几跳？</h3><p>网页不能发 ICMP，也做不了 traceroute，所以只能按路径分段判断，不能点名是哪一台路由器。分段判断已经能回答大多数问题：是 Wi‑Fi 和宽带、跨境线路、代理，还是对方的服务。</p></article><article data-hqb="4" hidden><h3>诊断和持续监控有什么不同？</h3><p>诊断测 2 分钟，20 秒先给出初步结论，回答&quot;现在卡不卡、卡在哪&quot;。持续监控一直测到你按停止：每段路径每 5 秒记一格，变差超过 10 秒就记成一个事件，断网、网络类型和公网地址的变化也会记下来。问题时有时无时，开着持续监控去做别的事，回来看事件记录，就知道是哪一段、什么时候、持续多久。页面放在后台也会继续测。</p></article><article data-hqb="5" hidden><h3>「路由器」这一行是怎么来的？</h3><p>开始测量时，页面会在几个常见地址上找你家的路由器，找到就加一行「路由器」。这样「你这一侧」的问题就能再分成两种：到路由器也变差，是 Wi‑Fi 或家里的网络；路由器正常而外面变差，是宽带接入。Chrome 会先问你是否允许这个页面访问本地网络，允许后才会测；其他浏览器暂时不支持，就没有这一行。</p></article><article data-hqb="6" hidden><h3>会上传我的数据吗？</h3><p>不会。所有请求都从你的浏览器直接发往被测的网站和 STUN 服务器，结果只留在这个页面里，关掉就没了。</p><p>分享结果时，链接里只有结论、数字和各段的状态，不含 IP 地址；勾选后才会带上国家和 Cloudflare 节点。</p></article></div>
     </div>
   </div>
 </div>
 
-<script type="application/json" id="data">{"lang":"zh-CN","paths":{"en":"/","zh-CN":"/zh-cn/"},"worker":"/assets/w.dc249a7d1b.js"}</script>
-<script src="/assets/l.zh-cn.b930bbf1a3.js"></script>
-<script src="/assets/app.31d16db8e9.js"></script>
+<script type="application/json" id="data">{"lang":"zh-CN","paths":{"en":"/","zh-CN":"/zh-cn/","zh-TW":"/zh-tw/","ja":"/ja/","ko":"/ko/","es":"/es/","fr":"/fr/","de":"/de/","pt":"/pt/","ru":"/ru/"},"worker":"/assets/w.f2f31b8fe6.js"}</script>
+<script src="/assets/l.zh-cn.f784e8da6c.js"></script>
+<script src="/assets/app.c5d9635b01.js"></script>
 </body>
 </html>

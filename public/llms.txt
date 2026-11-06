@@ -7,7 +7,8 @@
 > visitor's side (Wi-Fi, router, ISP); near fine, far worse = long-haul route; one service worse = that service;
 > UDP losing while HTTPS is fine = games and calls will stutter. With a proxy in mainland China, domestic sites stand
 > for the visitor's own line and Cloudflare through the proxy for the way to the proxy server. 20-second verdict,
-> then optional monitoring with an incident log. Nothing is sent to this site.
+> then optional monitoring with an incident log. Nothing is sent to this site. A result can be shared as a link
+> (/r/<code>) that holds the verdict, the numbers and each lane's states, never an address.
 
-- Page: https://diag.1ms.dog/ (also /zh-cn/)
+- Page: https://lag.1ms.dog/ (also /zh-cn/, /zh-tw/, /ja/, /ko/, /es/, /fr/, /de/, /pt/, /ru/)
 - Source code: https://github.com/yt1988/net-diagnosis

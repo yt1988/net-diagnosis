@@ -6,10 +6,12 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "test": "node scripts/build.mjs --check && node --test \"test/*.test.mjs\"",
+    "assets": "node scripts/assets.mjs",
     "dev": "wrangler dev --port 8804",
     "deploy": "wrangler deploy"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "esbuild": "0.25.10"
   },
   "license": "MIT",
@@ -17,5 +19,5 @@
     "type": "git",
     "url": "https://github.com/yt1988/net-diagnosis"
   },
-  "homepage": "https://diag.1ms.dog"
+  "homepage": "https://lag.1ms.dog"
 }

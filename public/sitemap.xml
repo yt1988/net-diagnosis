@@ -1,15 +1,143 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://diag.1ms.dog/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://diag.1ms.dog/"/>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://diag.1ms.dog/zh-cn/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://diag.1ms.dog/"/>
+    <loc>https://lag.1ms.dog/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lag.1ms.dog/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://lag.1ms.dog/zh-cn/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://lag.1ms.dog/zh-tw/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://lag.1ms.dog/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://lag.1ms.dog/ko/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://lag.1ms.dog/es/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://lag.1ms.dog/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://lag.1ms.dog/de/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://lag.1ms.dog/pt/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://lag.1ms.dog/ru/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://lag.1ms.dog/"/>
   </url>
   <url>
-    <loc>https://diag.1ms.dog/zh-cn/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://diag.1ms.dog/"/>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://diag.1ms.dog/zh-cn/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://diag.1ms.dog/"/>
+    <loc>https://lag.1ms.dog/zh-cn/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lag.1ms.dog/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://lag.1ms.dog/zh-cn/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://lag.1ms.dog/zh-tw/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://lag.1ms.dog/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://lag.1ms.dog/ko/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://lag.1ms.dog/es/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://lag.1ms.dog/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://lag.1ms.dog/de/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://lag.1ms.dog/pt/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://lag.1ms.dog/ru/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://lag.1ms.dog/"/>
+  </url>
+  <url>
+    <loc>https://lag.1ms.dog/zh-tw/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lag.1ms.dog/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://lag.1ms.dog/zh-cn/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://lag.1ms.dog/zh-tw/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://lag.1ms.dog/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://lag.1ms.dog/ko/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://lag.1ms.dog/es/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://lag.1ms.dog/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://lag.1ms.dog/de/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://lag.1ms.dog/pt/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://lag.1ms.dog/ru/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://lag.1ms.dog/"/>
+  </url>
+  <url>
+    <loc>https://lag.1ms.dog/ja/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lag.1ms.dog/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://lag.1ms.dog/zh-cn/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://lag.1ms.dog/zh-tw/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://lag.1ms.dog/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://lag.1ms.dog/ko/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://lag.1ms.dog/es/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://lag.1ms.dog/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://lag.1ms.dog/de/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://lag.1ms.dog/pt/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://lag.1ms.dog/ru/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://lag.1ms.dog/"/>
+  </url>
+  <url>
+    <loc>https://lag.1ms.dog/ko/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lag.1ms.dog/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://lag.1ms.dog/zh-cn/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://lag.1ms.dog/zh-tw/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://lag.1ms.dog/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://lag.1ms.dog/ko/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://lag.1ms.dog/es/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://lag.1ms.dog/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://lag.1ms.dog/de/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://lag.1ms.dog/pt/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://lag.1ms.dog/ru/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://lag.1ms.dog/"/>
+  </url>
+  <url>
+    <loc>https://lag.1ms.dog/es/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lag.1ms.dog/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://lag.1ms.dog/zh-cn/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://lag.1ms.dog/zh-tw/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://lag.1ms.dog/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://lag.1ms.dog/ko/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://lag.1ms.dog/es/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://lag.1ms.dog/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://lag.1ms.dog/de/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://lag.1ms.dog/pt/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://lag.1ms.dog/ru/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://lag.1ms.dog/"/>
+  </url>
+  <url>
+    <loc>https://lag.1ms.dog/fr/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lag.1ms.dog/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://lag.1ms.dog/zh-cn/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://lag.1ms.dog/zh-tw/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://lag.1ms.dog/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://lag.1ms.dog/ko/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://lag.1ms.dog/es/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://lag.1ms.dog/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://lag.1ms.dog/de/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://lag.1ms.dog/pt/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://lag.1ms.dog/ru/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://lag.1ms.dog/"/>
+  </url>
+  <url>
+    <loc>https://lag.1ms.dog/de/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lag.1ms.dog/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://lag.1ms.dog/zh-cn/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://lag.1ms.dog/zh-tw/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://lag.1ms.dog/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://lag.1ms.dog/ko/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://lag.1ms.dog/es/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://lag.1ms.dog/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://lag.1ms.dog/de/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://lag.1ms.dog/pt/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://lag.1ms.dog/ru/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://lag.1ms.dog/"/>
+  </url>
+  <url>
+    <loc>https://lag.1ms.dog/pt/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lag.1ms.dog/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://lag.1ms.dog/zh-cn/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://lag.1ms.dog/zh-tw/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://lag.1ms.dog/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://lag.1ms.dog/ko/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://lag.1ms.dog/es/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://lag.1ms.dog/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://lag.1ms.dog/de/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://lag.1ms.dog/pt/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://lag.1ms.dog/ru/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://lag.1ms.dog/"/>
+  </url>
+  <url>
+    <loc>https://lag.1ms.dog/ru/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://lag.1ms.dog/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://lag.1ms.dog/zh-cn/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://lag.1ms.dog/zh-tw/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://lag.1ms.dog/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://lag.1ms.dog/ko/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://lag.1ms.dog/es/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://lag.1ms.dog/fr/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://lag.1ms.dog/de/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://lag.1ms.dog/pt/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://lag.1ms.dog/ru/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://lag.1ms.dog/"/>
   </url>
 </urlset>

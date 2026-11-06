@@ -6,6 +6,7 @@
 import { NEAR, META, DIRECT, FAR, SERVICES, STUN, STUN_DIRECT, GATEWAYS } from './targets.mjs';
 import { stun, stunOverhead, meta } from './probes.mjs';
 import { udp as rtcUdp, quic as rtcQuic } from './rtc.mjs';
+import { encode as encodeShare, decode as decodeShare, sharePath, LANES, CELLS, squeeze } from './share.mjs';
 import {
   WINDOW_MS, windowStats, statusOf, udpStatusOf, stunLoss, attribute, mos, mosLevel, gaming, pageLevel, Incidents, confidence,
   proxyHint, tzCountry, median, RETX, bloatGrade, bloatLevel,
@@ -14,7 +15,9 @@ import {
 const L = window.L1MS, D = JSON.parse(document.getElementById('data').textContent);
 const $ = (s) => document.querySelector(s), $$ = (s) => [...document.querySelectorAll(s)];
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
-const t = (k, v) => { let s = L[k]; if (s == null) return k; if (v) s = String(s).replace(/\{(\w+)\}/g, (m, x) => (v[x] ?? m)); return s; };
+// a count of 1 (or what the language counts as one) takes the key's _one form when there is one
+const PL = new Intl.PluralRules(D.lang);
+const t = (k, v) => { let s = (typeof v?.n === 'number' && L[k + '_' + PL.select(v.n)]) || L[k]; if (s == null) return k; if (v) s = String(s).replace(/\{(\w+)\}/g, (m, x) => (v[x] ?? m)); return s; };
 const nameOf = (n) => (typeof n === 'string' ? n : n[D.lang] || n.other);
 const ms0 = (x) => (x == null ? '–' : Math.round(x));
 const pct = (x) => (x == null ? '–' : x.toFixed(1) + '%');
@@ -187,6 +190,7 @@ function syncServices() {
 async function begin() {
   if (running()) { finish(); return; }
   hideTip();
+  leaveShared();
   Object.assign(S, { mode: 'run', t0: Date.now(), windows: [], inc: new Incidents(), marks: [], stunI: 0, lag: null, last: null, fast: true, pub4: null, pub6: null, proto: { n: 0, h3: 0 }, load: null });
   if (S.gw) Object.assign(S.gw, { samples: [], floor: null });
   document.body.dataset.run = 'on';
@@ -403,7 +407,7 @@ function onWindow(now) {
   let held = 1;
   for (let i = S.windows.length - 1; i >= 0 && S.windows[i].v.key === v.key; i--) held++;
   if (!gap) v.conf = confidence(v.conf, held);
-  S.windows.push({ t: now, v });
+  S.windows.push({ t: now, v, lanes: {} });
   if (S.windows.length > 2000) S.windows.splice(0, 1000);
   drawLanes(sn, gap, now);
   // the load test fills the line on purpose: its windows say nothing about the line itself
@@ -509,7 +513,10 @@ async function startUdpx() {
 const why = (x) => (x.why?.length ? PAREN[0] + x.why.map((w) => t('why_' + w)).join(AND) + PAREN[1] : '');
 const listOf = (items) => items.map((x) => `${x.name ?? x.id} ${x.status === 'down' ? t('st_down') : ms0(x.med) + ' ms'}${why(x)}`).join(SEP);
 const LEVEL = { ok: 'ok', 'udp-slow': 'warn', unknown: 'warn', hidden: 'warn', ipv6: 'warn', running: 'run', idle: 'idle' };
-const nameIn = (id) => S.targets.find((x) => x.id === id)?.name || id;
+// a target's name: from this run, else from the built-in lists (a shared result), else the host it was given
+const nameIn = (id) => S.targets.find((x) => x.id === id)?.name
+  || [NEAR, ...DIRECT.CN, ...SERVICES].map((x) => (x.id === id ? nameOf(x.name) : null)).find(Boolean)
+  || (FAR.some((f) => f.id === id) ? t('far_' + id) : String(id).replace(/^c:/, ''));
 const evText = (e) => {
   if (e.k === 'udp-loss') return e.status === 'down' ? t('ev_udp-blocked') : t('ev_udp-loss', { loss: (e.lossPct ?? 0).toFixed(1) });
   if (e.k === 'ipv6-bad' || e.k === 'ipv4-ok') return t('ev_' + e.k, { loss: (e.lossPct ?? 0).toFixed(1) });
@@ -529,13 +536,16 @@ function verdict(v, state) {
     $('#sug').dataset.on = '';
     $('#evc').dataset.on = '';
     $('#evc').hidden = false;
+    $('#shareBtn').hidden = true;
     return;
   }
   $('#vH').textContent = t('v_' + v.key, { names: (v.ids || []).map(nameIn).join(' / ') });
-  const el = Date.now() - S.t0;
+  // a shared result says how long it was measured; it has no exit line (no network in the link)
+  const el = state === 'shared' ? v.secs * 1000 : Date.now() - S.t0;
   const st = state === 'prelim' ? t('st_prelim') : state === 'monitor' ? t('st_monitor', { t: clock(el), n: S.inc.list.length }) : t('st_final', { t: clock(el) });
   $('#vState').textContent = st + ' · ' + t('conf_' + (v.conf || 1));
-  $('#vExit').textContent = S.exit || '';
+  $('#vExit').textContent = state === 'shared' ? [v.cc && region(v.cc), v.colo && 'Cloudflare ' + v.colo].filter(Boolean).join(' · ') : S.exit || '';
+  $('#shareBtn').hidden = !(state === 'final' || state === 'monitor' || state === 'shared');
   // why and what to try, 3 lines each; with no evidence (all fine) the suggestions take the whole row
   const ev = (v.evidence || []).slice(0, 3);
   $('#ev').innerHTML = ev.map((e) => `<li>${esc(evText(e))}</li>`).join('');
@@ -581,13 +591,19 @@ function drawExtras() {
   lb.hidden = !!ld?.done;
   lb.disabled = !running() || !!ld;
   lb.textContent = ld && !ld.done ? t('load_run') : running() ? t('load_btn') : t('load_idle');
-  li.querySelector('em').textContent = ld?.done ? t('load_v', { mb: Math.round(ld.bytes / 1e6), mbps: Math.round(ld.mbps) }) : ' ';
+  li.querySelector('em').textContent = ld?.done && ld.bytes ? t('load_v', { mb: Math.round(ld.bytes / 1e6), mbps: Math.round(ld.mbps) }) : ' ';
+  // the line's speed is the speed test's job: offered once the loaded latency is in
+  const sp = tool('speed'), a = $('#speedLnk');
+  a.hidden = !(sp && ld?.done);
+  if (sp) a.href = sp + D.paths[D.lang];
 }
+// another 1ms.dog tool's address, from the meta the site adds (none when self-hosted: no link)
+function tool(id) { return document.querySelector(`meta[name="${id}"]`)?.content?.replace(/\/+$/, '') || ''; }
 $('#loadBtn').onclick = startLoad;
 $('#udpxBtn').onclick = startUdpx;
 
 function resetLanes() {
-  $$('.ln-tl').forEach((el) => { el.innerHTML = '<i></i>'.repeat(LANE_CELLS); });
+  $$('.ln-tl').forEach((el) => { el.style.gridTemplateColumns = ''; el.innerHTML = '<i></i>'.repeat(LANE_CELLS); });
   $$('.ln-st').forEach((el) => { el.textContent = t('st_none'); el.dataset.st = 'none'; el.dataset.tip = ''; });
   drawSvcLane();
 }
@@ -614,6 +630,8 @@ function drawLanes(sn, gap, now) {
     const li = $(`[data-lane="${k}"]`);
     if (!x || !li || li.hidden) continue;
     const st = gap ? 'gap' : x.st;
+    const win = S.windows[S.windows.length - 1];
+    if (win?.lanes) win.lanes[k] = st; // for the share link
     const s = li.querySelector('.ln-st');
     s.dataset.st = st; s.textContent = t('st_' + (st === 'gap' ? 'none' : st));
     s.dataset.tip = gap ? t('gap') : x.now || '';
@@ -683,14 +701,156 @@ $$('[data-mode]').forEach((b) => {
     $$('[data-mode]').forEach((x) => x.setAttribute('aria-checked', x === b));
     document.body.dataset.sel = S.sel;
     if (running() && !continuous() && Date.now() - S.t0 >= DURATION_MS) finish();
-    else if (!running() && !S.last) verdict({ key: 'idle' });
+    else if (!running() && !S.last && !SHARED) verdict({ key: 'idle' });
   };
 });
 
+
+/* ---------- share: the 1ms.dog share dialog (/assets/share/, copied verbatim from 1ms-shell), loaded on use ---------- */
+// It makes the link short, draws the card's frame (logo, name, QR code, date) and offers copy, download and the
+// system share sheet; this page gives the link, the card's middle and the footer. The box adds the country and the
+// Cloudflare location to both; no address or network is ever in either.
+const SHARE_JS = '/assets/share/share.js?v=8';
+let SHARED = null, RECV = null;
+const laneShown = (k) => !$(`[data-lane="${k}"]`).hidden;
+// this run as a share record: the headline verdict, its numbers, and each lane's windows
+function record() {
+  if (SHARED) return SHARED;
+  const v = S.last, sc = lastScores;
+  if (!v) return null;
+  const lanes = {};
+  for (const k of LANES) {
+    if (!laneShown(k)) continue;
+    const st = S.windows.map((w) => w.lanes?.[k]).filter(Boolean);
+    if (st.length) lanes[k] = st;
+  }
+  const end = running() ? Date.now() : S.windows.at(-1)?.t || Date.now();
+  return {
+    ts: S.t0, key: v.key, conf: v.conf, secs: Math.round((end - S.t0) / 1000), mon: continuous(),
+    near: sc?.nearMed, jitter: sc?.jitter, loss: S.udpx?.p ? S.udpx.p.loss : sc?.loss, mos: sc?.call, game: sc?.game?.level, spikes: sc?.spikes,
+    setup: sc?.setup, grade: S.load?.done ? S.load.grade : null, rise: S.load?.done ? S.load.rise : null,
+    cc: S.meta?.country || '', colo: S.meta?.colo || '', ids: v.ids || [], incidents: S.inc.list.length,
+    nearAs: S.cn ? (S.proxied ? 'near_proxy' : 'direct') : 'near', lanes,
+  };
+}
+const shareLink = (R, show) => location.origin + D.paths[D.lang] + 'r/' + encodeShare({ ...R, cc: show ? R.cc : '', colo: show ? R.colo : '' });
+const headline = (R) => t('v_' + R.key, { names: (R.ids || []).map(nameIn).join(' / ') });
+const lvColor = (v, lv) => v(lv === 'ok' || lv === 'good' ? 't1' : lv === 'warn' || lv === 'fair' ? 'warn' : 'bad');
+const span = (minutes) => (minutes < 1 ? t('dur_s', { n: Math.round(minutes * 60) }) : t('dur_m', { n: Math.round(minutes) }));
+const scoreRows = (R) => [
+  ['sc_call', mosLevel(R.mos), R.mos == null ? '' : t('sc_call_v', { v: R.mos.toFixed(1) })],
+  ['sc_game', R.game, R.spikes == null ? '' : t('sc_game_q', { n: R.spikes, span: span(R.secs / 60) })],
+  ['sc_page', pageLevel(R.setup), R.setup == null ? '' : t('sc_page_v', { ms: Math.round(R.setup) })],
+  ['sc_load', bloatLevel(R.grade), R.grade ? `${R.grade} · +${Math.round(R.rise)} ms` : ''],
+];
+const laneRows = (R) => LANES.filter((k) => R.lanes[k]?.length).map((k) => [t('lane_' + (k === 'near' ? R.nearAs || 'near' : k)), squeeze(R.lanes[k])]);
+// the headline in one line where it fits, else two at a smaller size
+function headLines(x, kit, s) {
+  const w = kit.W - kit.P * 2, z = kit.fit(x, s, w, 46, 34, 700);
+  if (x.measureText(s).width <= w) return { z, lines: [s] };
+  x.font = `700 36px ${kit.F}`;
+  return { z: 36, lines: kit.wrap(x, s, w, 2) };
+}
+const cardHeight = (x, kit, R) => kit.top + headLines(x, kit, headline(R)).lines.length * 56 + 48 + 116 + 134 + laneRows(R).length * 40 + 90;
+function drawCard(x, kit, R) {
+  const { W, P, F, M, v, roundRect, clip, fit } = kit, w = W - P * 2;
+  let y = kit.top;
+  x.textBaseline = 'alphabetic';
+  const h = headLines(x, kit, headline(R));
+  x.fillStyle = lvColor(v, LEVEL[R.key] || 'bad'); x.font = `700 ${h.z}px ${F}`;
+  h.lines.forEach((l, i) => x.fillText(l, P, y + 44 + i * 56));
+  y += h.lines.length * 56;
+  const sub = [t('st_final', { t: clock(R.secs * 1000) }), t('conf_' + R.conf), kit.show && R.cc && region(R.cc), kit.show && R.colo && 'Cloudflare ' + R.colo].filter(Boolean).join('  ·  ');
+  x.fillStyle = v('muted'); fit(x, sub, w, 24, 18, 500); x.fillText(clip(x, sub, w), P, y + 26);
+  y += 48;
+  // the three numbers
+  const nums = [['k_near', R.near == null ? '–' : Math.round(R.near) + ' ms'], ['k_jitter', R.jitter == null ? '–' : R.jitter.toFixed(1) + ' ms'], ['k_udp', R.loss == null ? '–' : R.loss.toFixed(1) + '%']];
+  const cw = w / 3;
+  nums.forEach(([k, val], i) => {
+    const at = P + i * cw;
+    x.fillStyle = v('muted'); fit(x, t(k), cw - 24, 24, 16, 500); x.fillText(clip(x, t(k), cw - 24), at, y + 30);
+    x.fillStyle = v('fg'); x.font = `700 54px ${M}`; x.fillText(val, at, y + 92);
+  });
+  y += 116;
+  // what it means for calls, games, pages and a full line
+  x.fillStyle = v('line'); x.fillRect(P, y, w, 2);
+  const sw = w / 4;
+  scoreRows(R).forEach(([k, l, detail], i) => {
+    const at = P + i * sw;
+    x.fillStyle = v('muted'); fit(x, t(k), sw - 20, 22, 15, 500); x.fillText(clip(x, t(k), sw - 20), at, y + 36);
+    x.fillStyle = l ? lvColor(v, l) : v('muted'); x.font = `700 30px ${F}`; x.fillText(l ? t('lv_' + l) : '–', at, y + 74);
+    if (detail) { x.fillStyle = v('muted'); fit(x, detail, sw - 20, 18, 13, 400); x.fillText(clip(x, detail, sw - 20), at, y + 98); }
+  });
+  y += 134;
+  // the lanes: name, then the run in stretches of time, coloured as on the page
+  const nw = 230, gap = 4, tw = w - nw, cwid = (tw - gap * (CELLS - 1)) / CELLS;
+  for (const [name, st] of laneRows(R)) {
+    x.fillStyle = v('fg'); fit(x, name, nw - 20, 22, 15, 600); x.fillText(clip(x, name, nw - 20), P, y + 24);
+    st.forEach((s, i) => {
+      x.fillStyle = s === 'ok' ? v('t1') : s === 'warn' ? v('warn') : s === 'bad' || s === 'down' ? v('bad') : v('line');
+      roundRect(x, P + nw + i * (cwid + gap), y + 4, cwid, 24, 4); x.fill();
+    });
+    y += 40;
+  }
+}
+$('#shareBtn').onclick = async () => {
+  const R = record();
+  if (!R) return;
+  const { share } = await import(SHARE_JS);
+  share({
+    lang: D.lang, name: t('app_name'), file: 'network-diagnosis',
+    show: ['country', 'colo'], never: ['ip', 'isp'], canShow: !!(R.cc || R.colo),
+    link: (show) => shareLink(R, show), home: location.origin + D.paths[D.lang],
+    text: () => t('share_text', { v: headline(R) }),
+    height: (x, kit) => cardHeight(x, kit, R), draw: (x, kit) => drawCard(x, kit, R),
+    foot: () => [t('card_foot')], ts: R.ts,
+  }).open();
+};
+
+/* ---------- someone else's result: the verdict, numbers and lanes from the link, the 1ms.dog banner above ---------- */
+async function showShared(R) {
+  SHARED = R;
+  document.body.dataset.shared = '1';
+  S.mode = 'done';
+  verdict({ ...R, evidence: [] }, 'shared');
+  numbers({ nearMed: R.near, jitter: R.jitter, call: R.mos, game: R.game ? { level: R.game, per10: (R.spikes / (R.secs / 60)) * 10 } : null, spikes: R.spikes, minutes: R.secs / 60, setup: R.setup, loss: R.loss });
+  S.load = R.grade ? { done: true, grade: R.grade, rise: R.rise } : null;
+  drawExtras();
+  const nk = R.nearAs || 'near';
+  $('[data-lane="near"] .ln-k').textContent = t('lane_' + nk);
+  $('[data-lane="near"] .ln-k').dataset.tip = t('lane_tip_' + nk);
+  for (const k of LANES) {
+    const li = $(`[data-lane="${k}"]`), st = R.lanes[k];
+    if (k === 'gw' || k === 'direct') li.hidden = !st;
+    const tl = li.querySelector('.ln-tl'), s = li.querySelector('.ln-st');
+    if (!st) { s.textContent = t('st_none'); continue; }
+    tl.style.gridTemplateColumns = `repeat(${st.length}, minmax(0, 1fr))`;
+    tl.innerHTML = st.map((x) => `<i data-st="${x}" data-tip="${esc(t('st_' + x))}"></i>`).join('');
+    const last = st[st.length - 1];
+    s.dataset.st = last; s.textContent = t('st_' + (last === 'gap' ? 'none' : last)); s.dataset.tip = '';
+  }
+  $('#svcIcons').innerHTML = '';
+  const { received } = await import(SHARE_JS);
+  if (SHARED === R) RECV = received({ lang: D.lang, ts: R.ts, at: $('#verdict'), test: () => begin() });
+}
+// the visitor's own run replaces someone else's result, the banner and the link's address
+function leaveShared() {
+  if (!SHARED) return;
+  SHARED = null;
+  delete document.body.dataset.shared;
+  RECV?.remove(); RECV = null;
+  history.replaceState(null, '', D.paths[D.lang] + location.search);
+  if (!S.gw) $('[data-lane="gw"]').hidden = true;
+  S.load = null;
+  drawSvcLane();
+}
 $('#go').onclick = begin;
 drawServices();
 resetLanes(); // empty cells from the start, so the lanes look the same before and during a run
 drawExtras();
+// a shared result's link: show it (a code this page can't read gets the 404 from the Worker before it gets here)
+const SP = sharePath(location.pathname), SR = SP && decodeShare(SP.code);
+if (SR) showShared(SR);
 
 // for the site's "report a problem" dialog: the last verdict and window states, no IP
 window.msReport = () => {

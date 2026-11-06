@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ko" data-paths="{&quot;en&quot;:&quot;/&quot;,&quot;zh-CN&quot;:&quot;/zh-cn/&quot;,&quot;zh-TW&quot;:&quot;/zh-tw/&quot;,&quot;ja&quot;:&quot;/ja/&quot;,&quot;ko&quot;:&quot;/ko/&quot;,&quot;es&quot;:&quot;/es/&quot;,&quot;fr&quot;:&quot;/fr/&quot;,&quot;de&quot;:&quot;/de/&quot;,&quot;pt&quot;:&quot;/pt/&quot;,&quot;ru&quot;:&quot;/ru/&quot;}">
+<head>
+<meta charset="utf-8">
+<script>(function(){var d=document.documentElement,th=null,s=null;try{th=localStorage.getItem("netdiag:theme");s=localStorage.getItem("netdiag:lang")}catch(e){}if(th==="light"||th==="dark")d.setAttribute("data-theme",th);if(!d.hasAttribute("data-root"))return;var P=JSON.parse(d.getAttribute("data-paths")||"{}"),l=null;try{var q=new URLSearchParams(location.search).get("lang");if(P[q])l=q}catch(e){}if(!l&&P[s])l=s;for(var ls=navigator.languages||[navigator.language||"en"],i=0;!l&&!s&&i<ls.length;i++){var x=String(ls[i]).toLowerCase(),b=x.split("-")[0];l=b==="zh"?(/tw|hk|mo|hant/.test(x)?"zh-TW":"zh-CN"):P[b]?b:null}if(l&&l!=="en"&&P[l])location.replace(P[l]+location.search+location.hash)})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>네트워크 진단: 인터넷이 끊기는 원인은 어디? 와이파이, 회선, 프록시, 서비스 · 1ms.dog</title>
+<meta name="description" content="가까운 곳, 먼 곳, UDP, 자주 쓰는 서비스를 브라우저에서 동시에 측정해, 렉의 원인이 기기, 와이파이와 회선, 장거리 경로, 프록시, 특정 서비스 중 어디인지 알려 줘요. UDP 패킷 손실을 추정하고 UDP 속도 제한을 찾아내며, 통화와 게임 품질을 점수로 보여 줘요. 설치 없이 휴대폰에서도 쓸 수 있고, 데이터는 수집하지 않아요.">
+<meta name="keywords" content="네트워크 진단,인터넷 끊김 원인,패킷 손실 테스트,지터 테스트,UDP 패킷 손실,지연 시간 테스트,핑 테스트,인터넷 느림">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="application-name" content="네트워크 진단">
+<meta name="theme-color" content="#f6f6f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1c1c1c" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://lag.1ms.dog/ko/">
+<link rel="alternate" hreflang="en" href="https://lag.1ms.dog/">
+<link rel="alternate" hreflang="zh-CN" href="https://lag.1ms.dog/zh-cn/">
+<link rel="alternate" hreflang="zh-TW" href="https://lag.1ms.dog/zh-tw/">
+<link rel="alternate" hreflang="ja" href="https://lag.1ms.dog/ja/">
+<link rel="alternate" hreflang="ko" href="https://lag.1ms.dog/ko/">
+<link rel="alternate" hreflang="es" href="https://lag.1ms.dog/es/">
+<link rel="alternate" hreflang="fr" href="https://lag.1ms.dog/fr/">
+<link rel="alternate" hreflang="de" href="https://lag.1ms.dog/de/">
+<link rel="alternate" hreflang="pt" href="https://lag.1ms.dog/pt/">
+<link rel="alternate" hreflang="ru" href="https://lag.1ms.dog/ru/">
+<link rel="alternate" hreflang="x-default" href="https://lag.1ms.dog/">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="1ms.dog">
+<meta property="og:title" content="네트워크 진단: 인터넷이 끊기는 원인은 어디? 와이파이, 회선, 프록시, 서비스 · 1ms.dog">
+<meta property="og:description" content="렉의 원인은 어디? 기기, 와이파이와 회선, 장거리 경로, 프록시, 서비스">
+<meta property="og:url" content="https://lag.1ms.dog/ko/">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:image" content="https://lag.1ms.dog/og/ko.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="네트워크 진단: 인터넷이 끊기는 원인은 어디? 와이파이, 회선, 프록시, 서비스 · 1ms.dog">
+<meta name="twitter:description" content="렉의 원인은 어디? 기기, 와이파이와 회선, 장거리 경로, 프록시, 서비스">
+<meta name="twitter:image" content="https://lag.1ms.dog/og/ko.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"네트워크 진단 · 1ms.dog","url":"https://lag.1ms.dog/ko/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"가까운 곳, 먼 곳, UDP, 자주 쓰는 서비스를 브라우저에서 동시에 측정해, 렉의 원인이 기기, 와이파이와 회선, 장거리 경로, 프록시, 특정 서비스 중 어디인지 알려 줘요. UDP 패킷 손실을 추정하고 UDP 속도 제한을 찾아내며, 통화와 게임 품질을 점수로 보여 줘요. 설치 없이 휴대폰에서도 쓸 수 있고, 데이터는 수집하지 않아요.","inLanguage":"ko","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"어느 구간이 문제인지 어떻게 알아내나요?","acceptedAnswer":{"@type":"Answer","text":"페이지가 여러 경로를 동시에 측정해요: 가장 가까운 Cloudflare 지점, 도쿄·프랑크푸르트·버지니아의 클라우드 리전, 고른 서비스, 그리고 공개 STUN 서버로 가는 UDP. 5초마다 비교해서, 모두 함께 나빠지면 내 쪽(와이파이, 공유기, 회선), 가까운 곳은 정상인데 먼 곳만 나빠지면 장거리 경로, 서비스 하나만 나빠지면 그 서비스, 웹은 정상인데 UDP만 손실되면 게임과 통화가 끊긴다고 판단해요. 모든 판단에 근거와 신뢰도를 함께 보여 줘요."}},{"@type":"Question","name":"프록시를 켜도 정확한가요?","acceptedAnswer":{"@type":"Answer","text":"구간을 나눠서 봐요. 중국 본토에서 프록시를 켰다면, 프록시를 거치지 않는 중국 내 사이트로 내 회선을, 프록시를 거친 가장 가까운 Cloudflare 지점으로 프록시 서버까지 가는 구간을, 먼 클라우드 리전으로 그 너머를 재요. 셋을 비교하면 회선인지, 서버까지인지, 그 너머인지 알 수 있어요. 프록시 앱이 TUN이나 fake-ip 모드면 UDP도 프록시를 거칠 수 있어서, 판단에 신뢰도를 함께 표시해요."}},{"@type":"Question","name":"UDP 손실은 어떻게 재나요?","acceptedAnswer":{"@type":"Answer","text":"웹 페이지는 UDP를 직접 보낼 수 없어서, 공개 STUN 서버(Cloudflare, Google, 중국 본토에서는 Xiaomi와 Bilibili도)에 내 공인 주소를 물어봐요. 한 번 물어보는 게 UDP 왕복 한 번이에요. 요청이 손실되면 브라우저가 250 ms 뒤에 다시 보내서 응답이 늦어져요. 이렇게 늦은 응답을 세어 손실률을 추정해요. 서버에서 일부러 2%, 5%, 10%를 버려 확인해 보니 각각 1~2%, 4~5%, 8~9%로 나왔어요. 서버당 1분에 약 80번 응답하므로, 정확한 비율을 보려면 몇 분 이상의 데이터가 필요해요."}},{"@type":"Question","name":"몇 번째 홉이 문제인지는 왜 알 수 없나요?","acceptedAnswer":{"@type":"Answer","text":"웹 페이지는 ICMP를 보낼 수도, traceroute를 할 수도 없어서, 경로를 구간으로 나눠 판단할 뿐 어느 라우터인지까지는 짚을 수 없어요. 그래도 와이파이와 회선, 장거리 경로, 프록시, 상대 서비스 중 어디인지라는 대부분의 궁금증에는 답할 수 있어요."}},{"@type":"Question","name":"「진단」과 「계속 모니터링」은 어떻게 다른가요?","acceptedAnswer":{"@type":"Answer","text":"진단은 2분 동안 측정하고 20초 뒤에 잠정 판단을 보여 줘요. \"지금 끊기는지, 어디가 문제인지\"에 답해요. 모니터링은 「중지」를 누를 때까지 계속돼요. 구간마다 5초에 한 칸씩 기록하고, 10초 넘게 나빠지면 이벤트로 남겨요. 오프라인, 네트워크 종류나 공인 주소의 변화도 기록해요. 문제가 생겼다 말았다 할 때는 모니터링을 켠 채 다른 일을 하다가 돌아와 기록을 보면, 어느 구간이 언제, 얼마나 나빴는지 알 수 있어요. 백그라운드 탭에서도 계속 측정해요."}},{"@type":"Question","name":"「공유기」 줄은 어떻게 생기나요?","acceptedAnswer":{"@type":"Answer","text":"측정을 시작하면 페이지가 흔한 주소 몇 개에서 집 공유기를 찾고, 찾으면 「공유기」 줄을 추가해요. 그러면 내 쪽 문제를 다시 둘로 나눌 수 있어요: 공유기까지도 나빠졌다면 와이파이나 집 안 네트워크, 공유기는 정상인데 그 너머가 나빠졌다면 회선 연결이에요. Chrome은 먼저 이 페이지가 로컬 네트워크에 접근해도 되는지 묻고, 허용해야 측정해요. 다른 브라우저는 아직 지원하지 않아서 이 줄이 없어요."}},{"@type":"Question","name":"내 데이터를 업로드하나요?","acceptedAnswer":{"@type":"Answer","text":"아니요. 모든 요청은 브라우저에서 측정 대상 사이트와 STUN 서버로 바로 가고, 결과는 이 페이지에만 남았다가 닫으면 사라져요. 결과를 공유하면 링크에는 판단, 숫자, 구간별 상태만 들어가고 IP 주소는 들어가지 않아요. 국가와 Cloudflare 지점은 체크했을 때만 들어가요."}}]}]}</script>
+<link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/app.452a252ccb.css">
+</head>
+<body data-sel="diag">
+<div class="app">
+  <header class="top">
+    <a class="brand" href="/ko/" aria-current="page">
+      <span class="logo"><img class="logo-light" src="/assets/logo-light.svg" width="90" height="36" alt="1ms.dog" loading="lazy"><img class="logo-dark" src="/assets/logo-dark.svg" width="90" height="36" alt="1ms.dog" loading="lazy"></span>
+      <span class="brand-name" data-i="app_name">네트워크 진단</span>
+    </a>
+    <div class="top-acts">
+      <label class="sel"><span class="sr" data-i="lang_label">언어</span>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c2 2 2.8 4 2.8 6.5S10 12.5 8 14.5C6 12.5 5.2 10.5 5.2 8S6 3.5 8 1.5z"/></svg>
+        <select id="lang"><option value="en">English</option><option value="zh-CN">简体中文</option><option value="zh-TW">繁體中文</option><option value="ja">日本語</option><option value="ko" selected>한국어</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="pt">Português</option><option value="ru">Русский</option></select>
+      </label>
+      <button class="icon-btn" id="helpBtn" type="button" aria-haspopup="dialog" aria-controls="help"><span class="sr" data-i="faq_h">도움말</span>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><path d="M6.3 6.2a1.8 1.8 0 1 1 2.5 1.7c-.5.2-.8.6-.8 1.1v.4M8 11.3v.1"/></svg>
+      </button>
+      <a class="icon-btn gh" href="https://github.com/yt1988/net-diagnosis" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7 0-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.4 7.4 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.7-3.6 3.9.3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2z"/></svg></a>
+      <button class="icon-btn" id="theme" type="button" aria-label="테마 전환">
+        <svg class="i-sys" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="9" rx="1.5"/><path d="M5.5 14h5M8 11.5V14"/></svg>
+        <svg class="i-light" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1v1.6M8 13.4V15M1 8h1.6M13.4 8H15M3 3l1.1 1.1M11.9 11.9 13 13M3 13l1.1-1.1M11.9 4.1 13 3"/></svg>
+        <svg class="i-dark" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 9.8A5.8 5.8 0 0 1 6.2 2.5a5.8 5.8 0 1 0 7.3 7.3z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero card">
+      <h1>인터넷이 끊기나요? 어느 구간이 문제인지 찾아요</h1>
+      <p class="lead" data-i="lead">내 브라우저에서 가까운 곳, 먼 곳, UDP, 자주 쓰는 서비스를 동시에 측정해, 렉이 어느 구간에서 생기는지 찾아요.</p>
+      <!-- the two modes are the tool: a diagnosis, or monitoring that keeps going until Stop -->
+      <div class="modes" role="radiogroup" aria-label="모드">
+        <button type="button" role="radio" data-mode="diag" aria-checked="true"><b data-i="mode_diag">진단</b><span data-i="mode_diag_s">2분 안에 원인 찾기</span></button>
+        <button type="button" role="radio" data-mode="mon" aria-checked="false"><b data-i="mode_mon">계속 모니터링</b><span data-i="mode_mon_s">문제를 모두 기록</span></button>
+      </div>
+      <div class="go-row">
+        <button class="go" id="go" type="button"><span class="go-t" id="goT" data-i="start">시작</span><span class="go-n" id="goN"></span></button>
+        <button class="icon-btn bell" id="ntf" type="button" aria-pressed="false" aria-label="알림" data-tip="문제가 생기면 데스크톱 알림을 보내요">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 11.5V7a4 4 0 1 1 8 0v4.5l1.2 1.5H2.8zM6.5 14.2a1.6 1.6 0 0 0 3 0"/></svg>
+        </button>
+      </div>
+
+      <!-- the verdict: one sentence, how sure and where it exits, 3 numbers, evidence, what it means for calls, games,
+           pages and a full line, and what to try. Every part keeps its space, so nothing moves when it fills. -->
+      <div class="verdict" id="verdict" data-lv="idle" aria-live="polite">
+        <p class="v-h" id="vH" data-i="v_idle">「시작」을 누르세요: 2분 동안 측정하고, 20초 뒤에 첫 판단을 보여 줘요</p>
+        <p class="v-sub"><span id="vState">&nbsp;</span><span class="v-exit" id="vExit"></span><button class="share-b" id="shareBtn" type="button" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 10.5V2M5 4.8 8 2l3 2.8M3.5 8.5v5h9v-5"/></svg><span data-i="share">공유</span></button></p>
+        <ul class="nums">
+          <li data-c="near"><span data-i="k_near">가까운 곳 지연</span><b>–</b></li>
+          <li data-c="jitter"><span data-i="k_jitter">지터</span><b>–</b></li>
+          <li data-c="udp"><span data-i="k_udp">UDP 손실</span><b>–</b><button class="lnk sm" id="udpxBtn" type="button" data-tip="1ms.dog의 도쿄 테스트 서버로 20초 동안 UDP 패킷을 보내 오가는 방향별 손실을 세고, 이어서 QUIC(HTTP/3가 쓰는 UDP)이 통하는지 확인해요." data-i="udpx_btn">정밀 측정(20초)</button></li>
+        </ul>
+        <div class="v-body">
+          <ul class="fit">
+            <li data-s="call"><span class="fit-k" data-tip="영상 통화 품질(MOS) 점수예요. 지연, 지터, 손실로 1~5점을 계산해요. 4점 이상은 깨끗하고 매끄럽고, 3.6~4점은 가끔 잡음이나 지연이 있고, 3.6점 미만은 자주 끊겨요." tabindex="0" data-i="sc_call">영상 통화</span><b>–</b><em>&nbsp;</em></li>
+            <li data-s="game"><span class="fit-k" data-tip="왕복 시간이 평소보다 100 ms 넘게 길거나 UDP 패킷을 다시 보내야 하면 한 번 끊긴 것으로 셉니다. 10분에 2번 이하면 좋음, 6번 이상이면 나쁨이에요." tabindex="0" data-i="sc_game">온라인 게임</span><b>–</b><em>&nbsp;</em></li>
+            <li data-s="page"><span class="fit-k" data-tip="새 사이트를 열 때 연결(DNS, TCP, TLS)을 수립하는 데 걸리는 시간이에요. 250 ms 미만이면 좋음, 600 ms를 넘으면 나쁨이에요." tabindex="0" data-i="sc_page">웹 페이지</span><b>–</b><em>&nbsp;</em></li>
+            <li data-s="load"><span class="fit-k" data-tip="10초 동안 내려받아 회선을 꽉 채우고, 지연이 얼마나 오르는지(버퍼블로트) 봐요. 많이 오르면 집에서 누가 내려받을 때 게임이나 회의가 끊겨요. 데이터를 쓰고, 빠른 회선에서는 수백 MB가 될 수 있어요. 등급은 Waveform 기준이에요: A+는 5 ms 미만, A는 30 미만, B는 60 미만, C는 200 미만, D는 400 미만, 그 이상은 F." tabindex="0" data-i="sc_load">부하 시 지연</span><b>–</b><em>&nbsp;</em><button class="lnk sm" id="loadBtn" type="button" data-i="load_btn">측정(10초)</button><a class="lnk sm xl" id="speedLnk" target="_blank" rel="noopener" hidden><span data-i="to_speed">속도 측정</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2.5h4.5V7M13.5 2.5 7.5 8.5M12 10v3.5H2.5V4H6"/></svg></a></li>
+          </ul>
+          <!-- why, and what to try: side by side, 3 lines each reserved, so the box keeps its height -->
+          <div class="v-two">
+            <div class="evc" id="evc" data-on=""><p class="sug-h" data-i="ev_h">근거</p><ul class="ev" id="ev"></ul></div>
+            <div class="sug" id="sug" data-on=""><p class="sug-h" data-i="sug_h">이렇게 해 보세요</p><ul id="sugL"></ul></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- every part of the path, one lane each: its state now and the last 6 minutes in 5-second windows -->
+    <section class="card lanes-c">
+      <div class="sec-h">
+        <h2 data-i="lanes_h">구간별 경로</h2>
+        <ul class="legend" aria-hidden="true">
+          <li data-st="ok"><i></i><span data-i="st_ok">정상</span></li>
+          <li data-st="warn"><i></i><span data-i="st_warn">보통</span></li>
+          <li data-st="bad"><i></i><span data-i="st_bad">나빠짐</span></li>
+          <li data-st="gap"><i></i><span data-i="st_gap">측정 안 함</span></li>
+        </ul>
+      </div>
+      <ul class="lanes"><li data-lane="device"><span class="ln-h"><span class="ln-k" data-tip="페이지 타이머가 제때 동작하는지: 기기나 브라우저가 너무 바쁘면 측정값을 믿을 수 없어요" tabindex="0">기기</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="gw" hidden><span class="ln-h"><span class="ln-k" data-tip="집 공유기 : 와이파이나 랜선 하나 거리라서 정상이면 몇 ms예요. 여기도 나빠지면 와이파이나 집 안 네트워크 문제예요" tabindex="0">공유기</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="direct" hidden><span class="ln-h"><span class="ln-k" data-tip="프록시를 거치지 않는 중국 내 사이트: 내 회선 자체" tabindex="0">중국 내 직접</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="near"><span class="ln-h"><span class="ln-k" data-tip="가장 가까운 Cloudflare 지점: 와이파이, 공유기, 회선 연결" tabindex="0">가까운 곳</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="far"><span class="ln-h"><span class="ln-k" data-tip="도쿄, 프랑크푸르트, 버지니아의 클라우드 리전: 장거리 경로" tabindex="0">먼 곳</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="udp"><span class="ln-h"><span class="ln-k" data-tip="공개 STUN 서버에 내 주소를 물어봄: UDP 왕복과 손실. 게임과 통화가 쓰는 게 UDP예요" tabindex="0">UDP</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="svc"><span class="ln-h"><span class="ln-k" data-tip="고른 서비스: 이것만 나빠지면 서비스 쪽 문제예요" tabindex="0">자주 쓰는 서비스</span><span class="ln-ic" id="svcIcons"></span><button class="ln-edit" id="svcEdit" type="button" aria-haspopup="dialog" aria-controls="svcs" aria-label="서비스 편집" data-tip="서비스 편집"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.5 2.5l3 3L6 13H3v-3z"/></svg></button></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li class="axis" aria-hidden="true"><span></span><span></span><span class="ax"><em>6분 전</em><em>지금</em></span></li></ul>
+    </section>
+
+    <section class="card inc-c" id="incC" hidden>
+      <h2 data-i="inc_h">이벤트 기록</h2>
+      <ol class="inc" id="inc"></ol>
+    </section>
+
+    <div data-ms-more></div>
+  </main>
+</div>
+
+<div class="scrim" id="svcs" hidden>
+  <div class="dialog svcs" role="dialog" aria-modal="true" aria-labelledby="svcsT">
+    <div class="dlg-h"><h2 id="svcsT" data-i="svc_h">자주 쓰는 서비스</h2>
+      <button class="icon-btn" data-close type="button" aria-label="닫기"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
+    <div class="dlg-b">
+      <div class="chips" id="svcList"></div>
+      <form class="svc-add" id="svcForm" autocomplete="off">
+        <input id="svcIn" type="text" inputmode="url" placeholder="사이트 추가(예: example.com)" aria-label="사이트 추가(예: example.com)" spellcheck="false">
+        <button class="btn" type="submit" data-i="svc_add">추가</button>
+      </form>
+      <p class="err" id="svcErr" aria-live="polite"></p>
+      <p class="note" data-i="svc_note">이름을 눌러 측정할 서비스를 고르세요. 측정하는 건 사이트의 favicon이에요. 일부 사이트는 애플리케이션 서버를 거쳐 보내기 때문에 지연이 높게 나와요. 추가한 사이트는 이 브라우저에만 저장돼요.</p>
+    </div>
+  </div>
+</div>
+<div class="scrim" id="help" hidden>
+  <div class="dialog help" role="dialog" aria-modal="true" aria-labelledby="helpT">
+    <div class="dlg-h"><h2 id="helpT" data-i="faq_h">도움말</h2>
+      <button class="icon-btn" data-close type="button" aria-label="닫기"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
+    <div class="help-b">
+      <nav class="help-nav" id="helpNav" role="tablist"><button type="button" role="tab" data-hq="0" aria-selected="true">어느 구간이 문제인지 어떻게 알아내나요?</button><button type="button" role="tab" data-hq="1" aria-selected="false">프록시를 켜도 정확한가요?</button><button type="button" role="tab" data-hq="2" aria-selected="false">UDP 손실은 어떻게 재나요?</button><button type="button" role="tab" data-hq="3" aria-selected="false">몇 번째 홉이 문제인지는 왜 알 수 없나요?</button><button type="button" role="tab" data-hq="4" aria-selected="false">「진단」과 「계속 모니터링」은 어떻게 다른가요?</button><button type="button" role="tab" data-hq="5" aria-selected="false">「공유기」 줄은 어떻게 생기나요?</button><button type="button" role="tab" data-hq="6" aria-selected="false">내 데이터를 업로드하나요?</button></nav>
+      <div class="help-pick">
+        <button class="icon-btn" type="button" data-hstep="-1" aria-label="이전"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 4L6 8l4 4"/></svg></button>
+        <select id="helpSel" aria-labelledby="helpT"></select>
+        <button class="icon-btn" type="button" data-hstep="1" aria-label="다음"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4"/></svg></button>
+      </div>
+      <div class="help-c" id="helpC"><article data-hqb="0"><h3>어느 구간이 문제인지 어떻게 알아내나요?</h3><p>페이지가 여러 경로를 동시에 측정해요: 가장 가까운 Cloudflare 지점, 도쿄·프랑크푸르트·버지니아의 클라우드 리전, 고른 서비스, 그리고 공개 STUN 서버로 가는 UDP. 5초마다 비교해서, 모두 함께 나빠지면 내 쪽(와이파이, 공유기, 회선), 가까운 곳은 정상인데 먼 곳만 나빠지면 장거리 경로, 서비스 하나만 나빠지면 그 서비스, 웹은 정상인데 UDP만 손실되면 게임과 통화가 끊긴다고 판단해요.</p><p>모든 판단에 근거와 신뢰도를 함께 보여 줘요.</p></article><article data-hqb="1" hidden><h3>프록시를 켜도 정확한가요?</h3><p>구간을 나눠서 봐요. 중국 본토에서 프록시를 켰다면, 프록시를 거치지 않는 중국 내 사이트로 내 회선을, 프록시를 거친 가장 가까운 Cloudflare 지점으로 프록시 서버까지 가는 구간을, 먼 클라우드 리전으로 그 너머를 재요. 셋을 비교하면 회선인지, 서버까지인지, 그 너머인지 알 수 있어요. 프록시 앱이 TUN이나 fake-ip 모드면 UDP도 프록시를 거칠 수 있어서, 판단에 신뢰도를 함께 표시해요.</p></article><article data-hqb="2" hidden><h3>UDP 손실은 어떻게 재나요?</h3><p>웹 페이지는 UDP를 직접 보낼 수 없어서, 공개 STUN 서버(Cloudflare, Google, 중국 본토에서는 Xiaomi와 Bilibili도)에 내 공인 주소를 물어봐요. 한 번 물어보는 게 UDP 왕복 한 번이에요. 요청이 손실되면 브라우저가 250 ms 뒤에 다시 보내서 응답이 늦어져요. 이렇게 늦은 응답을 세어 손실률을 추정해요. 서버에서 일부러 2%, 5%, 10%를 버려 확인해 보니 각각 1~2%, 4~5%, 8~9%로 나왔어요.</p><p>서버당 1분에 약 80번 응답하므로, 정확한 비율을 보려면 몇 분 이상의 데이터가 필요해요.</p></article><article data-hqb="3" hidden><h3>몇 번째 홉이 문제인지는 왜 알 수 없나요?</h3><p>웹 페이지는 ICMP를 보낼 수도, traceroute를 할 수도 없어서, 경로를 구간으로 나눠 판단할 뿐 어느 라우터인지까지는 짚을 수 없어요. 그래도 와이파이와 회선, 장거리 경로, 프록시, 상대 서비스 중 어디인지라는 대부분의 궁금증에는 답할 수 있어요.</p></article><article data-hqb="4" hidden><h3>「진단」과 「계속 모니터링」은 어떻게 다른가요?</h3><p>진단은 2분 동안 측정하고 20초 뒤에 잠정 판단을 보여 줘요. &quot;지금 끊기는지, 어디가 문제인지&quot;에 답해요. 모니터링은 「중지」를 누를 때까지 계속돼요. 구간마다 5초에 한 칸씩 기록하고, 10초 넘게 나빠지면 이벤트로 남겨요. 오프라인, 네트워크 종류나 공인 주소의 변화도 기록해요. 문제가 생겼다 말았다 할 때는 모니터링을 켠 채 다른 일을 하다가 돌아와 기록을 보면, 어느 구간이 언제, 얼마나 나빴는지 알 수 있어요. 백그라운드 탭에서도 계속 측정해요.</p></article><article data-hqb="5" hidden><h3>「공유기」 줄은 어떻게 생기나요?</h3><p>측정을 시작하면 페이지가 흔한 주소 몇 개에서 집 공유기를 찾고, 찾으면 「공유기」 줄을 추가해요. 그러면 내 쪽 문제를 다시 둘로 나눌 수 있어요: 공유기까지도 나빠졌다면 와이파이나 집 안 네트워크, 공유기는 정상인데 그 너머가 나빠졌다면 회선 연결이에요. Chrome은 먼저 이 페이지가 로컬 네트워크에 접근해도 되는지 묻고, 허용해야 측정해요. 다른 브라우저는 아직 지원하지 않아서 이 줄이 없어요.</p></article><article data-hqb="6" hidden><h3>내 데이터를 업로드하나요?</h3><p>아니요. 모든 요청은 브라우저에서 측정 대상 사이트와 STUN 서버로 바로 가고, 결과는 이 페이지에만 남았다가 닫으면 사라져요.</p><p>결과를 공유하면 링크에는 판단, 숫자, 구간별 상태만 들어가고 IP 주소는 들어가지 않아요. 국가와 Cloudflare 지점은 체크했을 때만 들어가요.</p></article></div>
+    </div>
+  </div>
+</div>
+
+<script type="application/json" id="data">{"lang":"ko","paths":{"en":"/","zh-CN":"/zh-cn/","zh-TW":"/zh-tw/","ja":"/ja/","ko":"/ko/","es":"/es/","fr":"/fr/","de":"/de/","pt":"/pt/","ru":"/ru/"},"worker":"/assets/w.f2f31b8fe6.js"}</script>
+<script src="/assets/l.ko.16e3fe5899.js"></script>
+<script src="/assets/app.c5d9635b01.js"></script>
+</body>
+</html>

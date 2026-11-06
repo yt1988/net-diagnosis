@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ja" data-paths="{&quot;en&quot;:&quot;/&quot;,&quot;zh-CN&quot;:&quot;/zh-cn/&quot;,&quot;zh-TW&quot;:&quot;/zh-tw/&quot;,&quot;ja&quot;:&quot;/ja/&quot;,&quot;ko&quot;:&quot;/ko/&quot;,&quot;es&quot;:&quot;/es/&quot;,&quot;fr&quot;:&quot;/fr/&quot;,&quot;de&quot;:&quot;/de/&quot;,&quot;pt&quot;:&quot;/pt/&quot;,&quot;ru&quot;:&quot;/ru/&quot;}">
+<head>
+<meta charset="utf-8">
+<script>(function(){var d=document.documentElement,th=null,s=null;try{th=localStorage.getItem("netdiag:theme");s=localStorage.getItem("netdiag:lang")}catch(e){}if(th==="light"||th==="dark")d.setAttribute("data-theme",th);if(!d.hasAttribute("data-root"))return;var P=JSON.parse(d.getAttribute("data-paths")||"{}"),l=null;try{var q=new URLSearchParams(location.search).get("lang");if(P[q])l=q}catch(e){}if(!l&&P[s])l=s;for(var ls=navigator.languages||[navigator.language||"en"],i=0;!l&&!s&&i<ls.length;i++){var x=String(ls[i]).toLowerCase(),b=x.split("-")[0];l=b==="zh"?(/tw|hk|mo|hant/.test(x)?"zh-TW":"zh-CN"):P[b]?b:null}if(l&&l!=="en"&&P[l])location.replace(P[l]+location.search+location.hash)})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ネットワーク診断：ネットが重いのはどこが原因？Wi‑Fi・回線・プロキシ・サービス · 1ms.dog</title>
+<meta name="description" content="近く・遠く・UDP・よく使うサービスをブラウザで同時に測り、遅さの原因が端末、Wi‑Fi と回線、長距離の経路、プロキシ、特定のサービスのどこにあるかを判定します。UDP のパケットロスを推定し、UDP の帯域制限も見抜き、通話とゲームの快適さを採点。インストール不要、スマホでも使え、データは集めません。">
+<meta name="keywords" content="ネットワーク診断,回線 遅い 原因,パケットロス 測定,ジッター 測定,UDP パケットロス,遅延 測定,ping 測定,ネット 重い">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="application-name" content="ネットワーク診断">
+<meta name="theme-color" content="#f6f6f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1c1c1c" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://lag.1ms.dog/ja/">
+<link rel="alternate" hreflang="en" href="https://lag.1ms.dog/">
+<link rel="alternate" hreflang="zh-CN" href="https://lag.1ms.dog/zh-cn/">
+<link rel="alternate" hreflang="zh-TW" href="https://lag.1ms.dog/zh-tw/">
+<link rel="alternate" hreflang="ja" href="https://lag.1ms.dog/ja/">
+<link rel="alternate" hreflang="ko" href="https://lag.1ms.dog/ko/">
+<link rel="alternate" hreflang="es" href="https://lag.1ms.dog/es/">
+<link rel="alternate" hreflang="fr" href="https://lag.1ms.dog/fr/">
+<link rel="alternate" hreflang="de" href="https://lag.1ms.dog/de/">
+<link rel="alternate" hreflang="pt" href="https://lag.1ms.dog/pt/">
+<link rel="alternate" hreflang="ru" href="https://lag.1ms.dog/ru/">
+<link rel="alternate" hreflang="x-default" href="https://lag.1ms.dog/">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="1ms.dog">
+<meta property="og:title" content="ネットワーク診断：ネットが重いのはどこが原因？Wi‑Fi・回線・プロキシ・サービス · 1ms.dog">
+<meta property="og:description" content="遅さの原因はどこ？端末、Wi‑Fi と回線、長距離の経路、プロキシ、サービス">
+<meta property="og:url" content="https://lag.1ms.dog/ja/">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://lag.1ms.dog/og/ja.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ネットワーク診断：ネットが重いのはどこが原因？Wi‑Fi・回線・プロキシ・サービス · 1ms.dog">
+<meta name="twitter:description" content="遅さの原因はどこ？端末、Wi‑Fi と回線、長距離の経路、プロキシ、サービス">
+<meta name="twitter:image" content="https://lag.1ms.dog/og/ja.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"ネットワーク診断 · 1ms.dog","url":"https://lag.1ms.dog/ja/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"近く・遠く・UDP・よく使うサービスをブラウザで同時に測り、遅さの原因が端末、Wi‑Fi と回線、長距離の経路、プロキシ、特定のサービスのどこにあるかを判定します。UDP のパケットロスを推定し、UDP の帯域制限も見抜き、通話とゲームの快適さを採点。インストール不要、スマホでも使え、データは集めません。","inLanguage":"ja","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"どうやって原因の区間を見分けるのですか？","acceptedAnswer":{"@type":"Answer","text":"ページは複数の経路を同時に測ります：最寄りの Cloudflare 拠点、東京・フランクフルト・バージニアのクラウドリージョン、選んだサービス、そして公開 STUN サーバーへの UDP。5 秒ごとに比べ、すべてが同時に悪化すれば手元側（Wi‑Fi、ルーター、回線）、近くは正常で遠くだけ悪化すれば長距離の経路、1 つのサービスだけならそのサービス、Web は正常で UDP だけロスしていればゲームや通話が途切れる、と判定します。 どの判定にも根拠と確度を示します。"}},{"@type":"Question","name":"プロキシを使っていても正確ですか？","acceptedAnswer":{"@type":"Answer","text":"区間を分けて見ます。中国本土でプロキシを使っている場合、プロキシを通らない中国国内サイトで自分の回線を、プロキシ経由の最寄り Cloudflare 拠点でプロキシサーバーまでの区間を、遠くのクラウドリージョンでその先を測ります。3 つを比べれば、回線・サーバーまで・その先のどこが原因かがわかります。プロキシアプリが TUN や fake-ip モードだと UDP もプロキシを通ることがあり、判定には確度を添えます。"}},{"@type":"Question","name":"UDP のパケットロスはどう測るのですか？","acceptedAnswer":{"@type":"Answer","text":"Web ページは UDP を直接送れないため、公開 STUN サーバー（Cloudflare、Google、中国本土では Xiaomi と Bilibili も）に自分のグローバルアドレスを問い合わせます。1 回の問い合わせが UDP の 1 往復です。要求が失われると、ブラウザは 250 ms 後に再送するので応答が遅れます。この遅れた応答を数えてロス率を推定します。サーバー側でわざと 2%、5%、10% を落として確かめたところ、それぞれ 1〜2%、4〜5%、8〜9% と出ました。 1 サーバーあたり毎分約 80 回の応答なので、正確な割合には数分以上のデータが必要です。"}},{"@type":"Question","name":"何ホップ目が悪いかまでわからないのはなぜ？","acceptedAnswer":{"@type":"Answer","text":"Web ページは ICMP を送れず、traceroute もできないので、経路を区間に分けて判定するしかなく、どのルーターかまでは特定できません。それでも、Wi‑Fi と回線、長距離の経路、プロキシ、相手のサービスのどれかという、たいていの疑問には答えられます。"}},{"@type":"Question","name":"「診断」と「監視を続ける」の違いは？","acceptedAnswer":{"@type":"Answer","text":"診断は 2 分間測り、20 秒で暫定の判定を出します。「いま重いか、どこが原因か」に答えます。監視は「停止」を押すまで続き、区間ごとに 5 秒で 1 マスを記録し、10 秒以上悪化した時間帯をイベントにします。オフライン、ネットワークの種類やグローバルアドレスの変化も記録します。調子が良くなったり悪くなったりするときは、監視を続けたまま別のことをして、あとで記録を見れば、どの区間がいつ、どれくらい悪かったかがわかります。バックグラウンドのタブでも測り続けます。"}},{"@type":"Question","name":"「ルーター」の行はどこから来るのですか？","acceptedAnswer":{"@type":"Answer","text":"測定を始めると、ページはよくあるアドレスで家のルーターを探し、見つかれば「ルーター」の行を追加します。すると手元側の問題をさらに分けられます：ルーターまでも悪化していれば Wi‑Fi か家の中のネットワーク、ルーターは正常でその先が悪化していれば回線の接続です。Chrome は最初に、このページがローカルネットワークにアクセスしてよいかを尋ね、許可したときだけ測ります。ほかのブラウザはまだ対応しておらず、この行は出ません。"}},{"@type":"Question","name":"データはアップロードされますか？","acceptedAnswer":{"@type":"Answer","text":"いいえ。すべての要求はブラウザから測定先のサイトや STUN サーバーへ直接送られ、結果はこのページにだけ残り、閉じれば消えます。 結果を共有するとき、リンクに含まれるのは判定・数値・区間ごとの状態だけで、IP アドレスは含まれません。国と Cloudflare 拠点は、チェックを入れたときだけ含まれます。"}}]}]}</script>
+<link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/app.452a252ccb.css">
+</head>
+<body data-sel="diag">
+<div class="app">
+  <header class="top">
+    <a class="brand" href="/ja/" aria-current="page">
+      <span class="logo"><img class="logo-light" src="/assets/logo-light.svg" width="90" height="36" alt="1ms.dog" loading="lazy"><img class="logo-dark" src="/assets/logo-dark.svg" width="90" height="36" alt="1ms.dog" loading="lazy"></span>
+      <span class="brand-name" data-i="app_name">ネットワーク診断</span>
+    </a>
+    <div class="top-acts">
+      <label class="sel"><span class="sr" data-i="lang_label">言語</span>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c2 2 2.8 4 2.8 6.5S10 12.5 8 14.5C6 12.5 5.2 10.5 5.2 8S6 3.5 8 1.5z"/></svg>
+        <select id="lang"><option value="en">English</option><option value="zh-CN">简体中文</option><option value="zh-TW">繁體中文</option><option value="ja" selected>日本語</option><option value="ko">한국어</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="pt">Português</option><option value="ru">Русский</option></select>
+      </label>
+      <button class="icon-btn" id="helpBtn" type="button" aria-haspopup="dialog" aria-controls="help"><span class="sr" data-i="faq_h">ヘルプ</span>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><path d="M6.3 6.2a1.8 1.8 0 1 1 2.5 1.7c-.5.2-.8.6-.8 1.1v.4M8 11.3v.1"/></svg>
+      </button>
+      <a class="icon-btn gh" href="https://github.com/yt1988/net-diagnosis" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7 0-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.4 7.4 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.7-3.6 3.9.3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2z"/></svg></a>
+      <button class="icon-btn" id="theme" type="button" aria-label="テーマを切り替え">
+        <svg class="i-sys" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="9" rx="1.5"/><path d="M5.5 14h5M8 11.5V14"/></svg>
+        <svg class="i-light" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1v1.6M8 13.4V15M1 8h1.6M13.4 8H15M3 3l1.1 1.1M11.9 11.9 13 13M3 13l1.1-1.1M11.9 4.1 13 3"/></svg>
+        <svg class="i-dark" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 9.8A5.8 5.8 0 0 1 6.2 2.5a5.8 5.8 0 1 0 7.3 7.3z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero card">
+      <h1>ネットが重い？どこが原因かを突き止める</h1>
+      <p class="lead" data-i="lead">あなたのブラウザから、近く・遠く・UDP・よく使うサービスを同時に測り、遅さの原因がどこにあるかを突き止めます。</p>
+      <!-- the two modes are the tool: a diagnosis, or monitoring that keeps going until Stop -->
+      <div class="modes" role="radiogroup" aria-label="モード">
+        <button type="button" role="radio" data-mode="diag" aria-checked="true"><b data-i="mode_diag">診断</b><span data-i="mode_diag_s">2 分で原因を特定</span></button>
+        <button type="button" role="radio" data-mode="mon" aria-checked="false"><b data-i="mode_mon">監視を続ける</b><span data-i="mode_mon_s">問題をすべて記録</span></button>
+      </div>
+      <div class="go-row">
+        <button class="go" id="go" type="button"><span class="go-t" id="goT" data-i="start">開始</span><span class="go-n" id="goN"></span></button>
+        <button class="icon-btn bell" id="ntf" type="button" aria-pressed="false" aria-label="通知" data-tip="問題が起きたらデスクトップ通知を出します">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 11.5V7a4 4 0 1 1 8 0v4.5l1.2 1.5H2.8zM6.5 14.2a1.6 1.6 0 0 0 3 0"/></svg>
+        </button>
+      </div>
+
+      <!-- the verdict: one sentence, how sure and where it exits, 3 numbers, evidence, what it means for calls, games,
+           pages and a full line, and what to try. Every part keeps its space, so nothing moves when it fills. -->
+      <div class="verdict" id="verdict" data-lv="idle" aria-live="polite">
+        <p class="v-h" id="vH" data-i="v_idle">「開始」を押してください：2 分間測り、20 秒で最初の判定を出します</p>
+        <p class="v-sub"><span id="vState">&nbsp;</span><span class="v-exit" id="vExit"></span><button class="share-b" id="shareBtn" type="button" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 10.5V2M5 4.8 8 2l3 2.8M3.5 8.5v5h9v-5"/></svg><span data-i="share">共有</span></button></p>
+        <ul class="nums">
+          <li data-c="near"><span data-i="k_near">近くの遅延</span><b>–</b></li>
+          <li data-c="jitter"><span data-i="k_jitter">ジッター</span><b>–</b></li>
+          <li data-c="udp"><span data-i="k_udp">UDP ロス</span><b>–</b><button class="lnk sm" id="udpxBtn" type="button" data-tip="1ms.dog の東京のテストサーバーへ 20 秒間 UDP パケットを送り、上りと下りそれぞれのロスを数えます。続けて QUIC（HTTP/3 が使う UDP）が通るかを確かめます。" data-i="udpx_btn">精密に測る（20 秒）</button></li>
+        </ul>
+        <div class="v-body">
+          <ul class="fit">
+            <li data-s="call"><span class="fit-k" data-tip="ビデオ通話の品質（MOS）。遅延・ジッター・ロスから 1〜5 点で算出します。4 点以上はクリアで滑らか、3.6〜4 点はときどき雑音や遅れ、3.6 点未満は途切れがちです。" tabindex="0" data-i="sc_call">ビデオ通話</span><b>–</b><em>&nbsp;</em></li>
+            <li data-s="game"><span class="fit-k" data-tip="往復がいつもより 100 ms 以上遅いか、UDP パケットの再送が必要になったら 1 回のカクつきと数えます。10 分あたり 2 回以下なら良好、6 回以上なら不良です。" tabindex="0" data-i="sc_game">オンラインゲーム</span><b>–</b><em>&nbsp;</em></li>
+            <li data-s="page"><span class="fit-k" data-tip="新しいサイトを開くとき、接続の確立（DNS・TCP・TLS）にかかる時間。250 ms 未満なら良好、600 ms 超なら不良です。" tabindex="0" data-i="sc_page">Web ページ</span><b>–</b><em>&nbsp;</em></li>
+            <li data-s="load"><span class="fit-k" data-tip="10 秒間ダウンロードして回線を埋め、遅延がどれだけ上がるか（バッファーブロート）を見ます。上がり幅が大きいと、家族がダウンロードしている間にゲームや会議がカクつきます。通信量を使い、速い回線では数百 MB になります。評価は Waveform の基準：A+ は 5 ms 未満、A は 30 未満、B は 60 未満、C は 200 未満、D は 400 未満、それ以上は F。" tabindex="0" data-i="sc_load">高負荷時の遅延</span><b>–</b><em>&nbsp;</em><button class="lnk sm" id="loadBtn" type="button" data-i="load_btn">測る（10 秒）</button><a class="lnk sm xl" id="speedLnk" target="_blank" rel="noopener" hidden><span data-i="to_speed">速度を測る</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2.5h4.5V7M13.5 2.5 7.5 8.5M12 10v3.5H2.5V4H6"/></svg></a></li>
+          </ul>
+          <!-- why, and what to try: side by side, 3 lines each reserved, so the box keeps its height -->
+          <div class="v-two">
+            <div class="evc" id="evc" data-on=""><p class="sug-h" data-i="ev_h">根拠</p><ul class="ev" id="ev"></ul></div>
+            <div class="sug" id="sug" data-on=""><p class="sug-h" data-i="sug_h">試せること</p><ul id="sugL"></ul></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- every part of the path, one lane each: its state now and the last 6 minutes in 5-second windows -->
+    <section class="card lanes-c">
+      <div class="sec-h">
+        <h2 data-i="lanes_h">経路の区間ごと</h2>
+        <ul class="legend" aria-hidden="true">
+          <li data-st="ok"><i></i><span data-i="st_ok">正常</span></li>
+          <li data-st="warn"><i></i><span data-i="st_warn">やや不安定</span></li>
+          <li data-st="bad"><i></i><span data-i="st_bad">悪化</span></li>
+          <li data-st="gap"><i></i><span data-i="st_gap">未測定</span></li>
+        </ul>
+      </div>
+      <ul class="lanes"><li data-lane="device"><span class="ln-h"><span class="ln-k" data-tip="ページのタイマーが時間どおりに動くか：端末やブラウザが忙しすぎると、測定値を信頼できません" tabindex="0">端末</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="gw" hidden><span class="ln-h"><span class="ln-k" data-tip="家のルーター ：Wi‑Fi かケーブル 1 本の距離で、正常なら数 ms。ここも悪化するなら Wi‑Fi か家の中のネットワークが原因です" tabindex="0">ルーター</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="direct" hidden><span class="ln-h"><span class="ln-k" data-tip="プロキシを通さない中国国内サイト：自分の回線そのもの" tabindex="0">中国国内（直接）</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="near"><span class="ln-h"><span class="ln-k" data-tip="最寄りの Cloudflare 拠点：Wi‑Fi、ルーター、回線の接続" tabindex="0">近く</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="far"><span class="ln-h"><span class="ln-k" data-tip="東京・フランクフルト・バージニアのクラウドリージョン：長距離の経路" tabindex="0">遠く</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="udp"><span class="ln-h"><span class="ln-k" data-tip="公開 STUN サーバーに自分のアドレスを問い合わせ：UDP の往復とロス。ゲームや通話が使うのは UDP です" tabindex="0">UDP</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="svc"><span class="ln-h"><span class="ln-k" data-tip="選んだサービス：これだけが悪化するなら、サービス側の問題です" tabindex="0">よく使うサービス</span><span class="ln-ic" id="svcIcons"></span><button class="ln-edit" id="svcEdit" type="button" aria-haspopup="dialog" aria-controls="svcs" aria-label="サービスを編集" data-tip="サービスを編集"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.5 2.5l3 3L6 13H3v-3z"/></svg></button></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li class="axis" aria-hidden="true"><span></span><span></span><span class="ax"><em>6 分前</em><em>現在</em></span></li></ul>
+    </section>
+
+    <section class="card inc-c" id="incC" hidden>
+      <h2 data-i="inc_h">イベント記録</h2>
+      <ol class="inc" id="inc"></ol>
+    </section>
+
+    <div data-ms-more></div>
+  </main>
+</div>
+
+<div class="scrim" id="svcs" hidden>
+  <div class="dialog svcs" role="dialog" aria-modal="true" aria-labelledby="svcsT">
+    <div class="dlg-h"><h2 id="svcsT" data-i="svc_h">よく使うサービス</h2>
+      <button class="icon-btn" data-close type="button" aria-label="閉じる"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
+    <div class="dlg-b">
+      <div class="chips" id="svcList"></div>
+      <form class="svc-add" id="svcForm" autocomplete="off">
+        <input id="svcIn" type="text" inputmode="url" placeholder="サイトを追加（例：example.com）" aria-label="サイトを追加（例：example.com）" spellcheck="false">
+        <button class="btn" type="submit" data-i="svc_add">追加</button>
+      </form>
+      <p class="err" id="svcErr" aria-live="polite"></p>
+      <p class="note" data-i="svc_note">名前を押して測るサービスを選びます。測っているのはサイトの favicon です。一部のサイトはアプリケーションサーバーを経由して返すため、遅延が高めに出ます。追加したサイトはこのブラウザにだけ保存されます。</p>
+    </div>
+  </div>
+</div>
+<div class="scrim" id="help" hidden>
+  <div class="dialog help" role="dialog" aria-modal="true" aria-labelledby="helpT">
+    <div class="dlg-h"><h2 id="helpT" data-i="faq_h">ヘルプ</h2>
+      <button class="icon-btn" data-close type="button" aria-label="閉じる"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
+    <div class="help-b">
+      <nav class="help-nav" id="helpNav" role="tablist"><button type="button" role="tab" data-hq="0" aria-selected="true">どうやって原因の区間を見分けるのですか？</button><button type="button" role="tab" data-hq="1" aria-selected="false">プロキシを使っていても正確ですか？</button><button type="button" role="tab" data-hq="2" aria-selected="false">UDP のパケットロスはどう測るのですか？</button><button type="button" role="tab" data-hq="3" aria-selected="false">何ホップ目が悪いかまでわからないのはなぜ？</button><button type="button" role="tab" data-hq="4" aria-selected="false">「診断」と「監視を続ける」の違いは？</button><button type="button" role="tab" data-hq="5" aria-selected="false">「ルーター」の行はどこから来るのですか？</button><button type="button" role="tab" data-hq="6" aria-selected="false">データはアップロードされますか？</button></nav>
+      <div class="help-pick">
+        <button class="icon-btn" type="button" data-hstep="-1" aria-label="前へ"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 4L6 8l4 4"/></svg></button>
+        <select id="helpSel" aria-labelledby="helpT"></select>
+        <button class="icon-btn" type="button" data-hstep="1" aria-label="次へ"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4"/></svg></button>
+      </div>
+      <div class="help-c" id="helpC"><article data-hqb="0"><h3>どうやって原因の区間を見分けるのですか？</h3><p>ページは複数の経路を同時に測ります：最寄りの Cloudflare 拠点、東京・フランクフルト・バージニアのクラウドリージョン、選んだサービス、そして公開 STUN サーバーへの UDP。5 秒ごとに比べ、すべてが同時に悪化すれば手元側（Wi‑Fi、ルーター、回線）、近くは正常で遠くだけ悪化すれば長距離の経路、1 つのサービスだけならそのサービス、Web は正常で UDP だけロスしていればゲームや通話が途切れる、と判定します。</p><p>どの判定にも根拠と確度を示します。</p></article><article data-hqb="1" hidden><h3>プロキシを使っていても正確ですか？</h3><p>区間を分けて見ます。中国本土でプロキシを使っている場合、プロキシを通らない中国国内サイトで自分の回線を、プロキシ経由の最寄り Cloudflare 拠点でプロキシサーバーまでの区間を、遠くのクラウドリージョンでその先を測ります。3 つを比べれば、回線・サーバーまで・その先のどこが原因かがわかります。プロキシアプリが TUN や fake-ip モードだと UDP もプロキシを通ることがあり、判定には確度を添えます。</p></article><article data-hqb="2" hidden><h3>UDP のパケットロスはどう測るのですか？</h3><p>Web ページは UDP を直接送れないため、公開 STUN サーバー（Cloudflare、Google、中国本土では Xiaomi と Bilibili も）に自分のグローバルアドレスを問い合わせます。1 回の問い合わせが UDP の 1 往復です。要求が失われると、ブラウザは 250 ms 後に再送するので応答が遅れます。この遅れた応答を数えてロス率を推定します。サーバー側でわざと 2%、5%、10% を落として確かめたところ、それぞれ 1〜2%、4〜5%、8〜9% と出ました。</p><p>1 サーバーあたり毎分約 80 回の応答なので、正確な割合には数分以上のデータが必要です。</p></article><article data-hqb="3" hidden><h3>何ホップ目が悪いかまでわからないのはなぜ？</h3><p>Web ページは ICMP を送れず、traceroute もできないので、経路を区間に分けて判定するしかなく、どのルーターかまでは特定できません。それでも、Wi‑Fi と回線、長距離の経路、プロキシ、相手のサービスのどれかという、たいていの疑問には答えられます。</p></article><article data-hqb="4" hidden><h3>「診断」と「監視を続ける」の違いは？</h3><p>診断は 2 分間測り、20 秒で暫定の判定を出します。「いま重いか、どこが原因か」に答えます。監視は「停止」を押すまで続き、区間ごとに 5 秒で 1 マスを記録し、10 秒以上悪化した時間帯をイベントにします。オフライン、ネットワークの種類やグローバルアドレスの変化も記録します。調子が良くなったり悪くなったりするときは、監視を続けたまま別のことをして、あとで記録を見れば、どの区間がいつ、どれくらい悪かったかがわかります。バックグラウンドのタブでも測り続けます。</p></article><article data-hqb="5" hidden><h3>「ルーター」の行はどこから来るのですか？</h3><p>測定を始めると、ページはよくあるアドレスで家のルーターを探し、見つかれば「ルーター」の行を追加します。すると手元側の問題をさらに分けられます：ルーターまでも悪化していれば Wi‑Fi か家の中のネットワーク、ルーターは正常でその先が悪化していれば回線の接続です。Chrome は最初に、このページがローカルネットワークにアクセスしてよいかを尋ね、許可したときだけ測ります。ほかのブラウザはまだ対応しておらず、この行は出ません。</p></article><article data-hqb="6" hidden><h3>データはアップロードされますか？</h3><p>いいえ。すべての要求はブラウザから測定先のサイトや STUN サーバーへ直接送られ、結果はこのページにだけ残り、閉じれば消えます。</p><p>結果を共有するとき、リンクに含まれるのは判定・数値・区間ごとの状態だけで、IP アドレスは含まれません。国と Cloudflare 拠点は、チェックを入れたときだけ含まれます。</p></article></div>
+    </div>
+  </div>
+</div>
+
+<script type="application/json" id="data">{"lang":"ja","paths":{"en":"/","zh-CN":"/zh-cn/","zh-TW":"/zh-tw/","ja":"/ja/","ko":"/ko/","es":"/es/","fr":"/fr/","de":"/de/","pt":"/pt/","ru":"/ru/"},"worker":"/assets/w.f2f31b8fe6.js"}</script>
+<script src="/assets/l.ja.d26d6960fa.js"></script>
+<script src="/assets/app.c5d9635b01.js"></script>
+</body>
+</html>

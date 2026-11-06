@@ -52,7 +52,7 @@
            pages and a full line, and what to try. Every part keeps its space, so nothing moves when it fills. -->
       <div class="verdict" id="verdict" data-lv="idle" aria-live="polite">
         <p class="v-h" id="vH" data-i="v_idle"></p>
-        <p class="v-sub"><span id="vState">&nbsp;</span><span class="v-exit" id="vExit"></span></p>
+        <p class="v-sub"><span id="vState">&nbsp;</span><span class="v-exit" id="vExit"></span><button class="share-b" id="shareBtn" type="button" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 10.5V2M5 4.8 8 2l3 2.8M3.5 8.5v5h9v-5"/></svg><span data-i="share"></span></button></p>
         <ul class="nums">
           <li data-c="near"><span data-i="k_near"></span><b>–</b></li>
           <li data-c="jitter"><span data-i="k_jitter"></span><b>–</b></li>
@@ -63,7 +63,7 @@
             <li data-s="call"><span class="fit-k" data-tip="{{a:tip_call}}" tabindex="0" data-i="sc_call"></span><b>–</b><em>&nbsp;</em></li>
             <li data-s="game"><span class="fit-k" data-tip="{{a:tip_game}}" tabindex="0" data-i="sc_game"></span><b>–</b><em>&nbsp;</em></li>
             <li data-s="page"><span class="fit-k" data-tip="{{a:tip_page}}" tabindex="0" data-i="sc_page"></span><b>–</b><em>&nbsp;</em></li>
-            <li data-s="load"><span class="fit-k" data-tip="{{a:tip_load}}" tabindex="0" data-i="sc_load"></span><b>–</b><em>&nbsp;</em><button class="lnk sm" id="loadBtn" type="button" data-i="load_btn"></button></li>
+            <li data-s="load"><span class="fit-k" data-tip="{{a:tip_load}}" tabindex="0" data-i="sc_load"></span><b>–</b><em>&nbsp;</em><button class="lnk sm" id="loadBtn" type="button" data-i="load_btn"></button><a class="lnk sm xl" id="speedLnk" target="_blank" rel="noopener" hidden><span data-i="to_speed"></span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2.5h4.5V7M13.5 2.5 7.5 8.5M12 10v3.5H2.5V4H6"/></svg></a></li>
           </ul>
           <!-- why, and what to try: side by side, 3 lines each reserved, so the box keeps its height -->
           <div class="v-two">

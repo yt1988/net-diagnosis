@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="pt" data-paths="{&quot;en&quot;:&quot;/&quot;,&quot;zh-CN&quot;:&quot;/zh-cn/&quot;,&quot;zh-TW&quot;:&quot;/zh-tw/&quot;,&quot;ja&quot;:&quot;/ja/&quot;,&quot;ko&quot;:&quot;/ko/&quot;,&quot;es&quot;:&quot;/es/&quot;,&quot;fr&quot;:&quot;/fr/&quot;,&quot;de&quot;:&quot;/de/&quot;,&quot;pt&quot;:&quot;/pt/&quot;,&quot;ru&quot;:&quot;/ru/&quot;}">
+<head>
+<meta charset="utf-8">
+<script>(function(){var d=document.documentElement,th=null,s=null;try{th=localStorage.getItem("netdiag:theme");s=localStorage.getItem("netdiag:lang")}catch(e){}if(th==="light"||th==="dark")d.setAttribute("data-theme",th);if(!d.hasAttribute("data-root"))return;var P=JSON.parse(d.getAttribute("data-paths")||"{}"),l=null;try{var q=new URLSearchParams(location.search).get("lang");if(P[q])l=q}catch(e){}if(!l&&P[s])l=s;for(var ls=navigator.languages||[navigator.language||"en"],i=0;!l&&!s&&i<ls.length;i++){var x=String(ls[i]).toLowerCase(),b=x.split("-")[0];l=b==="zh"?(/tw|hk|mo|hant/.test(x)?"zh-TW":"zh-CN"):P[b]?b:null}if(l&&l!=="en"&&P[l])location.replace(P[l]+location.search+location.hash)})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Diagnóstico de rede: por que minha internet está travando? Wi‑Fi, provedor, proxy ou o serviço · 1ms.dog</title>
+<meta name="description" content="Mede ao mesmo tempo, no navegador, o que está perto, o que está longe, o UDP e os serviços que você usa, e mostra de onde vem o lag: seu aparelho, o Wi‑Fi e a conexão, a rota de longa distância, um proxy ou um único serviço. Estima a perda de pacotes UDP, detecta UDP limitado e dá nota para chamadas e jogos. Sem instalar nada, funciona no celular e não coleta dados.">
+<meta name="keywords" content="diagnóstico de rede, teste de lag, teste de perda de pacotes, teste de jitter, perda de pacotes UDP, teste de latência, teste de ping, internet lenta por quê">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="application-name" content="Diagnóstico de rede">
+<meta name="theme-color" content="#f6f6f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1c1c1c" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://lag.1ms.dog/pt/">
+<link rel="alternate" hreflang="en" href="https://lag.1ms.dog/">
+<link rel="alternate" hreflang="zh-CN" href="https://lag.1ms.dog/zh-cn/">
+<link rel="alternate" hreflang="zh-TW" href="https://lag.1ms.dog/zh-tw/">
+<link rel="alternate" hreflang="ja" href="https://lag.1ms.dog/ja/">
+<link rel="alternate" hreflang="ko" href="https://lag.1ms.dog/ko/">
+<link rel="alternate" hreflang="es" href="https://lag.1ms.dog/es/">
+<link rel="alternate" hreflang="fr" href="https://lag.1ms.dog/fr/">
+<link rel="alternate" hreflang="de" href="https://lag.1ms.dog/de/">
+<link rel="alternate" hreflang="pt" href="https://lag.1ms.dog/pt/">
+<link rel="alternate" hreflang="ru" href="https://lag.1ms.dog/ru/">
+<link rel="alternate" hreflang="x-default" href="https://lag.1ms.dog/">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="1ms.dog">
+<meta property="og:title" content="Diagnóstico de rede: por que minha internet está travando? Wi‑Fi, provedor, proxy ou o serviço · 1ms.dog">
+<meta property="og:description" content="De onde vem o lag: aparelho, Wi‑Fi e conexão, rota longa, proxy ou o serviço">
+<meta property="og:url" content="https://lag.1ms.dog/pt/">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:image" content="https://lag.1ms.dog/og/pt.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Diagnóstico de rede: por que minha internet está travando? Wi‑Fi, provedor, proxy ou o serviço · 1ms.dog">
+<meta name="twitter:description" content="De onde vem o lag: aparelho, Wi‑Fi e conexão, rota longa, proxy ou o serviço">
+<meta name="twitter:image" content="https://lag.1ms.dog/og/pt.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Diagnóstico de rede · 1ms.dog","url":"https://lag.1ms.dog/pt/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"Mede ao mesmo tempo, no navegador, o que está perto, o que está longe, o UDP e os serviços que você usa, e mostra de onde vem o lag: seu aparelho, o Wi‑Fi e a conexão, a rota de longa distância, um proxy ou um único serviço. Estima a perda de pacotes UDP, detecta UDP limitado e dá nota para chamadas e jogos. Sem instalar nada, funciona no celular e não coleta dados.","inLanguage":"pt","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Como ele descobre qual trecho está com problema?","acceptedAnswer":{"@type":"Answer","text":"A página mede vários caminhos ao mesmo tempo: o ponto da Cloudflare mais próximo, regiões de nuvem em Tóquio, Frankfurt e Virgínia, os serviços que você escolheu e UDP para servidores STUN públicos. A cada 5 segundos ela compara. Tudo piora junto: seu lado (Wi‑Fi, roteador, provedor). Perto bem, mas longe pior: a rota de longa distância. Só um serviço pior: esse serviço. Sites funcionando, mas UDP perdendo pacotes: jogos e chamadas vão travar. Todo veredito mostra as evidências e o nível de confiança."}},{"@type":"Question","name":"Funciona com proxy ligado?","acceptedAnswer":{"@type":"Answer","text":"Ele divide o caminho. Na China continental com proxy ligado, os sites chineses (sem proxy) representam sua própria linha; o ponto da Cloudflare mais próximo pelo proxy, o caminho até o servidor proxy; e as regiões de nuvem distantes, o que vem depois. Comparar os três separa a linha, o caminho até o servidor e o resto. Quando o app de proxy roda em modo TUN ou fake-ip, ele pode levar o UDP também, e o veredito mostra o nível de confiança."}},{"@type":"Question","name":"Como a perda UDP é medida?","acceptedAnswer":{"@type":"Answer","text":"Uma página web não consegue enviar UDP puro, então pergunta seu endereço público a servidores STUN públicos (Cloudflare, Google e, na China continental, Xiaomi e Bilibili): cada resposta é uma ida e volta UDP. Quando um pedido se perde, o navegador reenvia depois de 250 ms e a resposta chega atrasada; contar essas respostas permite estimar a perda. Conferimos descartando 2%, 5% e 10% dos pacotes em um servidor: a medição deu 1–2%, 4–5% e 8–9%. São umas 80 respostas por servidor por minuto, então porcentagens exatas pedem alguns minutos."}},{"@type":"Question","name":"Por que ele não mostra o salto exato?","acceptedAnswer":{"@type":"Answer","text":"Uma página web não pode enviar ICMP nem fazer traceroute, então avalia o caminho por trechos e não consegue apontar um roteador específico. Os trechos respondem à maioria das perguntas: Wi‑Fi e provedor, rota de longa distância, proxy ou o serviço."}},{"@type":"Question","name":"Qual a diferença entre diagnosticar e monitorar?","acceptedAnswer":{"@type":"Answer","text":"O diagnóstico dura 2 minutos, com um primeiro veredito em 20 segundos: está travando agora, e onde? O monitoramento segue até você tocar em Parar: cada trecho ganha uma célula a cada 5 segundos, tudo que piora por mais de 10 segundos vira uma ocorrência, e quedas de conexão e mudanças de tipo de rede ou de endereço público também são registradas. Quando o problema vai e volta, deixe monitorando, volte depois e o registro diz qual trecho, quando e por quanto tempo. Ele continua medindo em uma aba em segundo plano."}},{"@type":"Question","name":"De onde vem a linha do roteador?","acceptedAnswer":{"@type":"Answer","text":"Ao começar, a página procura o roteador da sua casa em alguns endereços comuns e acrescenta uma linha Roteador quando o encontra. Aí “seu lado” se divide em dois: se o roteador também piora, é o Wi‑Fi ou a rede de casa; se o roteador está bem e o resto piora, é a conexão do provedor. O Chrome pergunta antes se esta página pode acessar sua rede local e só mede depois que você permite; outros navegadores ainda não suportam isso, então essa linha não aparece."}},{"@type":"Question","name":"Ele envia meus dados?","acceptedAnswer":{"@type":"Answer","text":"Não. Cada pedido vai direto do seu navegador para os sites e servidores STUN medidos; os resultados ficam nesta página e somem quando você a fecha. Ao compartilhar um resultado, o link leva o veredito, os números e o estado de cada trecho, nunca seu endereço IP; o país e o ponto da Cloudflare só se você marcar a caixa."}}]}]}</script>
+<link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/app.452a252ccb.css">
+</head>
+<body data-sel="diag">
+<div class="app">
+  <header class="top">
+    <a class="brand" href="/pt/" aria-current="page">
+      <span class="logo"><img class="logo-light" src="/assets/logo-light.svg" width="90" height="36" alt="1ms.dog" loading="lazy"><img class="logo-dark" src="/assets/logo-dark.svg" width="90" height="36" alt="1ms.dog" loading="lazy"></span>
+      <span class="brand-name" data-i="app_name">Diagnóstico de rede</span>
+    </a>
+    <div class="top-acts">
+      <label class="sel"><span class="sr" data-i="lang_label">Idioma</span>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c2 2 2.8 4 2.8 6.5S10 12.5 8 14.5C6 12.5 5.2 10.5 5.2 8S6 3.5 8 1.5z"/></svg>
+        <select id="lang"><option value="en">English</option><option value="zh-CN">简体中文</option><option value="zh-TW">繁體中文</option><option value="ja">日本語</option><option value="ko">한국어</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="pt" selected>Português</option><option value="ru">Русский</option></select>
+      </label>
+      <button class="icon-btn" id="helpBtn" type="button" aria-haspopup="dialog" aria-controls="help"><span class="sr" data-i="faq_h">Ajuda</span>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><path d="M6.3 6.2a1.8 1.8 0 1 1 2.5 1.7c-.5.2-.8.6-.8 1.1v.4M8 11.3v.1"/></svg>
+      </button>
+      <a class="icon-btn gh" href="https://github.com/yt1988/net-diagnosis" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7 0-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.4 7.4 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.7-3.6 3.9.3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2z"/></svg></a>
+      <button class="icon-btn" id="theme" type="button" aria-label="Mudar tema">
+        <svg class="i-sys" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="9" rx="1.5"/><path d="M5.5 14h5M8 11.5V14"/></svg>
+        <svg class="i-light" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1v1.6M8 13.4V15M1 8h1.6M13.4 8H15M3 3l1.1 1.1M11.9 11.9 13 13M3 13l1.1-1.1M11.9 4.1 13 3"/></svg>
+        <svg class="i-dark" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 9.8A5.8 5.8 0 0 1 6.2 2.5a5.8 5.8 0 1 0 7.3 7.3z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero card">
+      <h1>Internet travando? Descubra em que trecho está o problema</h1>
+      <p class="lead" data-i="lead">No seu próprio navegador, perto, longe, UDP e os serviços que você usa são medidos ao mesmo tempo, para achar de onde vem o lag.</p>
+      <!-- the two modes are the tool: a diagnosis, or monitoring that keeps going until Stop -->
+      <div class="modes" role="radiogroup" aria-label="Modo">
+        <button type="button" role="radio" data-mode="diag" aria-checked="true"><b data-i="mode_diag">Diagnosticar</b><span data-i="mode_diag_s">2 min para achar o problema</span></button>
+        <button type="button" role="radio" data-mode="mon" aria-checked="false"><b data-i="mode_mon">Monitorar</b><span data-i="mode_mon_s">registra cada problema</span></button>
+      </div>
+      <div class="go-row">
+        <button class="go" id="go" type="button"><span class="go-t" id="goT" data-i="start">Começar</span><span class="go-n" id="goN"></span></button>
+        <button class="icon-btn bell" id="ntf" type="button" aria-pressed="false" aria-label="Avisar" data-tip="Uma notificação na área de trabalho quando algo dá errado">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 11.5V7a4 4 0 1 1 8 0v4.5l1.2 1.5H2.8zM6.5 14.2a1.6 1.6 0 0 0 3 0"/></svg>
+        </button>
+      </div>
+
+      <!-- the verdict: one sentence, how sure and where it exits, 3 numbers, evidence, what it means for calls, games,
+           pages and a full line, and what to try. Every part keeps its space, so nothing moves when it fills. -->
+      <div class="verdict" id="verdict" data-lv="idle" aria-live="polite">
+        <p class="v-h" id="vH" data-i="v_idle">Toque em Começar: 2 minutos de medição, com um primeiro veredito em 20 segundos</p>
+        <p class="v-sub"><span id="vState">&nbsp;</span><span class="v-exit" id="vExit"></span><button class="share-b" id="shareBtn" type="button" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 10.5V2M5 4.8 8 2l3 2.8M3.5 8.5v5h9v-5"/></svg><span data-i="share">Compartilhar</span></button></p>
+        <ul class="nums">
+          <li data-c="near"><span data-i="k_near">Latência perto</span><b>–</b></li>
+          <li data-c="jitter"><span data-i="k_jitter">Jitter</span><b>–</b></li>
+          <li data-c="udp"><span data-i="k_udp">Perda UDP</span><b>–</b><button class="lnk sm" id="udpxBtn" type="button" data-tip="Envia pacotes UDP por 20 segundos ao servidor de testes da 1ms.dog em Tóquio, conta a perda em cada sentido e depois verifica se o QUIC (o UDP do HTTP/3) passa." data-i="udpx_btn">Teste exato (20 s)</button></li>
+        </ul>
+        <div class="v-body">
+          <ul class="fit">
+            <li data-s="call"><span class="fit-k" data-tip="Qualidade da videochamada (MOS), de 1 a 5, calculada pela latência, jitter e perda. 4 ou mais: clara e fluida; de 3,6 a 4: uma falha ou atraso de vez em quando; abaixo de 3,6: picotada." tabindex="0" data-i="sc_call">Videochamadas</span><b>–</b><em>&nbsp;</em></li>
+            <li data-s="game"><span class="fit-k" data-tip="Uma travada é uma ida e volta 100 ms acima do normal, ou um pacote UDP que precisou ser reenviado. Até 2 a cada 10 minutos é bom; 6 ou mais é ruim." tabindex="0" data-i="sc_game">Jogos online</span><b>–</b><em>&nbsp;</em></li>
+            <li data-s="page"><span class="fit-k" data-tip="O tempo para abrir a conexão (DNS, TCP, TLS) ao entrar em um site novo. Menos de 250 ms é bom; mais de 600 ms é ruim." tabindex="0" data-i="sc_page">Páginas web</span><b>–</b><em>&nbsp;</em></li>
+            <li data-s="load"><span class="fit-k" data-tip="Baixa por 10 segundos para encher a linha e mostra quanto a latência sobe (bufferbloat). Se sobe muito, jogos e chamadas travam quando alguém em casa baixa algo. Usa dados: em uma linha rápida, algumas centenas de MB. Notas segundo a Waveform: A+ abaixo de 5 ms, A abaixo de 30, B abaixo de 60, C abaixo de 200, D abaixo de 400, F acima disso." tabindex="0" data-i="sc_load">Latência com carga</span><b>–</b><em>&nbsp;</em><button class="lnk sm" id="loadBtn" type="button" data-i="load_btn">Medir (10 s)</button><a class="lnk sm xl" id="speedLnk" target="_blank" rel="noopener" hidden><span data-i="to_speed">Medir a velocidade</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2.5h4.5V7M13.5 2.5 7.5 8.5M12 10v3.5H2.5V4H6"/></svg></a></li>
+          </ul>
+          <!-- why, and what to try: side by side, 3 lines each reserved, so the box keeps its height -->
+          <div class="v-two">
+            <div class="evc" id="evc" data-on=""><p class="sug-h" data-i="ev_h">Por quê</p><ul class="ev" id="ev"></ul></div>
+            <div class="sug" id="sug" data-on=""><p class="sug-h" data-i="sug_h">O que tentar</p><ul id="sugL"></ul></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- every part of the path, one lane each: its state now and the last 6 minutes in 5-second windows -->
+    <section class="card lanes-c">
+      <div class="sec-h">
+        <h2 data-i="lanes_h">O caminho, trecho a trecho</h2>
+        <ul class="legend" aria-hidden="true">
+          <li data-st="ok"><i></i><span data-i="st_ok">bom</span></li>
+          <li data-st="warn"><i></i><span data-i="st_warn">regular</span></li>
+          <li data-st="bad"><i></i><span data-i="st_bad">pior</span></li>
+          <li data-st="gap"><i></i><span data-i="st_gap">não medido</span></li>
+        </ul>
+      </div>
+      <ul class="lanes"><li data-lane="device"><span class="ln-h"><span class="ln-k" data-tip="Se os timers da página disparam na hora: com o aparelho ocupado demais, os números não são confiáveis" tabindex="0">Aparelho</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="gw" hidden><span class="ln-h"><span class="ln-k" data-tip="O roteador da sua casa : a um Wi‑Fi ou cabo de distância, poucos ms quando está tudo bem. Se ele também piora, é o Wi‑Fi ou a rede de casa" tabindex="0">Roteador</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="direct" hidden><span class="ln-h"><span class="ln-k" data-tip="Sites da China continental, sem o proxy: sua própria linha" tabindex="0">China (direto)</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="near"><span class="ln-h"><span class="ln-k" data-tip="O ponto da Cloudflare mais próximo: seu Wi‑Fi, roteador e a conexão do provedor" tabindex="0">Perto</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="far"><span class="ln-h"><span class="ln-k" data-tip="Regiões de nuvem em Tóquio, Frankfurt e Virgínia: rotas de longa distância" tabindex="0">Longe</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="udp"><span class="ln-h"><span class="ln-k" data-tip="Pergunta seu endereço a servidores STUN públicos: ida e volta e perda no UDP, que é o que jogos e chamadas usam" tabindex="0">UDP</span></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li data-lane="svc"><span class="ln-h"><span class="ln-k" data-tip="Os serviços que você escolheu: se só eles pioram, é o serviço" tabindex="0">Serviços</span><span class="ln-ic" id="svcIcons"></span><button class="ln-edit" id="svcEdit" type="button" aria-haspopup="dialog" aria-controls="svcs" aria-label="Editar serviços" data-tip="Editar serviços"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.5 2.5l3 3L6 13H3v-3z"/></svg></button></span><span class="ln-st" data-st="none" tabindex="0">—</span><span class="ln-tl"></span></li><li class="axis" aria-hidden="true"><span></span><span></span><span class="ax"><em>há 6 min</em><em>agora</em></span></li></ul>
+    </section>
+
+    <section class="card inc-c" id="incC" hidden>
+      <h2 data-i="inc_h">Ocorrências</h2>
+      <ol class="inc" id="inc"></ol>
+    </section>
+
+    <div data-ms-more></div>
+  </main>
+</div>
+
+<div class="scrim" id="svcs" hidden>
+  <div class="dialog svcs" role="dialog" aria-modal="true" aria-labelledby="svcsT">
+    <div class="dlg-h"><h2 id="svcsT" data-i="svc_h">Serviços</h2>
+      <button class="icon-btn" data-close type="button" aria-label="Fechar"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
+    <div class="dlg-b">
+      <div class="chips" id="svcList"></div>
+      <form class="svc-add" id="svcForm" autocomplete="off">
+        <input id="svcIn" type="text" inputmode="url" placeholder="Adicione um site, como example.com" aria-label="Adicione um site, como example.com" spellcheck="false">
+        <button class="btn" type="submit" data-i="svc_add">Adicionar</button>
+      </form>
+      <p class="err" id="svcErr" aria-live="polite"></p>
+      <p class="note" data-i="svc_note">Escolha os serviços a medir. O que se cronometra é o favicon do site; alguns sites o enviam pelos servidores de aplicação, e o número sai mais alto. Os sites que você adiciona ficam só neste navegador.</p>
+    </div>
+  </div>
+</div>
+<div class="scrim" id="help" hidden>
+  <div class="dialog help" role="dialog" aria-modal="true" aria-labelledby="helpT">
+    <div class="dlg-h"><h2 id="helpT" data-i="faq_h">Ajuda</h2>
+      <button class="icon-btn" data-close type="button" aria-label="Fechar"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
+    <div class="help-b">
+      <nav class="help-nav" id="helpNav" role="tablist"><button type="button" role="tab" data-hq="0" aria-selected="true">Como ele descobre qual trecho está com problema?</button><button type="button" role="tab" data-hq="1" aria-selected="false">Funciona com proxy ligado?</button><button type="button" role="tab" data-hq="2" aria-selected="false">Como a perda UDP é medida?</button><button type="button" role="tab" data-hq="3" aria-selected="false">Por que ele não mostra o salto exato?</button><button type="button" role="tab" data-hq="4" aria-selected="false">Qual a diferença entre diagnosticar e monitorar?</button><button type="button" role="tab" data-hq="5" aria-selected="false">De onde vem a linha do roteador?</button><button type="button" role="tab" data-hq="6" aria-selected="false">Ele envia meus dados?</button></nav>
+      <div class="help-pick">
+        <button class="icon-btn" type="button" data-hstep="-1" aria-label="Anterior"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 4L6 8l4 4"/></svg></button>
+        <select id="helpSel" aria-labelledby="helpT"></select>
+        <button class="icon-btn" type="button" data-hstep="1" aria-label="Próximo"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4"/></svg></button>
+      </div>
+      <div class="help-c" id="helpC"><article data-hqb="0"><h3>Como ele descobre qual trecho está com problema?</h3><p>A página mede vários caminhos ao mesmo tempo: o ponto da Cloudflare mais próximo, regiões de nuvem em Tóquio, Frankfurt e Virgínia, os serviços que você escolheu e UDP para servidores STUN públicos. A cada 5 segundos ela compara. Tudo piora junto: seu lado (Wi‑Fi, roteador, provedor). Perto bem, mas longe pior: a rota de longa distância. Só um serviço pior: esse serviço. Sites funcionando, mas UDP perdendo pacotes: jogos e chamadas vão travar.</p><p>Todo veredito mostra as evidências e o nível de confiança.</p></article><article data-hqb="1" hidden><h3>Funciona com proxy ligado?</h3><p>Ele divide o caminho. Na China continental com proxy ligado, os sites chineses (sem proxy) representam sua própria linha; o ponto da Cloudflare mais próximo pelo proxy, o caminho até o servidor proxy; e as regiões de nuvem distantes, o que vem depois. Comparar os três separa a linha, o caminho até o servidor e o resto. Quando o app de proxy roda em modo TUN ou fake-ip, ele pode levar o UDP também, e o veredito mostra o nível de confiança.</p></article><article data-hqb="2" hidden><h3>Como a perda UDP é medida?</h3><p>Uma página web não consegue enviar UDP puro, então pergunta seu endereço público a servidores STUN públicos (Cloudflare, Google e, na China continental, Xiaomi e Bilibili): cada resposta é uma ida e volta UDP. Quando um pedido se perde, o navegador reenvia depois de 250 ms e a resposta chega atrasada; contar essas respostas permite estimar a perda. Conferimos descartando 2%, 5% e 10% dos pacotes em um servidor: a medição deu 1–2%, 4–5% e 8–9%.</p><p>São umas 80 respostas por servidor por minuto, então porcentagens exatas pedem alguns minutos.</p></article><article data-hqb="3" hidden><h3>Por que ele não mostra o salto exato?</h3><p>Uma página web não pode enviar ICMP nem fazer traceroute, então avalia o caminho por trechos e não consegue apontar um roteador específico. Os trechos respondem à maioria das perguntas: Wi‑Fi e provedor, rota de longa distância, proxy ou o serviço.</p></article><article data-hqb="4" hidden><h3>Qual a diferença entre diagnosticar e monitorar?</h3><p>O diagnóstico dura 2 minutos, com um primeiro veredito em 20 segundos: está travando agora, e onde? O monitoramento segue até você tocar em Parar: cada trecho ganha uma célula a cada 5 segundos, tudo que piora por mais de 10 segundos vira uma ocorrência, e quedas de conexão e mudanças de tipo de rede ou de endereço público também são registradas. Quando o problema vai e volta, deixe monitorando, volte depois e o registro diz qual trecho, quando e por quanto tempo. Ele continua medindo em uma aba em segundo plano.</p></article><article data-hqb="5" hidden><h3>De onde vem a linha do roteador?</h3><p>Ao começar, a página procura o roteador da sua casa em alguns endereços comuns e acrescenta uma linha Roteador quando o encontra. Aí “seu lado” se divide em dois: se o roteador também piora, é o Wi‑Fi ou a rede de casa; se o roteador está bem e o resto piora, é a conexão do provedor. O Chrome pergunta antes se esta página pode acessar sua rede local e só mede depois que você permite; outros navegadores ainda não suportam isso, então essa linha não aparece.</p></article><article data-hqb="6" hidden><h3>Ele envia meus dados?</h3><p>Não. Cada pedido vai direto do seu navegador para os sites e servidores STUN medidos; os resultados ficam nesta página e somem quando você a fecha.</p><p>Ao compartilhar um resultado, o link leva o veredito, os números e o estado de cada trecho, nunca seu endereço IP; o país e o ponto da Cloudflare só se você marcar a caixa.</p></article></div>
+    </div>
+  </div>
+</div>
+
+<script type="application/json" id="data">{"lang":"pt","paths":{"en":"/","zh-CN":"/zh-cn/","zh-TW":"/zh-tw/","ja":"/ja/","ko":"/ko/","es":"/es/","fr":"/fr/","de":"/de/","pt":"/pt/","ru":"/ru/"},"worker":"/assets/w.f2f31b8fe6.js"}</script>
+<script src="/assets/l.pt.e94786fc70.js"></script>
+<script src="/assets/app.c5d9635b01.js"></script>
+</body>
+</html>
