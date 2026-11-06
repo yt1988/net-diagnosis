@@ -55,6 +55,7 @@ export default {
   why_slower: 'slower than usual',
   why_far: 'high latency',
 
+  ev_h: 'Why',
   sug_h: 'What to try',
   's_ok': ['Does it come and go? Turn on monitoring: it records which part of the path fails, and when'],
   's_offline': ['Check that Wi‑Fi or the cable is connected', 'Restart the router or modem'],

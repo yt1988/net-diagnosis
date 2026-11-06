@@ -33,7 +33,7 @@ body[data-run="on"] .go { background: linear-gradient(90deg, var(--ink) calc(var
 .bell[aria-pressed="true"] { color: var(--ink); border-color: var(--ink); background: var(--ink-soft); }
 
 /* the verdict: centred head and numbers, the explanation in a readable column */
-.verdict { position: relative; width: 100%; margin-top: 28px; display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 26px 28px 26px; border-radius: 16px; background: var(--soft); min-height: 320px; }
+.verdict { position: relative; width: 100%; margin-top: 28px; display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 26px 28px 24px; border-radius: 16px; background: var(--soft); }
 .verdict::before { content: ""; position: absolute; left: 50%; top: 0; width: 64px; height: 4px; margin-left: -32px; border-radius: 0 0 4px 4px; background: var(--line); }
 .verdict[data-lv="ok"]::before { background: var(--t1); }
 .verdict[data-lv="warn"]::before { background: var(--warn); }
@@ -54,9 +54,11 @@ body[data-run="on"] .go { background: linear-gradient(90deg, var(--ink) calc(var
 .nums span, .fit-k { font-size: 12px; color: var(--muted); }
 .nums b { font: 600 26px/1.2 var(--f-num); font-variant-numeric: tabular-nums; }
 .v-body { width: 100%; max-width: 720px; display: flex; flex-direction: column; gap: 18px; text-align: left; }
-/* evidence (up to 4 lines) and suggestions (up to 4) keep their room from the start: the box doesn't grow when
-   the verdict arrives */
-.ev { margin: 0; padding: 0 0 0 18px; display: flex; flex-direction: column; gap: 5px; font-size: 13.5px; line-height: 1.55; min-height: calc(4 * 1.55em + 15px); }
+/* evidence and suggestions side by side, 3 lines each kept from the start: the box doesn't grow when the
+   verdict arrives, and doesn't sit half empty when it is short */
+.v-two { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; min-height: calc(12.5px * 1.5 + 6px + 3 * 13.5px * 1.55 + 8px); }
+.ev { margin: 0; padding: 0 0 0 18px; display: flex; flex-direction: column; gap: 4px; font-size: 13.5px; line-height: 1.55; }
+.evc[data-on=""] { visibility: hidden; }
 .fit { grid-template-columns: repeat(4, minmax(0, 1fr)); text-align: center; padding: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .fit b { font-size: 16px; font-weight: 650; line-height: 1.3; }
 .fit em { font-style: normal; font-size: 12px; color: var(--muted); font-family: var(--f-num); max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -65,10 +67,11 @@ body[data-run="on"] .go { background: linear-gradient(90deg, var(--ink) calc(var
 .fit li[data-lv="poor"] b { color: var(--bad); }
 .fit li .lnk { margin-top: -2px; }
 .fit li .lnk[hidden] + * { display: none; }
-.sug { min-height: calc(12.5px * 1.5 + 6px + 4 * 13.5px * 1.55 + 12px); }
 .sug[data-on=""] { visibility: hidden; }
 .sug-h { font-size: 12.5px; font-weight: 650; color: var(--ink); margin-bottom: 6px; }
 .sug ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; font-size: 13.5px; line-height: 1.55; }
+.evc .sug-h { color: var(--muted); }
+@media (max-width: 720px) { .v-two { grid-template-columns: minmax(0, 1fr); gap: 14px; } }
 
 /* lanes: name · state · timeline (a fixed number of cells, so nothing moves); the numbers are in the state's tooltip */
 .sec-h { display: flex; align-items: center; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; margin-bottom: 10px; }
@@ -181,3 +184,4 @@ body[data-run="on"] .go { background: linear-gradient(90deg, var(--ink) calc(var
   .help-b .help-pick { display: flex; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+.v-two:has(> .evc[hidden]) { grid-template-columns: minmax(0, 1fr); }

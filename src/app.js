@@ -527,6 +527,8 @@ function verdict(v, state) {
     $('#ev').innerHTML = '';
     $('#sugL').innerHTML = '';
     $('#sug').dataset.on = '';
+    $('#evc').dataset.on = '';
+    $('#evc').hidden = false;
     return;
   }
   $('#vH').textContent = t('v_' + v.key, { names: (v.ids || []).map(nameIn).join(' / ') });
@@ -534,8 +536,12 @@ function verdict(v, state) {
   const st = state === 'prelim' ? t('st_prelim') : state === 'monitor' ? t('st_monitor', { t: clock(el), n: S.inc.list.length }) : t('st_final', { t: clock(el) });
   $('#vState').textContent = st + ' · ' + t('conf_' + (v.conf || 1));
   $('#vExit').textContent = S.exit || '';
-  $('#ev').innerHTML = (v.evidence || []).slice(0, 4).map((e) => `<li>${esc(evText(e))}</li>`).join('');
-  const sug = (L['s_' + v.key] || []).filter((s, i) => !(v.key === 'ok' && i === 0 && continuous()));
+  // why and what to try, 3 lines each; with no evidence (all fine) the suggestions take the whole row
+  const ev = (v.evidence || []).slice(0, 3);
+  $('#ev').innerHTML = ev.map((e) => `<li>${esc(evText(e))}</li>`).join('');
+  $('#evc').dataset.on = ev.length ? '1' : '';
+  $('#evc').hidden = !ev.length;
+  const sug = (L['s_' + v.key] || []).filter((s, i) => !(v.key === 'ok' && i === 0 && continuous())).slice(0, 3);
   $('#sug').dataset.on = sug.length ? '1' : '';
   $('#sugL').innerHTML = sug.map((s) => `<li>${esc(s)}</li>`).join('');
 }

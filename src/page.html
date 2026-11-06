@@ -59,14 +59,17 @@
           <li data-c="udp"><span data-i="k_udp"></span><b>–</b><button class="lnk sm" id="udpxBtn" type="button" data-tip="{{a:tip_udpx}}" data-i="udpx_btn"></button></li>
         </ul>
         <div class="v-body">
-          <ul class="ev" id="ev"></ul>
           <ul class="fit">
             <li data-s="call"><span class="fit-k" data-tip="{{a:tip_call}}" tabindex="0" data-i="sc_call"></span><b>–</b><em>&nbsp;</em></li>
             <li data-s="game"><span class="fit-k" data-tip="{{a:tip_game}}" tabindex="0" data-i="sc_game"></span><b>–</b><em>&nbsp;</em></li>
             <li data-s="page"><span class="fit-k" data-tip="{{a:tip_page}}" tabindex="0" data-i="sc_page"></span><b>–</b><em>&nbsp;</em></li>
             <li data-s="load"><span class="fit-k" data-tip="{{a:tip_load}}" tabindex="0" data-i="sc_load"></span><b>–</b><em>&nbsp;</em><button class="lnk sm" id="loadBtn" type="button" data-i="load_btn"></button></li>
           </ul>
-          <div class="sug" id="sug" data-on=""><p class="sug-h" data-i="sug_h"></p><ul id="sugL"></ul></div>
+          <!-- why, and what to try: side by side, 3 lines each reserved, so the box keeps its height -->
+          <div class="v-two">
+            <div class="evc" id="evc" data-on=""><p class="sug-h" data-i="ev_h"></p><ul class="ev" id="ev"></ul></div>
+            <div class="sug" id="sug" data-on=""><p class="sug-h" data-i="sug_h"></p><ul id="sugL"></ul></div>
+          </div>
         </div>
       </div>
     </section>
