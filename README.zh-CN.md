@@ -29,6 +29,10 @@
 
 **调度放在专用 Worker 里**：后台标签页里，Chrome 会把页面的定时器链压到每分钟一次（开着 WebRTC 连接时是每 2 秒一次），Worker 仍然每秒一次。这是 2026-11-06 在 Chrome 156 上实测的。
 
+**按需测量**：找到家里的路由器时多一行「路由器」（Chrome 的本地网络访问权限），把 Wi‑Fi 和宽带接入分开；「满载延迟」下载 10 秒看延迟涨多少；「精确测一下」向 `rtc.1ms.dog` 的 WebRTC 回声服务器发 20 秒 UDP，算出两个方向的丢包，再看 QUIC 能不能通。
+
+**分享**：结果链接 `/r/<编码>` 里只有结论、数字和每一段的状态，不含 IP；`src/worker.js` 读这个编码，给链接预览加上结论标题。
+
 ## 开发
 
 ```bash
@@ -36,7 +40,10 @@ npm install
 npm run dev     # http://localhost:8804
 npm run build   # 改了 src/ 之后重新生成 public/（public/ 要提交）
 npm test        # public/ 是否最新、逻辑单元测试和带标签的场景回放
+npm run assets  # 改了标题之后重新生成 public/og/ 的预览图
 ```
+
+自己部署时，`npx wrangler deploy` 之后在 Cloudflare 控制台给 Worker 绑一个域名即可。「精确测一下」用的是 `rtc.1ms.dog`，它只接受来自 1ms.dog 的页面；要在自己的域名上用，需要自己运行一份回声服务器（[speed-test 的 `server/`](https://github.com/yt1988/speed-test/tree/main/server)），并改 `src/rtc.mjs` 里的地址。其余测量都不依赖本站。
 
 ## 许可
 

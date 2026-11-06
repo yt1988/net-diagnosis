@@ -32,6 +32,13 @@ VPS by dropping incoming STUN answers at random: injected 2 / 5 / 10 % read back
 minute (once every 2 s with a WebRTC connection open) but leaves a worker at once a second (measured
 2026-11-06, Chrome 156).
 
+**On demand**: a Router lane when the home router is found (Chrome's local network access), which tells the Wi‑Fi
+from the ISP; loaded latency (downloads for 10 s and reads how far latency rises); and an exact UDP test (20 s of
+packets to the WebRTC echo at `rtc.1ms.dog`, loss each way, then whether QUIC gets through).
+
+**Sharing**: a result link `/r/<code>` holds the verdict, the numbers and each lane's states, never an address;
+`src/worker.js` reads the code to put the verdict in the link's preview title.
+
 ## Develop
 
 ```bash
@@ -39,16 +46,26 @@ npm install
 npm run dev     # http://localhost:8804
 npm run build   # regenerate public/ after changing src/ (public/ is committed)
 npm test        # public/ up to date, logic unit tests and labelled scenario replays
+npm run assets  # regenerate the preview images in public/og/ after changing the headline
 ```
+
+To self-host, run `npx wrangler deploy` and bind a domain to the Worker in the Cloudflare dashboard. The exact UDP
+test talks to `rtc.1ms.dog`, which only answers 1ms.dog pages: on your own domain, run your own echo server
+([speed-test's `server/`](https://github.com/yt1988/speed-test/tree/main/server)) and change the address in
+`src/rtc.mjs`. Everything else measures public endpoints and needs nothing from this site.
 
 ```
 src/lib.mjs           pure logic: stats, STUN loss, target states, attribution, scores, incidents (unit-tested)
 src/targets.mjs       what is measured
 src/probes.mjs        HTTPS and STUN probes, Cloudflare's view of the exit
 src/worker-probe.js   the schedule and the HTTPS probes, in a dedicated worker
-src/app.js            the page: windows, verdict, lanes, incident log, notifications
-src/i18n/*.mjs        strings; en is the reference
+src/app.js            the page: windows, verdict, lanes, incident log, notifications, share
+src/share.mjs         the result in a link: encode, decode (unit-tested)
+src/rtc.mjs           the exact UDP and QUIC test (kept in step with speed-test's copy)
+src/worker.js         the Worker: /r/<code> pages with the verdict in their preview, a bare 404 otherwise
+src/i18n/*.mjs        strings in 10 languages; en is the reference
 scripts/build.mjs     builds public/: pages per language, sitemap, robots, llms.txt, _headers (CSP)
+scripts/assets.mjs    the preview images, public/og/<lang>.png
 ```
 
 ## License
