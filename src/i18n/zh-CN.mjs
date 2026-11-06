@@ -177,6 +177,7 @@ export default {
   udpx_done: '精确：去程 {up} · 回程 {down} · QUIC {q}',
   udpx_na: '精确测试暂不可用',
   tip_udpx: '向 1ms.dog 在东京的测试服务器连续发 20 秒 UDP 包，分别算出去程和回程的丢包，再看 QUIC（HTTP/3 用的 UDP）能不能通。',
+  udp_off: '浏览器限制了 WebRTC（比如防泄露扩展或浏览器设置），测不了 UDP；这不代表网络有问题',
   q_ok: '正常',
   q_slow: '偏慢',
   q_blocked: '被拦',

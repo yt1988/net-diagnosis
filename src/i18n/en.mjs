@@ -177,6 +177,7 @@ export default {
   udpx_done: 'Exact: out {up} · back {down} · QUIC {q}',
   udpx_na: 'Exact test unavailable',
   tip_udpx: 'Sends UDP packets to 1ms.dog’s test server in Tokyo for 20 seconds and counts the loss each way, then checks whether QUIC (the UDP behind HTTP/3) gets through.',
+  udp_off: 'The browser keeps WebRTC off UDP (an anti-leak extension or a setting), so UDP can’t be measured; this says nothing about the network',
   q_ok: 'fine',
   q_slow: 'slow',
   q_blocked: 'blocked',

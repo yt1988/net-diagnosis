@@ -224,6 +224,7 @@ async function begin() {
   S.worker = new Worker(D.worker);
   S.worker.onmessage = onWorker;
   startWorker();
+  findGateway();
 }
 
 function region(cc) {
@@ -260,7 +261,7 @@ function onWorker({ data: m }) {
     s.busy = true;
     stun(s.url).then((r) => {
       s.busy = false;
-      s.probes.push({ t: Date.now(), answers: r.answers.map((x) => Math.max(0, x - S.overhead)), v6: r.v6 || [] });
+      s.probes.push({ t: Date.now(), answers: r.answers.map((x) => Math.max(0, x - S.overhead)), v6: r.v6 || [], hosts: r.hosts });
       if (s.probes.length > 4000) s.probes.splice(0, 2000);
       // the public address changing mid-run: a new IP from the ISP, a switch between networks, a proxy reconnecting
       if (s.ref) {
@@ -280,29 +281,31 @@ function onWorker({ data: m }) {
 // ---------- the home router (optional) ----------
 // Chrome asks the visitor to allow this page to reach the local network; an http request to a private address is
 // then allowed from an https page. Each answer, or a quick refusal, is one round trip to the router.
-async function gwOnce(ip, timeout = 2000) {
+// → { ms, web }: web = the router answered over http; otherwise a refusal after a round trip (ms) or nothing (null)
+async function gwTry(ip, timeout = 2000) {
   const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), timeout), t0 = performance.now();
   try {
     await fetch(`http://${ip}/?_=${Math.random().toString(36).slice(2)}`, { mode: 'no-cors', cache: 'no-store', credentials: 'omit', signal: ctl.signal, targetAddressSpace: 'local' });
-    return performance.now() - t0;
+    return { ms: performance.now() - t0, web: true };
   } catch {
     const ms = performance.now() - t0;
-    return ms > 3 && ms < timeout - 50 ? ms : null; // refused after a round trip: reachable; at once: blocked; at the timeout: nothing there
+    return { ms: ms > 3 && ms < timeout - 50 ? ms : null, web: false }; // at once: blocked; at the timeout: nothing there
   } finally { clearTimeout(timer); }
 }
+const gwOnce = async (ip, timeout) => (await gwTry(ip, timeout)).ms;
+// Found by itself when a run starts: every common address at once, a real web answer first (a missing subnet can
+// come back as a quick "unreachable" from the router upstream), then the fastest. Nothing found: no lane.
 async function findGateway() {
-  const btn = $('#gwBtn');
-  btn.disabled = true; btn.textContent = t('gw_finding');
-  let found = null;
-  for (const ip of GATEWAYS) { if ((await gwOnce(ip, 1500)) != null) { found = ip; break; } }
-  btn.disabled = false;
-  if (!found) { btn.textContent = t('gw_add'); $('#gwMsg').textContent = t('gw_none'); return; }
-  $('#gwMsg').textContent = '';
-  S.gw = { ip: found, samples: [], floor: null, busy: false };
-  btn.hidden = true;
+  if (S.gw || S.gwLooking) return;
+  S.gwLooking = true;
+  const rs = await Promise.all(GATEWAYS.map(async (ip) => ({ ip, ...(await gwTry(ip, 1500)) })));
+  S.gwLooking = false;
+  const ok = rs.filter((r) => r.ms != null).sort((a, b) => (b.web - a.web) || a.ms - b.ms);
+  if (!ok.length || !running()) return;
+  S.gw = { ip: ok[0].ip, samples: [], floor: null, busy: false };
   const li = $('[data-lane="gw"]');
   li.hidden = false;
-  li.querySelector('.ln-k').dataset.tip = t('lane_tip_gw', { ip: found });
+  li.querySelector('.ln-k').dataset.tip = t('lane_tip_gw', { ip: ok[0].ip });
 }
 async function probeGateway() {
   const g = S.gw;
@@ -313,7 +316,6 @@ async function probeGateway() {
   g.samples.push({ t: Date.now(), ms });
   if (g.samples.length > 4000) g.samples.splice(0, 2000);
 }
-$('#gwBtn').onclick = findGateway;
 
 // ---------- judging ----------
 function groupStatus(list) {
@@ -344,7 +346,11 @@ function snapshot(from, to, { updateFloor = true, span = false } = {}) {
   // UDP over the last minute (or the run so far): enough answers to read a loss rate
   const ufrom = Math.max(S.t0, to - 60000);
   const recent = S.stuns.map((s) => ({ s, ps: s.probes.filter((p) => p.t > ufrom && p.t <= to) }));
-  const usSt = recent.map(({ s, ps }) => { const u = stunLoss(ps); return { id: s.id, ref: s.ref, ...u, ...udpStatusOf(u) }; });
+  // No local UDP address at all: the browser itself keeps WebRTC off UDP (an anti-leak extension, a policy). That
+  // says nothing about the network, so UDP is "can't measure", not "blocked" (seen 2026-11-06 in a real Chrome).
+  const all = recent.flatMap(({ ps }) => ps);
+  const browserOff = all.length >= 4 && all.every((p) => !p.hosts && !p.answers.length);
+  const usSt = recent.map(({ s, ps }) => { const u = stunLoss(ps); return { id: s.id, ref: s.ref, ...u, ...(browserOff ? { status: 'none' } : udpStatusOf(u)) }; });
   const measured = usSt.filter((u) => u.status !== 'none');
   const fam = (six) => {
     const rs = recent.map(({ ps }) => stunLoss(family(ps, six))).filter((u) => u.answered > 0);
@@ -362,8 +368,8 @@ function snapshot(from, to, { updateFloor = true, span = false } = {}) {
   const local = S.cn && !S.proxied; // see judge()
   return {
     near: local ? byG('direct') : byG('near'), direct: local ? [] : byG('direct'), far: local ? [...byG('far'), ...byG('near')] : byG('far'), svc: byG('svc').map(soften), gw,
-    udp: { status: groupStatus(measured), lossPct: measured.length ? median(measured.map((u) => u.lossPct ?? 0)) : null, med: ref?.med ?? null },
-    ipv4: fam(false), ipv6: fam(true),
+    udp: { status: groupStatus(measured), lossPct: measured.length ? median(measured.map((u) => u.lossPct ?? 0)) : null, med: ref?.med ?? null, browserOff },
+    ipv4: browserOff ? null : fam(false), ipv6: browserOff ? null : fam(true),
     tcpRef: near?.med ?? null, udpRef: ref?.med ?? null,
     lagP95: document.visibilityState === 'hidden' ? null : S.lag,
   };
@@ -446,7 +452,8 @@ function spanScores(from, to) {
   const w = windowStats(ss.map((ms) => ({ ms })));
   const ref = S.stuns.find((s) => s.ref) || S.stuns[0];
   const probes = ref ? ref.probes.filter((p) => p.t > from && p.t <= to) : [];
-  const u = ref ? stunLoss(probes) : null;
+  const off = probes.length >= 4 && probes.every((p) => !p.hosts && !p.answers.length); // the browser keeps WebRTC off UDP
+  const u = ref && !off ? stunLoss(probes) : null;
   let retx = 0;
   if (u && u.base != null) for (const p of probes) for (const a of p.answers) if (a - u.base > RETX[1] - 60) retx++;
   const spikes = (floor == null ? 0 : ss.filter((x) => x > floor + 100).length) + retx;
@@ -590,7 +597,7 @@ function drawLanes(sn, gap, now) {
   const dev = sn.lagP95 == null ? { st: 'none', now: '', why: '' } : { st: sn.lagP95 > 150 ? 'bad' : sn.lagP95 > 50 ? 'warn' : 'ok', now: t('ev_lag', { ms: ms0(sn.lagP95) }), why: t('ev_lag', { ms: ms0(sn.lagP95) }) };
   const fam = [sn.ipv4 && `IPv4 ${pct(sn.ipv4.lossPct)}`, sn.ipv6 && `IPv6 ${pct(sn.ipv6.lossPct)}`].filter(Boolean).join(' · ');
   const h3 = S.proto.n ? t(S.proto.h3 ? 'h3_yes' : 'h3_no') : '';
-  const udpNow = sn.udp.lossPct == null ? '' : [sn.udp.status === 'down' ? t('ev_udp-blocked') : t('tip_udp_cell', { loss: pct(sn.udp.lossPct), ms: ms0(sn.udp.med) }), fam, h3].filter(Boolean).join('\n');
+  const udpNow = sn.udp.browserOff ? t('udp_off') : sn.udp.lossPct == null ? '' : [sn.udp.status === 'down' ? t('ev_udp-blocked') : t('tip_udp_cell', { loss: pct(sn.udp.lossPct), ms: ms0(sn.udp.med) }), fam, h3].filter(Boolean).join('\n');
   const marks = S.marks.filter((x) => x.t > now - WINDOW_MS && x.t <= now).map(markText);
   const lanes = {
     device: { ...dev, why: [dev.why, ...marks].filter(Boolean).join('\n'), mk: marks.length > 0 },

@@ -43,7 +43,7 @@ body[data-run="on"] .go { background: linear-gradient(90deg, var(--ink) calc(var
 .verdict[data-lv="ok"] .v-h { color: var(--t1); }
 .verdict[data-lv="bad"] .v-h { color: var(--bad); }
 .verdict[data-lv="warn"] .v-h { color: var(--warn); }
-.verdict[data-lv="idle"] .v-h, .verdict[data-lv="run"] .v-h { color: var(--muted); font-weight: 600; font-size: 19px; }
+.verdict[data-lv="idle"] .v-h, .verdict[data-lv="run"] .v-h { color: var(--muted); font-weight: 600; }   /* same size as a verdict: the box keeps its height */
 .v-sub { margin-top: -10px; display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 14px; font-size: 12.5px; color: var(--muted); }
 .v-exit { overflow-wrap: anywhere; }
 .v-exit:empty { display: none; }
@@ -54,8 +54,9 @@ body[data-run="on"] .go { background: linear-gradient(90deg, var(--ink) calc(var
 .nums span, .fit-k { font-size: 12px; color: var(--muted); }
 .nums b { font: 600 26px/1.2 var(--f-num); font-variant-numeric: tabular-nums; }
 .v-body { width: 100%; max-width: 720px; display: flex; flex-direction: column; gap: 18px; text-align: left; }
-.ev { margin: 0; padding: 0 0 0 18px; display: flex; flex-direction: column; gap: 5px; font-size: 13.5px; line-height: 1.55; }
-.ev:empty { display: none; }
+/* evidence (up to 4 lines) and suggestions (up to 4) keep their room from the start: the box doesn't grow when
+   the verdict arrives */
+.ev { margin: 0; padding: 0 0 0 18px; display: flex; flex-direction: column; gap: 5px; font-size: 13.5px; line-height: 1.55; min-height: calc(4 * 1.55em + 15px); }
 .fit { grid-template-columns: repeat(4, minmax(0, 1fr)); text-align: center; padding: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .fit b { font-size: 16px; font-weight: 650; line-height: 1.3; }
 .fit em { font-style: normal; font-size: 12px; color: var(--muted); font-family: var(--f-num); max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -64,7 +65,8 @@ body[data-run="on"] .go { background: linear-gradient(90deg, var(--ink) calc(var
 .fit li[data-lv="poor"] b { color: var(--bad); }
 .fit li .lnk { margin-top: -2px; }
 .fit li .lnk[hidden] + * { display: none; }
-.sug[data-on=""] { display: none; }
+.sug { min-height: calc(12.5px * 1.5 + 6px + 4 * 13.5px * 1.55 + 12px); }
+.sug[data-on=""] { visibility: hidden; }
 .sug-h { font-size: 12.5px; font-weight: 650; color: var(--ink); margin-bottom: 6px; }
 .sug ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; font-size: 13.5px; line-height: 1.55; }
 
