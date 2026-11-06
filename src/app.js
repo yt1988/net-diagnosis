@@ -524,13 +524,23 @@ const evText = (e) => {
   return t('ev_' + e.k, { list: listOf(named), n: e.n, udp: e.udp, tcp: e.tcp, ms: e.ms });
 };
 
+// the exit line; its network's AS number links to the ASN lookup (a data value: dashed underline, no icon)
+function showExit(text) {
+  const el = $('#vExit'), asn = S.meta?.asn, base = tool('asn');
+  el.textContent = text || '';
+  if (!text || !asn || !base || SHARED) return;
+  const a = document.createElement('a');
+  a.className = 'asn'; a.href = `${base}${D.paths[D.lang]}AS${Number(asn)}`; a.target = '_blank'; a.rel = 'noopener';
+  a.textContent = 'AS' + Number(asn); a.title = a.href;
+  el.append(' · ', a);
+}
 function verdict(v, state) {
   const box = $('#verdict');
   box.dataset.lv = LEVEL[v.key] || 'bad';
   if (v.key === 'idle' || v.key === 'running') {
     $('#vH').textContent = t(v.key === 'idle' ? (continuous() ? 'v_idle_mon' : 'v_idle') : 'v_running');
     $('#vState').textContent = v.key === 'running' ? t(continuous() ? 'st_measuring_mon' : 'st_measuring') : ' ';
-    $('#vExit').textContent = (v.key === 'running' && S.exit) || '';
+    showExit(v.key === 'running' && S.exit);
     $('#ev').innerHTML = '';
     $('#sugL').innerHTML = '';
     $('#sug').dataset.on = '';
@@ -544,7 +554,8 @@ function verdict(v, state) {
   const el = state === 'shared' ? v.secs * 1000 : Date.now() - S.t0;
   const st = state === 'prelim' ? t('st_prelim') : state === 'monitor' ? t('st_monitor', { t: clock(el), n: S.inc.list.length }) : t('st_final', { t: clock(el) });
   $('#vState').textContent = st + ' · ' + t('conf_' + (v.conf || 1));
-  $('#vExit').textContent = state === 'shared' ? [v.cc && region(v.cc), v.colo && 'Cloudflare ' + v.colo].filter(Boolean).join(' · ') : S.exit || '';
+  if (state === 'shared') $('#vExit').textContent = [v.cc && region(v.cc), v.colo && 'Cloudflare ' + v.colo].filter(Boolean).join(' · ');
+  else showExit(S.exit);
   $('#shareBtn').hidden = !(state === 'final' || state === 'monitor' || state === 'shared');
   // why and what to try, 3 lines each; with no evidence (all fine) the suggestions take the whole row
   const ev = (v.evidence || []).slice(0, 3);

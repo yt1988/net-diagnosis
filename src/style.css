@@ -196,3 +196,4 @@ body[data-shared] #loadBtn, body[data-shared] #udpxBtn { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 .v-two:has(> .evc[hidden]) { grid-template-columns: minmax(0, 1fr); }
+.v-exit .asn { color: inherit; text-decoration: underline dashed; text-underline-offset: 3px; }
