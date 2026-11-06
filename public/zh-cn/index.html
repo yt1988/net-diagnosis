@@ -31,7 +31,7 @@
 <meta name="twitter:description" content="卡顿出在哪一段：设备、Wi‑Fi 和宽带、跨境线路、代理还是服务">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"网络诊断 · 1ms.dog","url":"https://diag.1ms.dog/zh-cn/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"在浏览器里同时测近处、远处、UDP 和常用服务，判断卡顿出在设备、Wi‑Fi 和宽带、跨境线路、代理节点，还是某个服务。估算 UDP 丢包，识别 UDP 被限速，给出通话和游戏评分。免安装，手机也能用，不收集数据。","inLanguage":"zh-CN","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"它怎么判断问题出在哪一段？","acceptedAnswer":{"@type":"Answer","text":"页面同时测几条路：最近的 Cloudflare 节点、东京、法兰克福和弗吉尼亚的云区域、你选的服务，以及向公共 STUN 服务器发 UDP。每 5 秒比较一次：所有路同时变差，问题在你这一侧（Wi‑Fi、路由器、宽带）；近处正常只有远处变差，问题在跨境或远程线路；只有一个服务变差，是那个服务自己的问题；网页正常但 UDP 丢包，游戏和通话会卡。 每条结论都列出依据和把握程度。"}},{"@type":"Question","name":"开着代理时还准吗？","acceptedAnswer":{"@type":"Answer","text":"能分开看。在中国大陆开着代理时，页面拿国内网站（不经过代理）代表你自己的宽带，拿经代理到最近的 Cloudflare 节点代表到代理节点这一段，再拿远处的云区域代表节点之后的路。三者对比，就能看出是宽带、到节点的线路，还是节点之后的问题。代理软件用 TUN 或 fake-ip 模式时，UDP 也可能被代理接管，结论会标出把握程度。"}},{"@type":"Question","name":"UDP 丢包是怎么测的？","acceptedAnswer":{"@type":"Answer","text":"浏览器不能直接发 UDP 包，所以页面向公共 STUN 服务器（Cloudflare、Google，大陆用户还有小米和哔哩哔哩）问自己的公网地址，每问一次就是一次 UDP 往返。请求丢了，浏览器会在 250 毫秒后重发，回答就会晚一截；数出这样的回答，就能估算丢包率。我们在服务器上故意丢 2%、5%、10% 的包验证过，测出来分别是 1–2%、4–5%、8–9%。 每分钟每个服务器大约 80 个回答，所以准确的百分比要几分钟以上的数据。"}},{"@type":"Question","name":"为什么不能告诉我是第几跳？","acceptedAnswer":{"@type":"Answer","text":"网页不能发 ICMP，也做不了 traceroute，所以只能按路径分段判断，不能点名是哪一台路由器。分段判断已经能回答大多数问题：是 Wi‑Fi 和宽带、跨境线路、代理，还是对方的服务。"}},{"@type":"Question","name":"会上传我的数据吗？","acceptedAnswer":{"@type":"Answer","text":"不会。所有请求都从你的浏览器直接发往被测的网站和 STUN 服务器，结果只留在这个页面里，关掉就没了。"}}]}]}</script>
 <link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/app.1c7c28d137.css">
+<link rel="stylesheet" href="/assets/app.0acc9aa96c.css">
 </head>
 <body>
 <div class="app">
@@ -59,54 +59,82 @@
 
   <main>
     <section class="hero card">
-      <div class="hero-h">
-        <h1>网卡了，问题出在哪一段？</h1>
-        <p class="lead" data-i="lead">同时测近处、远处、UDP 和你常用的服务，20 秒给出结论。问题时有时无，就开着持续监控。</p>
+      <div class="hero-top">
+        <div class="hero-h">
+          <h1>网卡了，问题出在哪一段？</h1>
+          <p class="lead" data-i="lead">同时测近处、远处、UDP 和常用服务，找出卡顿出在哪一段。一次测 2 分钟，20 秒先给出初步结论。</p>
+        </div>
+        <!-- the one action: Start / Stop, with the run's time and progress in the button itself -->
+        <div class="ctl">
+          <button class="go" id="go" type="button"><span class="go-t" id="goT" data-i="start">开始诊断</span><span class="go-n" id="goN"></span></button>
+          <div class="ctl-opts">
+            <label class="tog" data-tip="打开后，到 2 分钟不会停，一直测到你按「停止」；变差超过 10 秒的时段会记进事件记录。页面放在后台也会继续测，手机锁屏或切到后台时会暂停。"><input type="checkbox" id="mon"><span class="sw" aria-hidden="true"></span><span data-i="monitor">持续监控</span></label>
+            <label class="tog ntf" data-tip="出问题时发一条桌面通知"><input type="checkbox" id="ntf"><span class="sw" aria-hidden="true"></span><span data-i="notify">通知</span></label>
+          </div>
+        </div>
       </div>
-      <div class="go-row">
-        <button class="go" id="go" type="button"><span id="goT" data-i="start">开始诊断</span></button>
-        <span class="prog" id="prog">&nbsp;</span>
-        <label class="tog"><input type="checkbox" id="mon"><span class="sw" aria-hidden="true"></span><span data-i="monitor">持续监控</span></label>
-        <label class="tog"><input type="checkbox" id="ntf"><span class="sw" aria-hidden="true"></span><span data-i="notify">出问题时通知我</span></label>
-      </div>
-      <p class="info" id="info">&nbsp;</p>
-      <!-- the verdict: one sentence, how sure, up to 3 numbers, up to 4 pieces of evidence, what to try -->
+
+      <!-- the verdict: one sentence, how sure and where it exits, 3 numbers, up to 4 pieces of evidence, what it means
+           for calls, games and pages, and what to try. Every part keeps its space, so nothing moves when it fills. -->
       <div class="verdict" id="verdict" data-lv="idle" aria-live="polite">
-        <p class="v-h" id="vH" data-i="v_idle">点「开始诊断」，20 秒后在这里给出结论</p>
-        <p class="v-sub" id="vSub">&nbsp;</p>
-        <ul class="cards">
-          <li data-c="near"><span data-i="k_near">最近节点</span><b>–</b></li>
-          <li data-c="udp"><span data-i="k_udp">UDP 丢包</span><b>–</b></li>
+        <p class="v-h" id="vH" data-i="v_idle">点「开始诊断」：测 2 分钟，20 秒后先给出初步结论</p>
+        <p class="v-sub"><span id="vState">&nbsp;</span><span class="v-exit" id="vExit"></span></p>
+        <ul class="nums">
+          <li data-c="near"><span data-i="k_near">近处延迟</span><b>–</b></li>
           <li data-c="jitter"><span data-i="k_jitter">抖动</span><b>–</b></li>
+          <li data-c="udp"><span data-i="k_udp">UDP 丢包</span><b>–</b></li>
         </ul>
         <ul class="ev" id="ev"></ul>
-        <div class="sug" id="sug" hidden><p class="sug-h" data-i="sug_h">可以这样做</p><ul id="sugL"></ul></div>
+        <ul class="fit">
+          <li data-s="call"><span class="fit-k" data-tip="视频通话质量评分（MOS），1 到 5 分，按延迟、抖动和丢包算出。4 分以上清晰流畅；3.6 到 4 分偶尔有杂音或延迟；3.6 分以下会卡顿、断续。" tabindex="0" data-i="sc_call">视频通话</span><b>–</b><em>&nbsp;</em></li>
+          <li data-s="game"><span class="fit-k" data-tip="延迟比平时高出 100 ms 以上，或 UDP 包要重发，就算卡一次。每 10 分钟 2 次以内为好，6 次以上为差。" tabindex="0" data-i="sc_game">网络游戏</span><b>–</b><em>&nbsp;</em></li>
+          <li data-s="page"><span class="fit-k" data-tip="打开一个新网站时，建立连接（DNS、TCP、TLS）用的时间。250 ms 以内为好，600 ms 以上为差。" tabindex="0" data-i="sc_page">打开网页</span><b>–</b><em>&nbsp;</em></li>
+        </ul>
+        <div class="sug" id="sug" data-on=""><p class="sug-h" data-i="sug_h">可以这样做</p><ul id="sugL"></ul></div>
       </div>
-      <ul class="scores">
-        <li data-s="call"><span data-i="sc_call">视频通话</span><b>–</b><em>&nbsp;</em></li>
-        <li data-s="game"><span data-i="sc_game">网络游戏</span><b>–</b><em>&nbsp;</em></li>
-        <li data-s="page"><span data-i="sc_page">打开网页</span><b>–</b><em>&nbsp;</em></li>
-      </ul>
     </section>
 
     <!-- every part of the path, one lane each: its state now and the last 6 minutes in 5-second windows -->
     <section class="card lanes-c">
-      <ul class="lanes"><li data-lane="device"><span class="ln-k" title="页面计时器是否准时：设备或浏览器太忙时测出的数字不可信" tabindex="0">设备</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl" aria-hidden="true"></span></li><li data-lane="direct" hidden><span class="ln-k" title="国内网站（不经过代理）：代表你自己的宽带" tabindex="0">国内直连</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl" aria-hidden="true"></span></li><li data-lane="near"><span class="ln-k" title="最近的 Cloudflare 节点：代表你的 Wi‑Fi、路由器和宽带接入" tabindex="0">近处</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl" aria-hidden="true"></span></li><li data-lane="far"><span class="ln-k" title="东京、法兰克福、弗吉尼亚的云区域：跨境和远程线路" tabindex="0">远处</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl" aria-hidden="true"></span></li><li data-lane="udp"><span class="ln-k" title="向公共 STUN 服务器问地址：UDP 往返和丢包，游戏和通话用的就是 UDP" tabindex="0">UDP</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl" aria-hidden="true"></span></li><li data-lane="svc"><span class="ln-k" title="你选的常用服务：只有它们变差，就是服务自己的问题" tabindex="0">常用服务</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl" aria-hidden="true"></span></li></ul>
-      <p class="note" data-i="monitor_note">页面放在后台也会继续测；手机锁屏或切到后台时会暂停。</p>
+      <div class="sec-h">
+        <h2 data-i="lanes_h">各段路径</h2>
+        <ul class="legend" aria-hidden="true">
+          <li data-st="ok"><i></i><span data-i="st_ok">正常</span></li>
+          <li data-st="warn"><i></i><span data-i="st_warn">一般</span></li>
+          <li data-st="bad"><i></i><span data-i="st_bad">变差</span></li>
+          <li data-st="gap"><i></i><span data-i="st_gap">未测</span></li>
+        </ul>
+      </div>
+      <ul class="lanes"><li data-lane="device"><span class="ln-k" data-tip="页面计时器是否准时：设备或浏览器太忙时测出的数字不可信" tabindex="0">设备</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl"></span></li><li data-lane="direct" hidden><span class="ln-k" data-tip="国内网站（不经过代理）：代表你自己的宽带" tabindex="0">国内直连</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl"></span></li><li data-lane="near"><span class="ln-k" data-tip="最近的 Cloudflare 节点：代表你的 Wi‑Fi、路由器和宽带接入" tabindex="0">近处</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl"></span></li><li data-lane="far"><span class="ln-k" data-tip="东京、法兰克福、弗吉尼亚的云区域：跨境和远程线路" tabindex="0">远处</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl"></span></li><li data-lane="udp"><span class="ln-k" data-tip="向公共 STUN 服务器问地址：UDP 往返和丢包，游戏和通话用的就是 UDP" tabindex="0">UDP</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl"></span></li><li data-lane="svc"><span class="ln-k" data-tip="你选的常用服务：只有它们变差，就是服务自己的问题" tabindex="0">常用服务</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl"></span></li></ul>
+      <div class="lanes-f">
+        <span class="svc-sum"><span class="m" data-i="svc_h">常用服务</span><span id="svcSum"></span></span>
+        <button class="lnk" id="svcBtn" type="button" aria-haspopup="dialog" aria-controls="svcs" data-i="svc_edit">编辑</button>
+      </div>
     </section>
 
-    <section class="card inc-c">
+    <section class="card inc-c" id="incC" hidden>
       <h2 data-i="inc_h">事件记录</h2>
-      <ol class="inc" id="inc"><li class="m" data-i="inc_none">还没有事件。打开「持续监控」后，变差超过 10 秒的时段会记在这里。</li></ol>
-    </section>
-
-    <section class="card svc-c">
-      <h2 data-i="svc_h">关注的服务</h2>
-      <div class="chips" id="svcs"></div>
+      <ol class="inc" id="inc"></ol>
     </section>
 
     <div data-ms-more></div>
   </main>
+</div>
+
+<div class="scrim" id="svcs" hidden>
+  <div class="dialog svcs" role="dialog" aria-modal="true" aria-labelledby="svcsT">
+    <div class="dlg-h"><h2 id="svcsT" data-i="svc_h">常用服务</h2>
+      <button class="icon-btn" data-close type="button" aria-label="关闭"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
+    <div class="dlg-b">
+      <div class="chips" id="svcList"></div>
+      <form class="svc-add" id="svcForm" autocomplete="off">
+        <input id="svcIn" type="text" inputmode="url" placeholder="添加网站，比如 example.com" aria-label="添加网站，比如 example.com" spellcheck="false">
+        <button class="btn" type="submit" data-i="svc_add">添加</button>
+      </form>
+      <p class="err" id="svcErr" aria-live="polite"></p>
+      <p class="note" data-i="svc_note">点名字选择要测的服务。测的是网站的 favicon；少数网站要先经过应用服务器才返回它，测出的延迟会偏高。添加的网站只保存在这个浏览器里。</p>
+    </div>
+  </div>
 </div>
 <div class="scrim" id="help" hidden>
   <div class="dialog help" role="dialog" aria-modal="true" aria-labelledby="helpT">
@@ -124,8 +152,8 @@
   </div>
 </div>
 
-<script type="application/json" id="data">{"lang":"zh-CN","paths":{"en":"/","zh-CN":"/zh-cn/"},"worker":"/assets/w.cb0564ee4c.js"}</script>
-<script src="/assets/l.zh-cn.213eefecec.js"></script>
-<script src="/assets/app.49a6e6d969.js"></script>
+<script type="application/json" id="data">{"lang":"zh-CN","paths":{"en":"/","zh-CN":"/zh-cn/"},"worker":"/assets/w.8697773cdf.js"}</script>
+<script src="/assets/l.zh-cn.c5058fc51a.js"></script>
+<script src="/assets/app.a37b7e7415.js"></script>
 </body>
 </html>

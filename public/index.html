@@ -28,7 +28,7 @@
 <meta name="twitter:description" content="Where the lag comes from: device, Wi‑Fi and ISP, long-haul route, proxy or the service">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Network Diagnosis · 1ms.dog","url":"https://diag.1ms.dog/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"Measures nearby, distant, UDP and your usual services at once in the browser and tells where the lag comes from: your device, Wi‑Fi and ISP, the long-haul route, a proxy, or one service. Estimates UDP packet loss, spots throttled UDP, scores calls and games. No install, works on phones, collects nothing.","inLanguage":"en","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How does it tell which part of the path is at fault?","acceptedAnswer":{"@type":"Answer","text":"The page measures several paths at once: the nearest Cloudflare location, cloud regions in Tokyo, Frankfurt and Virginia, the services you picked, and UDP to public STUN servers. Every 5 seconds it compares them. All worse together: your side (Wi‑Fi, router, ISP). Nearby fine but distant worse: the long-haul route. One service worse: that service. Web fine but UDP losing packets: games and calls will stutter. Every verdict lists its evidence and how sure it is."}},{"@type":"Question","name":"Does it work with a proxy on?","acceptedAnswer":{"@type":"Answer","text":"It splits the path. In mainland China with a proxy on, domestic sites (not proxied) stand for your own line, the nearest Cloudflare location through the proxy for the way to the proxy server, and the distant cloud regions for what lies past it. Comparing the three tells the line, the way to the server and what follows apart. When the proxy app runs in TUN or fake-ip mode it may carry UDP too, and the verdict says how sure it is."}},{"@type":"Question","name":"How is UDP loss measured?","acceptedAnswer":{"@type":"Answer","text":"A web page can’t send raw UDP, so it asks public STUN servers (Cloudflare, Google, and in mainland China Xiaomi and Bilibili) for its public address: each answer is one UDP round trip. When a request is lost, the browser resends it after 250 ms, so the answer comes late; counting those answers estimates the loss. We checked it by dropping 2%, 5% and 10% of packets on a server: it read 1–2%, 4–5% and 8–9%. There are about 80 answers per server per minute, so exact percentages need a few minutes."}},{"@type":"Question","name":"Why can’t it name the hop?","acceptedAnswer":{"@type":"Answer","text":"A web page can’t send ICMP or run a traceroute, so it judges the path in parts and can’t point at a single router. The parts answer most questions: Wi‑Fi and ISP, long-haul route, proxy, or the service."}},{"@type":"Question","name":"Does it upload my data?","acceptedAnswer":{"@type":"Answer","text":"No. Every request goes straight from your browser to the sites and STUN servers being measured; results stay on this page and are gone when you close it."}}]}]}</script>
 <link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/app.1c7c28d137.css">
+<link rel="stylesheet" href="/assets/app.0acc9aa96c.css">
 </head>
 <body>
 <div class="app">
@@ -56,54 +56,82 @@
 
   <main>
     <section class="hero card">
-      <div class="hero-h">
-        <h1>Internet lagging? Find which part of the path it is</h1>
-        <p class="lead" data-i="lead">Nearby, distant, UDP and your usual services, measured at once: a verdict in 20 seconds. If it comes and goes, keep monitoring on.</p>
+      <div class="hero-top">
+        <div class="hero-h">
+          <h1>Internet lagging? Find which part of the path it is</h1>
+          <p class="lead" data-i="lead">Nearby, distant, UDP and your usual services, measured at once, to find where the lag comes from. A run takes 2 minutes; a first verdict comes at 20 seconds.</p>
+        </div>
+        <!-- the one action: Start / Stop, with the run's time and progress in the button itself -->
+        <div class="ctl">
+          <button class="go" id="go" type="button"><span class="go-t" id="goT" data-i="start">Start</span><span class="go-n" id="goN"></span></button>
+          <div class="ctl-opts">
+            <label class="tog" data-tip="When on, the run doesn’t stop at 2 minutes but goes on until you press Stop; any stretch worse for over 10 seconds goes into the incident log. It keeps measuring in a background tab, and pauses when a phone locks or the browser goes to the background."><input type="checkbox" id="mon"><span class="sw" aria-hidden="true"></span><span data-i="monitor">Keep monitoring</span></label>
+            <label class="tog ntf" data-tip="A desktop notification when something goes wrong"><input type="checkbox" id="ntf"><span class="sw" aria-hidden="true"></span><span data-i="notify">Notify</span></label>
+          </div>
+        </div>
       </div>
-      <div class="go-row">
-        <button class="go" id="go" type="button"><span id="goT" data-i="start">Start</span></button>
-        <span class="prog" id="prog">&nbsp;</span>
-        <label class="tog"><input type="checkbox" id="mon"><span class="sw" aria-hidden="true"></span><span data-i="monitor">Keep monitoring</span></label>
-        <label class="tog"><input type="checkbox" id="ntf"><span class="sw" aria-hidden="true"></span><span data-i="notify">Notify me when something goes wrong</span></label>
-      </div>
-      <p class="info" id="info">&nbsp;</p>
-      <!-- the verdict: one sentence, how sure, up to 3 numbers, up to 4 pieces of evidence, what to try -->
+
+      <!-- the verdict: one sentence, how sure and where it exits, 3 numbers, up to 4 pieces of evidence, what it means
+           for calls, games and pages, and what to try. Every part keeps its space, so nothing moves when it fills. -->
       <div class="verdict" id="verdict" data-lv="idle" aria-live="polite">
-        <p class="v-h" id="vH" data-i="v_idle">Press Start: the verdict appears here in 20 seconds</p>
-        <p class="v-sub" id="vSub">&nbsp;</p>
-        <ul class="cards">
-          <li data-c="near"><span data-i="k_near">Nearest location</span><b>–</b></li>
-          <li data-c="udp"><span data-i="k_udp">UDP loss</span><b>–</b></li>
+        <p class="v-h" id="vH" data-i="v_idle">Press Start: a 2-minute run, with a first verdict at 20 seconds</p>
+        <p class="v-sub"><span id="vState">&nbsp;</span><span class="v-exit" id="vExit"></span></p>
+        <ul class="nums">
+          <li data-c="near"><span data-i="k_near">Nearby latency</span><b>–</b></li>
           <li data-c="jitter"><span data-i="k_jitter">Jitter</span><b>–</b></li>
+          <li data-c="udp"><span data-i="k_udp">UDP loss</span><b>–</b></li>
         </ul>
         <ul class="ev" id="ev"></ul>
-        <div class="sug" id="sug" hidden><p class="sug-h" data-i="sug_h">What to try</p><ul id="sugL"></ul></div>
+        <ul class="fit">
+          <li data-s="call"><span class="fit-k" data-tip="Video call quality (MOS), 1 to 5, worked out from latency, jitter and loss. 4 and up: clear and smooth; 3.6 to 4: the odd glitch or delay; under 3.6: choppy, breaking up." tabindex="0" data-i="sc_call">Video calls</span><b>–</b><em>&nbsp;</em></li>
+          <li data-s="game"><span class="fit-k" data-tip="A hiccup is a round trip 100 ms above usual, or a UDP packet that had to be resent. Up to 2 per 10 minutes is good, 6 or more is poor." tabindex="0" data-i="sc_game">Online games</span><b>–</b><em>&nbsp;</em></li>
+          <li data-s="page"><span class="fit-k" data-tip="The time to set up a connection (DNS, TCP, TLS) when opening a new site. Under 250 ms is good, over 600 ms is poor." tabindex="0" data-i="sc_page">Web pages</span><b>–</b><em>&nbsp;</em></li>
+        </ul>
+        <div class="sug" id="sug" data-on=""><p class="sug-h" data-i="sug_h">What to try</p><ul id="sugL"></ul></div>
       </div>
-      <ul class="scores">
-        <li data-s="call"><span data-i="sc_call">Video calls</span><b>–</b><em>&nbsp;</em></li>
-        <li data-s="game"><span data-i="sc_game">Online games</span><b>–</b><em>&nbsp;</em></li>
-        <li data-s="page"><span data-i="sc_page">Web pages</span><b>–</b><em>&nbsp;</em></li>
-      </ul>
     </section>
 
     <!-- every part of the path, one lane each: its state now and the last 6 minutes in 5-second windows -->
     <section class="card lanes-c">
-      <ul class="lanes"><li data-lane="device"><span class="ln-k" title="Whether the page’s timers fire on time: when the device is too busy, the numbers can’t be trusted" tabindex="0">Device</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl" aria-hidden="true"></span></li><li data-lane="direct" hidden><span class="ln-k" title="Domestic sites, without the proxy: your own line" tabindex="0">Domestic</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl" aria-hidden="true"></span></li><li data-lane="near"><span class="ln-k" title="The nearest Cloudflare location: your Wi‑Fi, router and ISP connection" tabindex="0">Nearby</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl" aria-hidden="true"></span></li><li data-lane="far"><span class="ln-k" title="Cloud regions in Tokyo, Frankfurt and Virginia: long-haul routes" tabindex="0">Distant</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl" aria-hidden="true"></span></li><li data-lane="udp"><span class="ln-k" title="Asking public STUN servers for your address: UDP round trips and loss, what games and calls use" tabindex="0">UDP</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl" aria-hidden="true"></span></li><li data-lane="svc"><span class="ln-k" title="The services you picked: when only they get worse, it is the service" tabindex="0">Services</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl" aria-hidden="true"></span></li></ul>
-      <p class="note" data-i="monitor_note">Keeps measuring in a background tab; pauses when a phone locks or the browser goes to the background.</p>
+      <div class="sec-h">
+        <h2 data-i="lanes_h">The path, part by part</h2>
+        <ul class="legend" aria-hidden="true">
+          <li data-st="ok"><i></i><span data-i="st_ok">fine</span></li>
+          <li data-st="warn"><i></i><span data-i="st_warn">so-so</span></li>
+          <li data-st="bad"><i></i><span data-i="st_bad">worse</span></li>
+          <li data-st="gap"><i></i><span data-i="st_gap">not measured</span></li>
+        </ul>
+      </div>
+      <ul class="lanes"><li data-lane="device"><span class="ln-k" data-tip="Whether the page’s timers fire on time: when the device is too busy, the numbers can’t be trusted" tabindex="0">Device</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl"></span></li><li data-lane="direct" hidden><span class="ln-k" data-tip="Domestic sites, without the proxy: your own line" tabindex="0">Domestic</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl"></span></li><li data-lane="near"><span class="ln-k" data-tip="The nearest Cloudflare location: your Wi‑Fi, router and ISP connection" tabindex="0">Nearby</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl"></span></li><li data-lane="far"><span class="ln-k" data-tip="Cloud regions in Tokyo, Frankfurt and Virginia: long-haul routes" tabindex="0">Distant</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl"></span></li><li data-lane="udp"><span class="ln-k" data-tip="Asking public STUN servers for your address: UDP round trips and loss, what games and calls use" tabindex="0">UDP</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl"></span></li><li data-lane="svc"><span class="ln-k" data-tip="The services you picked: when only they get worse, it is the service" tabindex="0">Services</span><span class="ln-st" data-st="none">—</span><span class="ln-v">&nbsp;</span><span class="ln-tl"></span></li></ul>
+      <div class="lanes-f">
+        <span class="svc-sum"><span class="m" data-i="svc_h">Services</span><span id="svcSum"></span></span>
+        <button class="lnk" id="svcBtn" type="button" aria-haspopup="dialog" aria-controls="svcs" data-i="svc_edit">Edit</button>
+      </div>
     </section>
 
-    <section class="card inc-c">
+    <section class="card inc-c" id="incC" hidden>
       <h2 data-i="inc_h">Incidents</h2>
-      <ol class="inc" id="inc"><li class="m" data-i="inc_none">No incidents yet. With monitoring on, any stretch worse for over 10 seconds is listed here.</li></ol>
-    </section>
-
-    <section class="card svc-c">
-      <h2 data-i="svc_h">Services to watch</h2>
-      <div class="chips" id="svcs"></div>
+      <ol class="inc" id="inc"></ol>
     </section>
 
     <div data-ms-more></div>
   </main>
+</div>
+
+<div class="scrim" id="svcs" hidden>
+  <div class="dialog svcs" role="dialog" aria-modal="true" aria-labelledby="svcsT">
+    <div class="dlg-h"><h2 id="svcsT" data-i="svc_h">Services</h2>
+      <button class="icon-btn" data-close type="button" aria-label="Close"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
+    <div class="dlg-b">
+      <div class="chips" id="svcList"></div>
+      <form class="svc-add" id="svcForm" autocomplete="off">
+        <input id="svcIn" type="text" inputmode="url" placeholder="Add a site, such as example.com" aria-label="Add a site, such as example.com" spellcheck="false">
+        <button class="btn" type="submit" data-i="svc_add">Add</button>
+      </form>
+      <p class="err" id="svcErr" aria-live="polite"></p>
+      <p class="note" data-i="svc_note">Pick the services to measure. What is timed is the site’s favicon; a few sites send it through their application servers, which reads higher. Sites you add are kept in this browser only.</p>
+    </div>
+  </div>
 </div>
 <div class="scrim" id="help" hidden>
   <div class="dialog help" role="dialog" aria-modal="true" aria-labelledby="helpT">
@@ -121,8 +149,8 @@
   </div>
 </div>
 
-<script type="application/json" id="data">{"lang":"en","paths":{"en":"/","zh-CN":"/zh-cn/"},"worker":"/assets/w.cb0564ee4c.js"}</script>
-<script src="/assets/l.en.273da7322e.js"></script>
-<script src="/assets/app.49a6e6d969.js"></script>
+<script type="application/json" id="data">{"lang":"en","paths":{"en":"/","zh-CN":"/zh-cn/"},"worker":"/assets/w.8697773cdf.js"}</script>
+<script src="/assets/l.en.b9a41aa397.js"></script>
+<script src="/assets/app.a37b7e7415.js"></script>
 </body>
 </html>

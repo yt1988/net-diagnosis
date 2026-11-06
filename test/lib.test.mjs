@@ -51,7 +51,7 @@ test('statusOf thresholds', () => {
   assert.equal(statusOf(jittery, { floor: 20 }).status, 'bad');
   const slower = windowStats([95, 100, 98, 97, 99].map((ms) => ({ ms })));
   assert.equal(statusOf(slower, { floor: 20 }).status, 'bad');
-  assert.equal(statusOf(windowStats([{ ms: null }, { ms: null }])).status, 'down');
+  assert.deepEqual(statusOf(windowStats([{ ms: null }, { ms: null }])), { status: 'down', why: ['timeouts'] });
   assert.equal(statusOf(windowStats([{ ms: 20 }, { ms: null }, { ms: 21 }, { ms: 20 }, { ms: 22 }, { ms: 20 }]), { floor: 20 }).status, 'warn');
   const farButSteady = windowStats([180, 182, 181, 183, 180].map((ms) => ({ ms })));
   assert.equal(statusOf(farButSteady, { floor: 180 }).status, 'ok', 'a long path is not a problem by itself');

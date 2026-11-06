@@ -70,7 +70,7 @@ export function stunLoss(probes, base = null) {
 // so a high round trip alone is a problem.
 export function statusOf(w, { floor = null, near = false } = {}) {
   if (!w || !w.n) return { status: 'none' };
-  if (!w.ok) return { status: 'down', why: 'timeouts' };
+  if (!w.ok) return { status: 'down', why: ['timeouts'] };
   const f = floor ?? w.min;
   const fail = w.fails / w.n, spread = w.p90 - w.min, excess = w.med - f;
   const why = [];

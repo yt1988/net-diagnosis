@@ -34,54 +34,82 @@
 
   <main>
     <section class="hero card">
-      <div class="hero-h">
-        <h1>{{h1}}</h1>
-        <p class="lead" data-i="lead"></p>
+      <div class="hero-top">
+        <div class="hero-h">
+          <h1>{{h1}}</h1>
+          <p class="lead" data-i="lead"></p>
+        </div>
+        <!-- the one action: Start / Stop, with the run's time and progress in the button itself -->
+        <div class="ctl">
+          <button class="go" id="go" type="button"><span class="go-t" id="goT" data-i="start"></span><span class="go-n" id="goN"></span></button>
+          <div class="ctl-opts">
+            <label class="tog" data-tip="{{a:monitor_tip}}"><input type="checkbox" id="mon"><span class="sw" aria-hidden="true"></span><span data-i="monitor"></span></label>
+            <label class="tog ntf" data-tip="{{a:notify_tip}}"><input type="checkbox" id="ntf"><span class="sw" aria-hidden="true"></span><span data-i="notify"></span></label>
+          </div>
+        </div>
       </div>
-      <div class="go-row">
-        <button class="go" id="go" type="button"><span id="goT" data-i="start"></span></button>
-        <span class="prog" id="prog">&nbsp;</span>
-        <label class="tog"><input type="checkbox" id="mon"><span class="sw" aria-hidden="true"></span><span data-i="monitor"></span></label>
-        <label class="tog"><input type="checkbox" id="ntf"><span class="sw" aria-hidden="true"></span><span data-i="notify"></span></label>
-      </div>
-      <p class="info" id="info">&nbsp;</p>
-      <!-- the verdict: one sentence, how sure, up to 3 numbers, up to 4 pieces of evidence, what to try -->
+
+      <!-- the verdict: one sentence, how sure and where it exits, 3 numbers, up to 4 pieces of evidence, what it means
+           for calls, games and pages, and what to try. Every part keeps its space, so nothing moves when it fills. -->
       <div class="verdict" id="verdict" data-lv="idle" aria-live="polite">
         <p class="v-h" id="vH" data-i="v_idle"></p>
-        <p class="v-sub" id="vSub">&nbsp;</p>
-        <ul class="cards">
+        <p class="v-sub"><span id="vState">&nbsp;</span><span class="v-exit" id="vExit"></span></p>
+        <ul class="nums">
           <li data-c="near"><span data-i="k_near"></span><b>–</b></li>
-          <li data-c="udp"><span data-i="k_udp"></span><b>–</b></li>
           <li data-c="jitter"><span data-i="k_jitter"></span><b>–</b></li>
+          <li data-c="udp"><span data-i="k_udp"></span><b>–</b></li>
         </ul>
         <ul class="ev" id="ev"></ul>
-        <div class="sug" id="sug" hidden><p class="sug-h" data-i="sug_h"></p><ul id="sugL"></ul></div>
+        <ul class="fit">
+          <li data-s="call"><span class="fit-k" data-tip="{{a:tip_call}}" tabindex="0" data-i="sc_call"></span><b>–</b><em>&nbsp;</em></li>
+          <li data-s="game"><span class="fit-k" data-tip="{{a:tip_game}}" tabindex="0" data-i="sc_game"></span><b>–</b><em>&nbsp;</em></li>
+          <li data-s="page"><span class="fit-k" data-tip="{{a:tip_page}}" tabindex="0" data-i="sc_page"></span><b>–</b><em>&nbsp;</em></li>
+        </ul>
+        <div class="sug" id="sug" data-on=""><p class="sug-h" data-i="sug_h"></p><ul id="sugL"></ul></div>
       </div>
-      <ul class="scores">
-        <li data-s="call"><span data-i="sc_call"></span><b>–</b><em>&nbsp;</em></li>
-        <li data-s="game"><span data-i="sc_game"></span><b>–</b><em>&nbsp;</em></li>
-        <li data-s="page"><span data-i="sc_page"></span><b>–</b><em>&nbsp;</em></li>
-      </ul>
     </section>
 
     <!-- every part of the path, one lane each: its state now and the last 6 minutes in 5-second windows -->
     <section class="card lanes-c">
+      <div class="sec-h">
+        <h2 data-i="lanes_h"></h2>
+        <ul class="legend" aria-hidden="true">
+          <li data-st="ok"><i></i><span data-i="st_ok"></span></li>
+          <li data-st="warn"><i></i><span data-i="st_warn"></span></li>
+          <li data-st="bad"><i></i><span data-i="st_bad"></span></li>
+          <li data-st="gap"><i></i><span data-i="st_gap"></span></li>
+        </ul>
+      </div>
       <ul class="lanes">{{lanes}}</ul>
-      <p class="note" data-i="monitor_note"></p>
+      <div class="lanes-f">
+        <span class="svc-sum"><span class="m" data-i="svc_h"></span><span id="svcSum"></span></span>
+        <button class="lnk" id="svcBtn" type="button" aria-haspopup="dialog" aria-controls="svcs" data-i="svc_edit"></button>
+      </div>
     </section>
 
-    <section class="card inc-c">
+    <section class="card inc-c" id="incC" hidden>
       <h2 data-i="inc_h"></h2>
-      <ol class="inc" id="inc"><li class="m" data-i="inc_none"></li></ol>
-    </section>
-
-    <section class="card svc-c">
-      <h2 data-i="svc_h"></h2>
-      <div class="chips" id="svcs"></div>
+      <ol class="inc" id="inc"></ol>
     </section>
 
     <div data-ms-more></div>
   </main>
+</div>
+
+<div class="scrim" id="svcs" hidden>
+  <div class="dialog svcs" role="dialog" aria-modal="true" aria-labelledby="svcsT">
+    <div class="dlg-h"><h2 id="svcsT" data-i="svc_h"></h2>
+      <button class="icon-btn" data-close type="button" aria-label="{{a:a_close}}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
+    <div class="dlg-b">
+      <div class="chips" id="svcList"></div>
+      <form class="svc-add" id="svcForm" autocomplete="off">
+        <input id="svcIn" type="text" inputmode="url" placeholder="{{a:svc_add_ph}}" aria-label="{{a:svc_add_ph}}" spellcheck="false">
+        <button class="btn" type="submit" data-i="svc_add"></button>
+      </form>
+      <p class="err" id="svcErr" aria-live="polite"></p>
+      <p class="note" data-i="svc_note"></p>
+    </div>
+  </div>
 </div>
 <div class="scrim" id="help" hidden>
   <div class="dialog help" role="dialog" aria-modal="true" aria-labelledby="helpT">
