@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>网络诊断原型</title>
+<style>
+  :root { --bg:#fff; --fg:#1a1a1a; --muted:#666; --line:#ddd; --card:#f7f7f5; --accent:#1f6feb; --good:#1a7f37; --bad:#cf222e; --warn:#9a6700; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#111; --fg:#e8e8e8; --muted:#999; --line:#333; --card:#1b1b1b; --accent:#58a6ff; --good:#3fb950; --bad:#f85149; --warn:#d29922; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.6 system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
+  main { max-width: 920px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 17px; margin: 0 0 4px; }
+  p { margin: 6px 0; }
+  .muted { color: var(--muted); font-size: 13px; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 16px; margin: 16px 0; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 10px 0; }
+  button { font: inherit; padding: 6px 14px; border-radius: 6px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
+  button.ghost { background: transparent; color: var(--accent); }
+  button:disabled { opacity: .5; cursor: default; }
+  input[type=text], input[type=number], select { font: inherit; padding: 4px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); }
+  input[type=number] { width: 80px; }
+  input.wide { width: min(100%, 520px); }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; margin-top: 8px; display: block; overflow-x: auto; }
+  th, td { border-bottom: 1px solid var(--line); padding: 4px 8px; text-align: left; white-space: nowrap; }
+  th { color: var(--muted); font-weight: 600; }
+  pre { font-size: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px; overflow-x: auto; max-height: 260px; margin: 8px 0 0; }
+  .good { color: var(--good); } .bad { color: var(--bad); } .warn { color: var(--warn); }
+  .verdict { font-weight: 600; margin-top: 8px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>网络诊断原型</h1>
+  <p class="muted">四项验证，决定第一版能依赖哪些能力。所有测量都在这个页面里进行，结果只在本机，点"导出"才会生成文件。</p>
+  <p class="muted" id="env"></p>
+
+  <section id="a">
+    <h2>A · 隐藏的标签页能否保持每秒采样</h2>
+    <p class="muted">开始后切到别的标签页（或最小化窗口）至少 10 分钟，再切回来看结果。Chrome 会在页面隐藏 5 分钟后加重节流，这里看两种计时方式在开着 / 不开 WebRTC 连接时的表现。</p>
+    <div class="row">
+      <label><input type="checkbox" id="a-rtc" checked> 保持一条 WebRTC 连接（本机回环）</label>
+      <label><input type="checkbox" id="a-fetch" checked> 每次采样发一个请求</label>
+      <button id="a-start">开始</button>
+      <button id="a-stop" class="ghost" disabled>停止</button>
+    </div>
+    <div id="a-out"></div>
+  </section>
+
+  <section id="e">
+    <h2>E · UDP：免费 STUN 探测</h2>
+    <p class="muted">轮流向几个公共 STUN 服务器取公网地址，每次取地址就是一次 UDP 往返。请求丢了，浏览器会在 250 ms、750 ms、1750 ms 后重发，所以耗时会落在"往返"、"往返 + 250"、"往返 + 750"这几簇上，由此估算丢包。同时测到 Cloudflare 的 HTTPS 往返，和 Cloudflare 的 STUN 对比，看 UDP 是否比 TCP 差。</p>
+    <div class="row">
+      <input type="text" id="e-targets" class="wide" value="stun:stun.cloudflare.com:3478, stun:stun.l.google.com:19302, stun:stun.miwifi.com:3478, stun:stun.chat.bilibili.com:3478">
+    </div>
+    <div class="row">
+      <label>每秒 <select id="e-rate"><option value="1" selected>1</option><option value="2">2</option></select> 次（各服务器轮流）</label>
+      <label>持续 <input type="number" id="e-secs" value="120" min="20" max="1800"> 秒</label>
+      <button id="e-start">开始</button>
+      <button id="e-stop" class="ghost" disabled>停止</button>
+    </div>
+    <div id="e-out"></div>
+  </section>
+
+  <section id="b">
+    <h2>B · UDP 真丢包：WebRTC 经 TURN 绕回自己（已停用）</h2>
+    <p class="warn">2026-11-06 实测：凭证吊销后、过了有效期，一小时后仍然能用，账单风险控制不住，所以停用。代码保留作参考。</p>
+    <p class="muted">两条 WebRTC 连接都强制走 Cloudflare TURN 中继，数据通道不可靠、不重传。往返时间约等于到 TURN 节点往返的两倍。每次运行单独申请一个凭证，只在这次测试期间有效，测完立即吊销；每人每天、全站每天的次数都有上限。</p>
+    <div id="b-ts"></div>
+    <div class="row">
+      <label>方式 <select id="b-transport"><option value="udp">UDP 3478</option><option value="udp443">UDP 443</option><option value="tcp">TCP</option><option value="tls">TLS 443</option></select></label>
+      <label>每秒 <input type="number" id="b-rate" value="50" min="1" max="200"> 包</label>
+      <label>持续 <input type="number" id="b-secs" value="20" min="5" max="60"> 秒</label>
+      <button id="b-run">运行</button>
+      <button id="b-all" class="ghost">三种方式依次对比</button>
+      <span class="muted" id="b-left"></span>
+    </div>
+    <div id="b-out"></div>
+  </section>
+
+  <section id="c">
+    <h2>C · 网关探针（Chrome Local Network Access）</h2>
+    <p class="muted">要在公网 HTTPS 页面上测才有意义：本机 localhost 打开时不会弹权限，也不涉及混合内容拦截。第一次请求时 Chrome 会询问是否允许访问本地网络，请自己决定是否允许。</p>
+    <div class="row">
+      <input type="text" id="c-addrs" class="wide" value="192.168.1.1, 192.168.0.1, 192.168.31.1, 192.168.3.1, 192.168.2.1, 192.168.50.1, 10.0.0.1, 192.168.100.1">
+    </div>
+    <div class="row">
+      <label><input type="checkbox" id="c-tas" checked> 带 <code>targetAddressSpace: "local"</code></label>
+      <button id="c-run">测网关</button>
+    </div>
+    <div id="c-out"></div>
+  </section>
+
+  <section id="d">
+    <h2>D · 能否看出 HTTP/3 与 HTTP/2</h2>
+    <p class="muted">对每个地址连续请求 8 次，读 Resource Timing 里的实际协议，看第几次起换成 HTTP/3，以及跨域时能否读到连接细节。</p>
+    <div class="row">
+      <input type="text" id="d-extra" class="wide" placeholder="可选：再加一个地址，例如 https://example.com/favicon.ico">
+      <button id="d-run">运行</button>
+    </div>
+    <div id="d-out"></div>
+  </section>
+
+  <div class="row">
+    <button id="export">导出全部结果（JSON）</button>
+    <span class="muted" id="export-note"></span>
+  </div>
+</main>
+<script type="module" src="app.js"></script>
+</body>
+</html>
