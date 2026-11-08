@@ -735,7 +735,7 @@ function record() {
     const st = S.windows.map((w) => w.lanes?.[k]).filter(Boolean);
     if (st.length) lanes[k] = st;
   }
-  const end = running() ? Date.now() : S.windows.at(-1)?.t || Date.now();
+  const end = running() ? Date.now() : S.windows[S.windows.length - 1]?.t || Date.now();
   return {
     ts: S.t0, key: v.key, conf: v.conf, secs: Math.round((end - S.t0) / 1000), mon: continuous(),
     near: sc?.nearMed, jitter: sc?.jitter, loss: S.udpx?.p ? S.udpx.p.loss : sc?.loss, mos: sc?.call, game: sc?.game?.level, spikes: sc?.spikes,

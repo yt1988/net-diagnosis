@@ -16,7 +16,7 @@ export async function https(url, timeout = 3000) {
     await r.arrayBuffer().catch(() => {});
     const ms = performance.now() - t0;
     await sleep(20); // the entry is queued after the response; in a worker it lands a moment later
-    const e = performance.getEntriesByName(href).at(-1);
+    const es = performance.getEntriesByName(href), e = es[es.length - 1];
     if (e) performance.clearResourceTimings?.();
     let setup = null;
     if (e && e.connectEnd > e.connectStart && e.requestStart > 0) setup = e.connectEnd - (e.domainLookupStart || e.connectStart);

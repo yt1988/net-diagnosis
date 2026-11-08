@@ -54,7 +54,7 @@ export async function build({ check = false } = {}) {
   const tpl = await readFile(new URL('page.html', src), 'utf8');
 
   const root = fileURLToPath(new URL('..', import.meta.url));
-  const opts = { bundle: true, minify: true, format: 'iife', target: 'es2020', legalComments: 'none', write: false, absWorkingDir: root };
+  const opts = { bundle: true, minify: true, format: 'iife', target: ['es2019', 'chrome70', 'safari12', 'firefox68', 'edge79'], legalComments: 'none', write: false, absWorkingDir: root };
   const js = (await bundle({ ...opts, entryPoints: [fileURLToPath(new URL('app.js', src))] })).outputFiles[0].text;
   const wjs = (await bundle({ ...opts, entryPoints: [fileURLToPath(new URL('worker-probe.js', src))] })).outputFiles[0].text;
   const cssFull = (await Promise.all(['fonts.css', 'base.css', 'style.css'].map((f) => readFile(new URL(f, src), 'utf8')))).join('\n');
