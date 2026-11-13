@@ -721,7 +721,7 @@ $$('[data-mode]').forEach((b) => {
 // It makes the link short, draws the card's frame (logo, name, QR code, date) and offers copy, download and the
 // system share sheet; this page gives the link, the card's middle and the footer. The box adds the country and the
 // Cloudflare location to both; no address or network is ever in either.
-const SHARE_JS = '/assets/share/share.js?v=9';
+const SHARE_JS = '/assets/share/share.js?v=10';
 let SHARED = null, RECV = null;
 const laneShown = (k) => !$(`[data-lane="${k}"]`).hidden;
 // this run as a share record: the headline verdict, its numbers, and each lane's windows
