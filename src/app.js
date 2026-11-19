@@ -163,7 +163,7 @@ const PRELIM_MS = 20000, DURATION_MS = 120000, LANE_CELLS = 72; // the lanes sho
 // 10 s or 400 MB, whichever comes first (a 674 Mbps line reached 300 MB in 3.5 s, too short to read)
 const LOAD = { url: NEAR.url.replace(/\?.*$/, ''), secs: 10, maxBytes: 400e6, rampMs: 1000 };
 const S = {
-  mode: 'idle', sel: 'diag', t0: 0, targets: [], stuns: [], overhead: 0, meta: null, home: null, cn: false, proxied: false, exit: '',
+  mode: 'idle', sel: 'diag', t0: 0, targets: [], stuns: [], overhead: 0, meta: null, home: null, cn: false, proxied: false, exit: '', boot: null,
   windows: [], inc: new Incidents(), marks: [], worker: null, stunI: 0, lag: null, fast: true, last: null, pub4: null, pub6: null,
   proto: { n: 0, h3: 0 }, gw: null, load: null, udpx: null,
 };
@@ -216,12 +216,14 @@ async function begin() {
   tickButton();
   const tz = TZ;
   S.home = tzCountry(tz);
-  // Cloudflare's view of the exit, and the browser's own STUN overhead, before the first window closes
+  // Cloudflare's view of the exit, and the browser's own STUN overhead, before the first window closes. The view
+  // taken at load (the same endpoint, used to name the nearby lane) stands in when this one does not answer.
   const [m, oh] = await Promise.all([meta(META), stunOverhead().catch(() => 0)]);
   if (!running()) return; // stopped while asking
   S.meta = m; S.overhead = oh;
-  const hint = proxyHint({ tz, exitCountry: m?.country });
-  const cn = (S.cn = S.home === 'CN' || m?.country === 'CN');
+  const exit = m?.country || S.boot;
+  const hint = proxyHint({ tz, exitCountry: exit });
+  const cn = (S.cn = S.home === 'CN' || exit === 'CN');
   S.proxied = !!hint && cn;
   S.exit = [m && t('info_exit', { org: m.org || 'AS' + m.asn, colo: m.colo || '?' }), hint && t('info_proxy', { home: region(hint.home), exit: region(hint.exit) })].filter(Boolean).join(' · ');
   // the nearest location gets an absolute bar only where it should be near (not from mainland China: it is abroad)
@@ -906,14 +908,17 @@ $('#go').onclick = begin;
 drawServices();
 resetLanes(); // empty cells from the start, so the lanes look the same before and during a run
 drawExtras();
-setNearLane(nearKeyFor(TZ)); // the lane's name before Start, so it does not change when the run begins
-// the shell knows the exit country without a third party (self-hosted answers 404: the timezone stands alone)
-fetch('/_ms/me', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((m) => {
-  if (m && !running() && !SHARED) setNearLane(nearKeyFor(TZ, m.country));
-}).catch(() => {});
+// the lane's name before Start, so it does not change when the run begins: the timezone at once, then the same view
+// of this connection's exit that the run uses (Cloudflare's meta; no answer: the timezone stands alone)
+setNearLane(nearKeyFor(TZ));
 // a shared result's link: show it (a code this page can't read gets the 404 from the Worker before it gets here)
 const SP = sharePath(location.pathname), SR = SP && decodeShare(SP.code);
 if (SR) showShared(SR);
+else meta(META).then((m) => {
+  if (!m?.country || running()) return;
+  S.boot = m.country;
+  setNearLane(nearKeyFor(TZ, m.country));
+});
 
 // for the site's "report a problem" dialog: the last verdict and window states, no IP
 window.msReport = () => {
