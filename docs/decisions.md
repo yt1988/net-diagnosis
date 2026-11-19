@@ -10,6 +10,8 @@
 - 控制台那句 `Mixed Content ... should also be served over HTTPS` 只是警告，不拦请求。真正的闸门是 Chrome 的 Local Network Access 权限：`navigator.permissions.query({ name: 'local-network-access' })` 是 `prompt` / `granted` / `denied`。允许以后 `http://192.168.1.1` 正常测到 5 ms；拒绝、或者根本没弹窗时，请求 1–2 ms 就失败。
 - 这个 1–2 ms 的失败原先会被 `gwTry` 的 `ms > 3` 当成「路由器很快地拒绝连接」，于是并发的一次慢一点的失败会被选成路由器：拒绝权限时实测出现过 192.168.3.1、192.168.10.1 被当成路由器并标成「变差 / 不通」，这会把结论引向「Wi‑Fi 或家里的网络」。现在权限不是 `granted` 时只认真的拿回了网页的回答；没找到时在路由器那一行写「需要授权 / 未授权」，点开说明怎么允许，允许后自动再找一次（`permissions` 的 `change`）。
 - 近处那一行的名字在页面打开时就定：时区先定，随后用测量本身用的同一个 Cloudflare `meta` 修正代理的判断，开始测量时不再从 Nearby 跳成 Domestic。不能用 shell 的 `/_ms/me` 代替：实测这台机器上它看到出口在日本、`speed.cloudflare.com` 的 `meta` 看到在中国，两个来源不同，名字照样会跳。`meta` 拿不到时只看时区，开始测量时也拿它作兜底（`S.boot`）。
+- 顺带修掉一个现有缺陷：事件卡片的 `<section>` 带着 `inc-c` 类，撞上了置信度列的 `.inc-c { white-space: nowrap }`。俄语的空状态那句话因此不换行，375 px 下把整页撑到 595 px（横向滚动）。去掉这个类即可，事件行自己仍用 `.inc-c`。
+
 
 
 ## 一切都在浏览器里测
