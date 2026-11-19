@@ -3,6 +3,15 @@
 技术上为什么这样做，以及每条背后测出来的数据。改动下面任何一条之前，先读它的原因。日期都是 2026 年。
 怎么测、怎么判断的细节见 [design.md](design.md)。
 
+## 路由器的本地网络权限，和近处那一行的名字（2026-11-19）
+
+外部 P0 审计说 `app.js` 的 http 请求被 Mixed Content 拦截，近处那一行从 Nearby 跳成 Domestic。用 Playwright 打开 https://lag.1ms.dog 实测（Chromium 145，可授权 `local-network-access`）：
+
+- 控制台那句 `Mixed Content ... should also be served over HTTPS` 只是警告，不拦请求。真正的闸门是 Chrome 的 Local Network Access 权限：`navigator.permissions.query({ name: 'local-network-access' })` 是 `prompt` / `granted` / `denied`。允许以后 `http://192.168.1.1` 正常测到 5 ms；拒绝、或者根本没弹窗时，请求 1–2 ms 就失败。
+- 这个 1–2 ms 的失败原先会被 `gwTry` 的 `ms > 3` 当成「路由器很快地拒绝连接」，于是并发的一次慢一点的失败会被选成路由器：拒绝权限时实测出现过 192.168.3.1、192.168.10.1 被当成路由器并标成「变差 / 不通」，这会把结论引向「Wi‑Fi 或家里的网络」。现在权限不是 `granted` 时只认真的拿回了网页的回答；没找到时在路由器那一行写「需要授权 / 未授权」，点开说明怎么允许，允许后自动再找一次（`permissions` 的 `change`）。
+- 近处那一行的名字在页面打开时就定：时区先定，随后用 shell 的 `/_ms/me`（同源，不经过第三方）修正代理的判断，开始测量时不再从 Nearby 跳成 Domestic。自部署时 `/_ms/me` 返回 404，退回只看时区。
+
+
 ## 一切都在浏览器里测
 
 - **路由器从浏览器测**：页面在几个常见网关地址（`src/targets.mjs` 的 `GATEWAYS`）上找路由器，找到就多一行「路由器」，借此分开 Wi‑Fi 和宽带接入。

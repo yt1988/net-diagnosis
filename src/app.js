@@ -170,6 +170,20 @@ const S = {
 const running = () => S.mode === 'run';
 const continuous = () => S.sel === 'mon';
 
+// The nearby lane is not the same path everywhere: the nearest Cloudflare location normally, the domestic sites in
+// mainland China without a proxy, and the way to the proxy server behind one. Its name is decided before Start (the
+// timezone at once, the shell's /_ms/me a moment later), so it does not change under the visitor's eyes mid-run.
+function nearKeyFor(tz, exitCountry) {
+  const cn = tzCountry(tz) === 'CN' || exitCountry === 'CN';
+  return cn ? (proxyHint({ tz, exitCountry }) ? 'near_proxy' : 'direct') : 'near';
+}
+function setNearLane(key) {
+  const k = $('[data-lane="near"] .ln-k');
+  k.textContent = t('lane_' + key);
+  k.dataset.tip = t('lane_tip_' + key);
+}
+const TZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
 const newTarget = (key, id, name, url, group, near, extra = {}) => ({ key, id, name, url, group, near, samples: [], floor: null, ...extra });
 const svcTargets = () => services().filter((s) => picked.has(s.id)).map((s) => newTarget('svc:' + s.id, s.id, s.name, s.url, 'svc', false));
 function plan() {
@@ -200,7 +214,7 @@ async function begin() {
   numbers(null);
   verdict({ key: 'running' });
   tickButton();
-  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const tz = TZ;
   S.home = tzCountry(tz);
   // Cloudflare's view of the exit, and the browser's own STUN overhead, before the first window closes
   const [m, oh] = await Promise.all([meta(META), stunOverhead().catch(() => 0)]);
@@ -221,9 +235,7 @@ async function begin() {
   // with a proxy in mainland China domestic sites get their own lane and "nearby" is the proxy server; without
   // one, domestic sites are the nearby lane and Cloudflare (abroad) joins the distant one
   $('[data-lane="direct"]').hidden = !(cn && S.proxied);
-  const nearKey = cn ? (S.proxied ? 'near_proxy' : 'direct') : 'near';
-  $('[data-lane="near"] .ln-k').textContent = t('lane_' + nearKey);
-  $('[data-lane="near"] .ln-k').dataset.tip = t('lane_tip_' + nearKey);
+  setNearLane(cn ? (S.proxied ? 'near_proxy' : 'direct') : 'near');
   verdict({ key: 'running' });
   S.worker = new Worker(D.worker);
   S.worker.onmessage = onWorker;
@@ -284,7 +296,8 @@ function onWorker({ data: m }) {
 
 // ---------- the home router (optional) ----------
 // Chrome asks the visitor to allow this page to reach the local network; an http request to a private address is
-// then allowed from an https page. Each answer, or a quick refusal, is one round trip to the router.
+// then allowed from an https page (the browser logs it as mixed content, but does not block it once allowed). Each
+// answer, or a quick refusal, is one round trip to the router.
 // → { ms, web }: web = the router answered over http; otherwise a refusal after a round trip (ms) or nothing (null)
 async function gwTry(ip, timeout = 2000) {
   const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), timeout), t0 = performance.now();
@@ -297,18 +310,52 @@ async function gwTry(ip, timeout = 2000) {
   } finally { clearTimeout(timer); }
 }
 const gwOnce = async (ip, timeout) => (await gwTry(ip, timeout)).ms;
+
+// Chrome's Local Network Access permission decides whether a request to a private address leaves the browser at
+// all. Without it every attempt fails in a millisecond or two, which used to look like a very fast router and could
+// be picked as one (and then judged "worse" or "down"). The lane says which case it is instead of staying hidden.
+let lna = null;
+async function lnaState() {
+  try {
+    if (!lna) { lna = await navigator.permissions.query({ name: 'local-network-access' }); lna.addEventListener('change', onLna); }
+    return lna.state;
+  } catch { return null; } // no such permission in this browser: it can't ask, so nothing to explain
+}
+// the visitor allows it (in the Chrome prompt or in the site settings): look for the router again, no reload
+function onLna() {
+  if (!running() || S.gw) return;
+  if (lna.state === 'granted') { $('[data-lane="gw"]').hidden = true; findGateway(); }
+  else if (lna.state === 'denied') gwMsg('denied');
+}
+function gwMsg(state) {
+  const li = $('[data-lane="gw"]'), st = li.querySelector('.ln-st'), k = state === 'denied' ? 'gw_blocked' : 'gw_ask';
+  li.hidden = false;
+  st.dataset.st = 'none';
+  st.textContent = t(k);
+  st.dataset.tip = li.querySelector('.ln-k').dataset.tip = t(k + '_tip');
+}
 // Found by itself when a run starts: every common address at once, a real web answer first (a missing subnet can
-// come back as a quick "unreachable" from the router upstream), then the fastest. Nothing found: no lane.
+// come back as a quick "unreachable" from the router upstream), then the fastest. Nothing found: no lane, unless
+// the browser blocked the page from the local network — that is said in the lane.
 async function findGateway() {
   if (S.gw || S.gwLooking) return;
   S.gwLooking = true;
+  const before = await lnaState();
   const rs = await Promise.all(GATEWAYS.map(async (ip) => ({ ip, ...(await gwTry(ip, 1500)) })));
+  const after = before === 'prompt' ? await lnaState() : before;
   S.gwLooking = false;
-  const ok = rs.filter((r) => r.ms != null).sort((a, b) => (b.web - a.web) || a.ms - b.ms);
-  if (!ok.length || !running()) return;
+  if (!running()) return;
+  // a real http answer counts always; a bare refusal only when the permission was already there before the attempt
+  const ok = rs.filter((r) => r.ms != null && (r.web || before === 'granted')).sort((a, b) => (b.web - a.web) || a.ms - b.ms);
+  if (!ok.length) {
+    if (after === 'denied' || after === 'prompt') gwMsg(after);
+    else $('[data-lane="gw"]').hidden = true;
+    return;
+  }
   S.gw = { ip: ok[0].ip, samples: [], floor: null, busy: false };
-  const li = $('[data-lane="gw"]');
+  const li = $('[data-lane="gw"]'), st = li.querySelector('.ln-st');
   li.hidden = false;
+  st.dataset.st = 'none'; st.textContent = t('st_none'); st.dataset.tip = '';
   li.querySelector('.ln-k').dataset.tip = t('lane_tip_gw', { ip: ok[0].ip });
 }
 async function probeGateway() {
@@ -859,6 +906,11 @@ $('#go').onclick = begin;
 drawServices();
 resetLanes(); // empty cells from the start, so the lanes look the same before and during a run
 drawExtras();
+setNearLane(nearKeyFor(TZ)); // the lane's name before Start, so it does not change when the run begins
+// the shell knows the exit country without a third party (self-hosted answers 404: the timezone stands alone)
+fetch('/_ms/me', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((m) => {
+  if (m && !running() && !SHARED) setNearLane(nearKeyFor(TZ, m.country));
+}).catch(() => {});
 // a shared result's link: show it (a code this page can't read gets the 404 from the Worker before it gets here)
 const SP = sharePath(location.pathname), SR = SP && decodeShare(SP.code);
 if (SR) showShared(SR);
