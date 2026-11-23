@@ -131,7 +131,7 @@ test('proxy hint and confidence', () => {
   assert.equal(hint({ tz: 'Asia/Shanghai', exitCC: 'CN' }), null);
   assert.equal(hint({ tz: 'Asia/Shanghai', exitCC: 'HK' }), null); // a mainland device with a Hong Kong exit is not a hint
   assert.deepEqual(hint({ tz: 'Europe/Paris', exitCC: 'US' }), { home: 'FR', exit: 'US' }); // the shared table knows Paris
-  assert.equal(hint({ tz: 'Antarctica/Troll', exitCC: 'US' }), null); // an unknown zone says nothing
+  assert.equal(hint({ tz: 'Mars/Olympus', exitCC: 'US' }), null); // an unknown zone says nothing
   assert.equal(confidence(3, 1), 2);
   assert.equal(confidence(2, 7), 3);
 });

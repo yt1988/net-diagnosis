@@ -5,7 +5,7 @@
 
 ## 出口判断改用全站组件（2026-11-23）
 
-站长要求全站凡回答「直连还是代理」的地方用同一份实现（Public 转达）。`src/egress.js` 是从 1ms.dog 的 `src/egress.js` VERSION 3（73f1272）原样复制的，头部留了来源；本地规则不在这个仓库改，要改找 shell。和 VERSION 1 相比，core 之后只改了三处：Cloudflare 的网络（ASN 13335 或组织名 cloudflare）不论 WARP 都判代理（VERSION 2）；单栈探测按同族网络比较、WebRTC 按网络比较、时区表补全到更多时区（VERSION 3）。本页只用 `hint()` 和 `tzCountry()`：中国大陆的四个时区仍映射到 CN，CN 判定不变；时区表变大后，更多国家的 `hint()` 会有答案，出口那一行可能出现「看起来经过了代理」，代理结论仍然只在中国大陆涉及的一侧使用。
+站长要求全站凡回答「直连还是代理」的地方用同一份实现（Public 转达）。`src/egress.js` 是从 1ms.dog 的 `src/egress.js` VERSION 4（3d6aad3）原样复制的，头部留了来源；本地规则不在这个仓库改，要改找 shell。和 VERSION 1 相比，core 之后改了四处：Cloudflare 的网络（ASN 13335 或组织名 cloudflare）不论 WARP 都判代理（VERSION 2）；单栈探测按同族网络比较、WebRTC 按网络比较、时区表补全（VERSION 3）；时区表换成完整的 IANA 表 552 条（VERSION 4）。本页只用 `hint()` 和 `tzCountry()`：中国大陆的时区仍映射到 CN，CN 判定不变；时区表变大后，更多国家的 `hint()` 会有答案，出口那一行可能出现「看起来经过了代理」，代理结论仍然只在中国大陆涉及的一侧使用。shell 的 `npm run shared` 会逐仓库核对这份副本（允许第一行来源头），lag 显示 VERSION 4、ok。
 
 - 本地时区表删掉，`tzCountry` 直接用 core 的（从 12 个时区变成 50 个）。
 - `proxyHint` 删掉，页面直接调 `hint({ tz, exitCC })`。只有 `home` 或 `exit` 是 CN 时才把提示当成代理结论（`S.proxied`），这条留在页面；线路归因（proxy-entry / proxy-exit）和 `info_exit` / `info_proxy` 文案没动。
