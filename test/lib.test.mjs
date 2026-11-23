@@ -2,8 +2,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  quantile, windowStats, stunLoss, statusOf, udpStatusOf, attribute, mos, mosLevel, gaming, Incidents, WINDOW_MS, proxyHint, confidence, bloatGrade, bloatLevel,
+  quantile, windowStats, stunLoss, statusOf, udpStatusOf, attribute, mos, mosLevel, gaming, Incidents, WINDOW_MS, confidence, bloatGrade, bloatLevel,
 } from '../src/lib.mjs';
+import { hint } from '../src/egress.js';
 
 test('quantile and window stats', () => {
   assert.equal(quantile([1, 2, 3, 4, 5], 0.5), 3);
@@ -126,9 +127,11 @@ test('incidents open after 2 bad windows and close after 3 good ones', () => {
 });
 
 test('proxy hint and confidence', () => {
-  assert.deepEqual(proxyHint({ tz: 'Asia/Shanghai', exitCountry: 'JP' }), { home: 'CN', exit: 'JP' });
-  assert.equal(proxyHint({ tz: 'Asia/Shanghai', exitCountry: 'CN' }), null);
-  assert.equal(proxyHint({ tz: 'Europe/Paris', exitCountry: 'US' }), null);
+  assert.deepEqual(hint({ tz: 'Asia/Shanghai', exitCC: 'JP' }), { home: 'CN', exit: 'JP' });
+  assert.equal(hint({ tz: 'Asia/Shanghai', exitCC: 'CN' }), null);
+  assert.equal(hint({ tz: 'Asia/Shanghai', exitCC: 'HK' }), null); // a mainland device with a Hong Kong exit is not a hint
+  assert.deepEqual(hint({ tz: 'Europe/Paris', exitCC: 'US' }), { home: 'FR', exit: 'US' }); // the shared table knows Paris
+  assert.equal(hint({ tz: 'Antarctica/Troll', exitCC: 'US' }), null); // an unknown zone says nothing
   assert.equal(confidence(3, 1), 2);
   assert.equal(confidence(2, 7), 3);
 });

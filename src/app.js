@@ -9,8 +9,9 @@ import { udp as rtcUdp, quic as rtcQuic } from './rtc.mjs';
 import { encode as encodeShare, decode as decodeShare, sharePath, LANES, CELLS, squeeze } from './share.mjs';
 import {
   WINDOW_MS, windowStats, statusOf, udpStatusOf, stunLoss, attribute, mos, mosLevel, gaming, pageLevel, Incidents, confidence,
-  proxyHint, tzCountry, median, RETX, bloatGrade, bloatLevel,
+  tzCountry, median, RETX, bloatGrade, bloatLevel,
 } from './lib.mjs';
+import { hint } from './egress.js';
 
 const L = window.L1MS, D = JSON.parse(document.getElementById('data').textContent);
 const $ = (s) => document.querySelector(s), $$ = (s) => [...document.querySelectorAll(s)];
@@ -175,7 +176,7 @@ const continuous = () => S.sel === 'mon';
 // timezone at once, the shell's /_ms/me a moment later), so it does not change under the visitor's eyes mid-run.
 function nearKeyFor(tz, exitCountry) {
   const cn = tzCountry(tz) === 'CN' || exitCountry === 'CN';
-  return cn ? (proxyHint({ tz, exitCountry }) ? 'near_proxy' : 'direct') : 'near';
+  return cn ? (hint({ tz, exitCC: exitCountry }) ? 'near_proxy' : 'direct') : 'near';
 }
 function setNearLane(key) {
   const k = $('[data-lane="near"] .ln-k');
@@ -222,13 +223,15 @@ async function begin() {
   if (!running()) return; // stopped while asking
   S.meta = m; S.overhead = oh;
   const exit = m?.country || S.boot;
-  const hint = proxyHint({ tz, exitCountry: exit });
+  // the shared rule (src/egress.js): the device's time zone against the exit Cloudflare sees. The proxy verdict is
+  // the mainland-China case only, so that gate stays here.
+  const ex = hint({ tz, exitCC: exit });
   const cn = (S.cn = S.home === 'CN' || exit === 'CN');
-  S.proxied = !!hint && cn;
-  S.exit = [m && t('info_exit', { org: m.org || 'AS' + m.asn, colo: m.colo || '?' }), hint && t('info_proxy', { home: region(hint.home), exit: region(hint.exit) })].filter(Boolean).join(' · ');
+  S.proxied = !!ex && cn;
+  S.exit = [m && t('info_exit', { org: m.org || 'AS' + m.asn, colo: m.colo || '?' }), ex && t('info_proxy', { home: region(ex.home), exit: region(ex.exit) })].filter(Boolean).join(' · ');
   // the nearest location gets an absolute bar only where it should be near (not from mainland China: it is abroad)
   S.targets = [
-    newTarget('near:cf', NEAR.id, NEAR.name, NEAR.url, 'near', !cn && !hint),
+    newTarget('near:cf', NEAR.id, NEAR.name, NEAR.url, 'near', !cn && !ex),
     ...(cn ? DIRECT.CN : []).map((d) => newTarget('direct:' + d.id, d.id, nameOf(d.name), d.url, 'direct', true)),
     ...FAR.map((f) => newTarget('far:' + f.id, f.id, t('far_' + f.id), f.url, 'far', false)),
     ...svcTargets(),

@@ -254,14 +254,6 @@ export class Incidents {
 export function confidence(base, heldWindows) { return Math.max(1, Math.min(3, base - (heldWindows < 2 ? 1 : 0) + (heldWindows >= 6 ? 1 : 0))); }
 
 // ---------- proxy hint ----------
-// The time zone's country against the exit country Cloudflare sees. Only the zones that matter most here; others: unknown.
-const TZ = {
-  'Asia/Shanghai': 'CN', 'Asia/Chongqing': 'CN', 'Asia/Harbin': 'CN', 'Asia/Urumqi': 'CN', 'Asia/Hong_Kong': 'HK', 'Asia/Taipei': 'TW',
-  'Asia/Tokyo': 'JP', 'Asia/Seoul': 'KR', 'Asia/Singapore': 'SG', 'Europe/Moscow': 'RU', 'Asia/Tehran': 'IR', 'Europe/Istanbul': 'TR',
-};
-export const tzCountry = (tz) => TZ[tz] || null;
-export function proxyHint({ tz, exitCountry }) {
-  const home = tzCountry(tz);
-  if (!home || !exitCountry) return null;
-  return home !== exitCountry ? { home, exit: exitCountry } : null;
-}
+// The time zone's country against the exit country Cloudflare sees: the shared module's hint() (src/egress.js,
+// vendored from 1ms.dog) and its time-zone table. The mainland-China gate lives in the page, not here.
+export { tzCountry } from './egress.js';

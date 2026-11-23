@@ -3,6 +3,15 @@
 技术上为什么这样做，以及每条背后测出来的数据。改动下面任何一条之前，先读它的原因。日期都是 2026 年。
 怎么测、怎么判断的细节见 [design.md](design.md)。
 
+## 出口判断改用全站组件（2026-11-23）
+
+站长要求全站凡回答「直连还是代理」的地方用同一份实现（Public 转达）。`src/egress.js` 是从 1ms.dog 的 `src/egress.js` VERSION 1（3b38822）原样复制的，头部留了来源；本地规则不在这个仓库改，要改找 shell。
+
+- 本地时区表删掉，`tzCountry` 直接用 core 的（从 12 个时区变成 50 个）。
+- `proxyHint` 删掉，页面直接调 `hint({ tz, exitCC })`。只有 `home` 或 `exit` 是 CN 时才把提示当成代理结论（`S.proxied`），这条留在页面；线路归因（proxy-entry / proxy-exit）和 `info_exit` / `info_proxy` 文案没动。
+- 两处可见变化都来自 core 的规则：中国大陆设备、出口在香港或澳门时不再提示代理（core 视为同一处）；时区表变大后，非中国用户（例如法国时区、美国出口）也会在出口那一行看到「看起来经过了代理」，但代理结论仍然只在中国大陆涉及的一侧使用。
+
+
 ## 路由器的本地网络权限，和近处那一行的名字（2026-11-19）
 
 外部 P0 审计说 `app.js` 的 http 请求被 Mixed Content 拦截，近处那一行从 Nearby 跳成 Domestic。用 Playwright 打开 https://lag.1ms.dog 实测（Chromium 145，可授权 `local-network-access`）：
