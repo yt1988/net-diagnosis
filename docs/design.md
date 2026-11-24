@@ -124,7 +124,7 @@ MOS = 1 + 0.035R + 7×10⁻⁶ · R(R − 60)(100 − R)
 | `src/targets.mjs` | 测哪些地址 |
 | `src/probes.mjs` | HTTPS 和 STUN 探测，Cloudflare 看到的出口 |
 | `src/worker-probe.js` | 专用 Worker：调度、HTTPS 探测、满载下载 |
-| `src/rtc.mjs` | 精确的 UDP 和 QUIC 测试（从 speed-test 复制，两边要保持一致） |
+| `src/rtc.mjs` | 精确的 UDP 和 QUIC 测试，同时打上海和东京两台回声（从 speed-test 复制，两边要保持一致） |
 | `src/app.js` | 页面：每格的快照、结论、各段时间线、事件记录、通知、分享、打开分享链接 |
 | `src/share.mjs` | 分享链接的编码和解码 |
 | `src/worker.js` | Cloudflare Worker：`/r/` 链接的预览，其余返回 404 |

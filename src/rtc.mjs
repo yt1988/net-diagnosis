@@ -1,15 +1,17 @@
-// Copied from speed-test (src/rtc.mjs, MIT, same author): the client for rtc.1ms.dog. Keep the two in step.
-// UDP and QUIC to rtc.1ms.dog in Tokyo (server/main.go). Little traffic: 50 packets of 12 bytes a second while the
-// test runs (with WebRTC's own acknowledgements about 130 UDP packets and 10 KB a second each way, 0.4-0.7 MB a
-// test), then 10 echoes over QUIC and 10 over TCP.
+// Copied from speed-test (src/rtc.mjs, MIT, same author): keep the two in step.
+// UDP and QUIC to our two servers (server/main.go): rtc.1ms.dog in Tokyo (the cross-border path) and
+// rtc.dog.1msapp.com in mainland China (the domestic path). The same measurement runs against both, which tells a
+// network that limits UDP at home from one that limits it only across the border. Little traffic each: 50 packets of
+// 12 bytes a second while the test runs (with WebRTC's own acknowledgements about 130 UDP packets and 10 KB a second
+// each way, 0.4-0.7 MB a test), then 10 echoes over QUIC and 10 over TCP. Both together: 0.8-1.4 MB.
 //
-//   udp()          a WebRTC data channel, unreliable and unordered (as calls and games send): .phase(0|1|2) tags
-//                  what follows as idle, download or upload; .stop() gives { state, phases: [{ loss, up, down, jit }] }
-//   quic()         WebTransport datagrams against a WebSocket to the same server: is QUIC let through, and as fast?
+//   udp(sig)       a WebRTC data channel, unreliable and unordered (as calls and games send): .phase(0|1|2) tags
+//                  what follows as idle, download or upload; .stop() gives { state, family, phases: [{ loss, up, down, jit }] }
+//   quic(sig,wt)   WebTransport datagrams against a WebSocket to the same server: is QUIC let through, and as fast?
 //
-// Pure helpers (lossOf, quicVerdict) are unit-tested; the rest needs a browser.
-export const RTC = "https://rtc.1ms.dog";
-export const SIG = RTC + ":2087", WT = RTC + ":40101/wt";
+// Pure helpers (lossOf, quicVerdict, compareSides) are unit-tested; the rest needs a browser.
+export const RTC = "https://rtc.1ms.dog", RTC_CN = "https://rtc.dog.1msapp.com";
+export const SIG = RTC + ":2087", WT = RTC + ":40101/wt", SIG_CN = RTC_CN + ":2087", WT_CN = RTC_CN + ":40101/wt";
 export const RATE_MS = 20, WAIT_MS = 1500;
 const PHASES = 3;
 
@@ -35,6 +37,20 @@ export function quicVerdict({ api, wt, ws }) {
   return "ok";
 }
 
+// The two measurement points side by side, each given the worst loss among its measured phases (null when that side
+// never connected). Under 1% is fine, the threshold the help and the tiles use. side, for the sentence the page
+// shows: same (both fine) | border (only the cross-border path loses) | domestic (only the domestic path loses) |
+// both | partial (one side not measured) | none (neither).
+export function compareSides(cn, os) {
+  const bad = p => p != null && p >= 1;
+  if (cn == null && os == null) return { side: "none", cn, os };
+  if (cn == null || os == null) return { side: "partial", cn, os };
+  if (bad(cn) && bad(os)) return { side: "both", cn, os };
+  if (bad(cn)) return { side: "domestic", cn, os };
+  if (bad(os)) return { side: "border", cn, os };
+  return { side: "same", cn, os };
+}
+
 const timeout = (p, ms) => Promise.race([p, new Promise((_, j) => setTimeout(() => j(new Error("timeout")), ms))]);
 
 export function udp(sig = SIG) {
@@ -43,8 +59,18 @@ export function udp(sig = SIG) {
   dc.binaryType = "arraybuffer";
   // sent: the packets still out, by sequence number; out: per phase, how many went and when, the round trips back
   const sent = new Map(), out = Array.from({ length: PHASES }, () => ({ sent: 0, at: [], rtts: [] }));
-  // state: connecting → open, or blocked (the server answered, UDP didn't get through) or down (no server)
-  let phase = 0, seq = 0, tick = null, counts = null, state = "connecting", reached = false;
+  // state: connecting → open, or blocked (the server answered, UDP didn't get through) or down (no server);
+  // family: which address family the browser chose for this path (4 or 6, null until known), for the row's label
+  let phase = 0, seq = 0, tick = null, counts = null, state = "connecting", reached = false, fam = null;
+  const readFamily = async () => {
+    try {
+      const s = await pc.getStats();
+      let pair = null, remote = null;
+      s.forEach(r => { if (r.type === "transport" && r.selectedCandidatePairId) pair = r.selectedCandidatePairId; });
+      s.forEach(r => { if (r.type === "candidate-pair" && (pair ? r.id === pair : r.selected)) remote = r.remoteCandidateId; });
+      s.forEach(r => { if (r.type === "remote-candidate" && r.id === remote && r.address) fam = r.address.includes(":") ? 6 : 4; });
+    } catch (e) {}
+  };
   const t0 = performance.now();
   dc.onmessage = e => {
     if (typeof e.data === "string") { try { counts = JSON.parse(e.data); } catch (x) {} return; }
@@ -62,6 +88,7 @@ export function udp(sig = SIG) {
     reached = true;                 // the server answered over HTTPS: if the channel doesn't open now, UDP is blocked
     await timeout(open, 6000);
     state = "open";
+    readFamily();
     tick = setInterval(() => {
       if (dc.readyState !== "open") return;
       const b = new ArrayBuffer(12), v = new DataView(b);
@@ -93,11 +120,12 @@ export function udp(sig = SIG) {
       let res = null;
       if (state === "open") {
         await new Promise(r => setTimeout(r, WAIT_MS));
+        await readFamily();           // the label says which family this path used
         try { dc.send("n"); await new Promise(r => setTimeout(r, 400)); } catch (e) {}
         res = out.map((o, i) => lossOf(o.sent, counts ? counts[i] : null, o.rtts));
       }
       try { pc.close(); } catch (e) {}
-      return { state, phases: res };
+      return { state, family: fam, phases: res };
     },
   };
 }

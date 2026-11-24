@@ -40,7 +40,7 @@ void ORIGINS;
 const cspOf = () => ["default-src 'self'", `script-src 'self' 'sha256-${sha(PREPAINT)}'`, "worker-src 'self'", "style-src 'self' 'unsafe-inline'", "font-src 'self'", "img-src 'self' data: blob: https:",
   // https: any service; wss: rtc.1ms.dog's echo (src/rtc.mjs); http: the home router addresses (GATEWAYS), only
   // reached after the visitor allows local network access
-  "connect-src 'self' https: wss://rtc.1ms.dog:2087 " + GATEWAYS.map((ip) => 'http://' + ip).join(' '),
+  "connect-src 'self' https: wss://rtc.1ms.dog:2087 wss://rtc.dog.1msapp.com:2087 " + GATEWAYS.map((ip) => 'http://' + ip).join(' '),
   "manifest-src 'self'", "object-src 'none'", "base-uri 'none'", "form-action 'none'", "frame-ancestors 'none'"].join('; ');
 
 // strings only the build uses (the page already shows them); everything else goes to the browser

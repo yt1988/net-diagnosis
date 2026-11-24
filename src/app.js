@@ -2,10 +2,10 @@
 // runs STUN when told, judges every 5-second window with src/lib.mjs, and draws the verdict, the lanes and the log.
 // Two modes: a diagnosis (DURATION_MS, a first verdict at PRELIM_MS) or monitoring (until Stop).
 // On demand: the home router (Chrome's local network permission), loaded latency (fills the line for 10 s) and an
-// exact UDP / QUIC test against rtc.1ms.dog (src/rtc.mjs).
+// exact UDP / QUIC test against both echoes, Shanghai and Tokyo (src/rtc.mjs).
 import { NEAR, META, DIRECT, FAR, SERVICES, STUN, STUN_DIRECT, GATEWAYS } from './targets.mjs';
 import { stun, stunOverhead, meta } from './probes.mjs';
-import { udp as rtcUdp, quic as rtcQuic } from './rtc.mjs';
+import { udp as rtcUdp, quic as rtcQuic, SIG, WT, SIG_CN, WT_CN } from './rtc.mjs';
 import { encode as encodeShare, decode as decodeShare, sharePath, LANES, CELLS, squeeze } from './share.mjs';
 import {
   WINDOW_MS, windowStats, statusOf, udpStatusOf, stunLoss, attribute, mos, mosLevel, gaming, pageLevel, Incidents, confidence,
@@ -549,17 +549,34 @@ function onLoaded(m) {
   S.load.grade = bloatGrade(S.load.rise);
   drawExtras();
 }
+// The exact test against both of 1ms.dog's echoes at once — Shanghai (the path inside mainland China, "domestic")
+// and Tokyo (across the border) — so the two see the same conditions. 12-byte packets: the two flows do not fill the
+// line. Each side reports its own loss both ways and whether QUIC gets through; they run together, so it is still
+// about 20 seconds.
+const UDPX_SIDES = [{ k: 'cn', sig: SIG_CN, wt: WT_CN }, { k: 'os', sig: SIG, wt: WT }];
+const udpSideLoss = (s) => s?.p?.loss ?? null;
+// one headline number: the worst path that was measured (the exact test's own number; STUN estimates the rest)
+function udpxLoss(u) {
+  const a = [udpSideLoss(u?.cn), udpSideLoss(u?.os)].filter((x) => x != null);
+  return a.length ? Math.max(...a) : null;
+}
+// the word shown when both paths agree; when they differ, the worse one (the tooltip says which side)
+const Q_ORDER = ['ok', 'slow', 'na', 'blocked', 'down'];
+const worstQ = (a, b) => Q_ORDER[Math.max(Q_ORDER.indexOf(a), Q_ORDER.indexOf(b))] || 'down';
 async function startUdpx() {
   if (S.udpx?.run) return;
   S.udpx = { run: true };
   drawExtras();
-  const u = rtcUdp();
+  const us = UDPX_SIDES.map((s) => rtcUdp(s.sig));
   await sleep(20000);
-  const r = await u.stop();
-  const q = await rtcQuic().catch(() => ({ verdict: 'down' }));
-  S.udpx = { run: false, state: r.state, p: r.phases?.[0] || null, q: q.verdict };
+  const rs = await Promise.all(us.map((u) => u.stop()));
+  const qs = await Promise.all(UDPX_SIDES.map((s) => rtcQuic(s.sig, s.wt).catch(() => ({ verdict: 'down' }))));
+  const side = (i) => ({ state: rs[i].state, p: rs[i].phases?.[0] || null, q: qs[i].verdict, fam: rs[i].family });
+  S.udpx = { run: false, cn: side(0), os: side(1) };
   drawExtras();
 }
+// the description the page was built with, put back once a run of the exact test has been replaced
+const UDPX_TIP = $('#udpxBtn').dataset.tip;
 
 /* ---------- drawing ---------- */
 const why = (x) => (x.why?.length ? PAREN[0] + x.why.map((w) => t('why_' + w)).join(AND) + PAREN[1] : '');
@@ -643,10 +660,19 @@ function numbers(sc) {
 // UDP loss (estimated, or exact once rtc.1ms.dog was asked) and loaded latency, each with its own button
 function drawExtras() {
   const u = S.udpx, card = $('[data-c="udp"]');
-  card.querySelector('b').textContent = u && !u.run && u.p ? pct(u.p.loss) : lastScores?.loss == null ? '–' : pct(lastScores.loss);
+  const done = u && !u.run && u.cn && u.os, ex = done ? udpxLoss(u) : null;
+  card.querySelector('b').textContent = ex != null ? pct(ex) : lastScores?.loss == null ? '–' : pct(lastScores.loss);
   const ub = $('#udpxBtn');
   ub.disabled = !!u?.run;
-  ub.textContent = u?.run ? t('udpx_run') : u && !u.run ? (u.p ? t('udpx_done', { up: pct(u.p.up), down: pct(u.p.down), q: t('q_' + u.q) }) : t('udpx_na')) : t('udpx_btn');
+  const sideText = (s) => (s?.p ? pct(s.p.loss) : t('q_' + (s?.state === 'blocked' ? 'blocked' : 'down')));
+  const measured = done && (u.cn.p || u.os.p);
+  ub.textContent = u?.run ? t('udpx_run')
+    : measured ? t('udpx_done', { cn: sideText(u.cn), os: sideText(u.os), q: t('q_' + worstQ(u.cn.q, u.os.q)) })
+      : done ? t('udpx_na') : t('udpx_btn');
+  ub.dataset.tip = measured ? t('udpx_tip', {
+    cup: u.cn.p ? pct(u.cn.p.up) : '–', cdown: u.cn.p ? pct(u.cn.p.down) : '–', cq: t('q_' + u.cn.q),
+    oup: u.os.p ? pct(u.os.p.up) : '–', odown: u.os.p ? pct(u.os.p.down) : '–', oq: t('q_' + u.os.q),
+  }) : UDPX_TIP;
   const ld = S.load, li = $('[data-s="load"]');
   const lb = $('#loadBtn');
   li.dataset.lv = ld?.done ? bloatLevel(ld.grade) || '' : '';
@@ -790,7 +816,7 @@ function record() {
   const end = running() ? Date.now() : S.windows[S.windows.length - 1]?.t || Date.now();
   return {
     ts: S.t0, key: v.key, conf: v.conf, secs: Math.round((end - S.t0) / 1000), mon: continuous(),
-    near: sc?.nearMed, jitter: sc?.jitter, loss: S.udpx?.p ? S.udpx.p.loss : sc?.loss, mos: sc?.call, game: sc?.game?.level, spikes: sc?.spikes,
+    near: sc?.nearMed, jitter: sc?.jitter, loss: udpxLoss(S.udpx) ?? sc?.loss, mos: sc?.call, game: sc?.game?.level, spikes: sc?.spikes,
     setup: sc?.setup, grade: S.load?.done ? S.load.grade : null, rise: S.load?.done ? S.load.rise : null,
     cc: S.meta?.country || '', colo: S.meta?.colo || '', ids: v.ids || [], incidents: S.inc.list.length,
     nearAs: S.cn ? (S.proxied ? 'near_proxy' : 'direct') : 'near', lanes,

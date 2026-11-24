@@ -46,7 +46,8 @@ minute (once every 2 s with a WebRTC connection open) but leaves a worker at onc
 
 **On demand**: a Router lane when the home router is found (Chrome's local network access), which tells the Wi‑Fi
 from the ISP; loaded latency (downloads for 10 s and reads how far latency rises); and an exact UDP test (20 s of
-packets to the WebRTC echo at `rtc.1ms.dog`, loss each way, then whether QUIC gets through).
+packets to the WebRTC echoes in Shanghai and Tokyo at once — the path inside mainland China and the one across the
+border — loss each way on both, then whether QUIC gets through).
 
 **Sharing**: a result link `/r/<code>` holds the verdict, the numbers and each lane's states, never an address;
 `src/worker.js` reads the code to put the verdict in the link's preview title.
