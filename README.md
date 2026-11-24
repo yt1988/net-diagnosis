@@ -63,8 +63,8 @@ npm run assets  # regenerate the preview images in public/og/ after changing the
 ```
 
 To self-host, run `npx wrangler deploy` and bind a domain to the Worker in the Cloudflare dashboard. The exact UDP
-test talks to `rtc.1ms.dog`, which only answers 1ms.dog pages: on your own domain, run your own echo server
-([speed-test's `server/`](https://github.com/yt1988/speed-test/tree/main/server)) and change the address in
+test talks to 1ms.dog's echo servers, which only answer 1ms.dog pages: on your own domain, run your own echo servers
+([speed-test's `server/`](https://github.com/yt1988/speed-test/tree/main/server)) and change the addresses in
 `src/rtc.mjs`. Everything else measures public endpoints and needs nothing from this site.
 
 ```
