@@ -560,9 +560,6 @@ function udpxLoss(u) {
   const a = [udpSideLoss(u?.cn), udpSideLoss(u?.os)].filter((x) => x != null);
   return a.length ? Math.max(...a) : null;
 }
-// the word shown when both paths agree; when they differ, the worse one (the tooltip says which side)
-const Q_ORDER = ['ok', 'slow', 'na', 'blocked', 'down'];
-const worstQ = (a, b) => Q_ORDER[Math.max(Q_ORDER.indexOf(a), Q_ORDER.indexOf(b))] || 'down';
 async function startUdpx() {
   if (S.udpx?.run) return;
   S.udpx = { run: true };
@@ -664,11 +661,16 @@ function drawExtras() {
   card.querySelector('b').textContent = ex != null ? pct(ex) : lastScores?.loss == null ? '–' : pct(lastScores.loss);
   const ub = $('#udpxBtn');
   ub.disabled = !!u?.run;
-  const sideText = (s) => (s?.p ? pct(s.p.loss) : t('q_' + (s?.state === 'blocked' ? 'blocked' : 'down')));
+  // one line per echo, each with its own loss and its own QUIC verdict: a single mixed line reads as if both
+  // were the same ("Shanghai 13.7% · Tokyo 4.2% · QUIC unreachable" says nothing about which one failed)
+  const sideLine = (s, k) => (s?.p
+    ? t(`udpx_${k}_side`, { loss: pct(s.p.loss), q: t('q_' + s.q) })
+    : t(`udpx_${k}_na`, { why: t('q_' + (s?.state === 'blocked' ? 'blocked' : 'down')) }));
   const measured = done && (u.cn.p || u.os.p);
-  ub.textContent = u?.run ? t('udpx_run')
-    : measured ? t('udpx_done', { cn: sideText(u.cn), os: sideText(u.os), q: t('q_' + worstQ(u.cn.q, u.os.q)) })
-      : done ? t('udpx_na') : t('udpx_btn');
+  ub.textContent = u?.run ? t('udpx_run') : done && !measured ? t('udpx_na') : t('udpx_btn');
+  // the two echoes get a line each, in their own full-width row: two names and two verdicts do not fit the tile.
+  // The row exists before the test too, so its two lines already have their room when the numbers arrive.
+  $('#udpxOut').textContent = measured ? `${sideLine(u.cn, 'cn')}\n${sideLine(u.os, 'os')}` : ' ';
   ub.dataset.tip = measured ? t('udpx_tip', {
     cup: u.cn.p ? pct(u.cn.p.up) : '–', cdown: u.cn.p ? pct(u.cn.p.down) : '–', cq: t('q_' + u.cn.q),
     oup: u.os.p ? pct(u.os.p.up) : '–', odown: u.os.p ? pct(u.os.p.down) : '–', oq: t('q_' + u.os.q),
