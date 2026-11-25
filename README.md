@@ -23,14 +23,14 @@ optional monitoring that logs every incident.
 | Part of the path | Probe | Every |
 |---|---|---|
 | Device | how late a 250 ms timer fires in the worker | continuous |
-| Nearby | the nearest Cloudflare location (`speed.cloudflare.com`); in mainland China, domestic sites | 1 s |
+| Nearby | the nearest Cloudflare location (`speed.cloudflare.com`); in mainland China, Chinese sites | 1 s |
 | Distant | single-location cloud regions: Tokyo, Frankfurt, Virginia (AWS DynamoDB `/ping`) | 5 s |
 | UDP | ICE gathering against public STUN servers (Cloudflare, Google; Xiaomi and Bilibili in mainland China) | 1 s |
 | Services | the ones you pick (ChatGPT, Google, GitHub…; the endpoints 1ms.dog checks daily) | 5 s |
 
 Each 5-second window is judged by `src/lib.mjs`. All paths worse together means your side (Wi‑Fi, router, ISP).
 Nearby fine but distant worse means the long-haul route. Only one service worse means that service. HTTPS fine but
-UDP losing packets means games and calls will stutter. With a proxy in mainland China, domestic sites (not proxied)
+UDP losing packets means games and calls will stutter. With a proxy in mainland China, Chinese sites (not proxied)
 stand for your own line, Cloudflare through the proxy for the way to the proxy server, and the distant regions for
 what lies past it. Every verdict lists its evidence and a confidence.
 
@@ -46,8 +46,8 @@ minute (once every 2 s with a WebRTC connection open) but leaves a worker at onc
 
 **On demand**: a Router lane when the home router is found (Chrome's local network access), which tells the Wi‑Fi
 from the ISP; loaded latency (downloads for 10 s and reads how far latency rises); and an exact UDP test (20 s of
-packets to the WebRTC echoes in Shanghai and Tokyo at once — the path inside mainland China and the one across the
-border — loss each way on both, then whether QUIC gets through).
+packets to the WebRTC echoes in Shanghai and Tokyo at once, loss each way on both, then whether QUIC gets
+through).
 
 **Sharing**: a result link `/r/<code>` holds the verdict, the numbers and each lane's states, never an address;
 `src/worker.js` reads the code to put the verdict in the link's preview title.
@@ -63,8 +63,8 @@ npm run assets  # regenerate the preview images in public/og/ after changing the
 ```
 
 To self-host, run `npx wrangler deploy` and bind a domain to the Worker in the Cloudflare dashboard. The exact UDP
-test takes its echo servers from a `<meta name="ms-rtc">` in the page (`sig`, `ice`, `wt` as comma lists, the path
-inside mainland China first, then across the border); without it the block stays hidden. On your own domain, run your
+test takes its echo servers from a `<meta name="ms-rtc">` in the page (`sig`, `ice`, `wt` as comma lists, Shanghai
+first, then Tokyo); without it the block stays hidden. On your own domain, run your
 own echo servers ([speed-test's `server/`](https://github.com/yt1988/speed-test/tree/main/server)) and add that meta.
 Everything else measures public endpoints and needs nothing from this site.
 
