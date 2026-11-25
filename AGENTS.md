@@ -18,10 +18,11 @@ the visitor's browser; nothing is measured from a server and no result is sent a
   timers slow to once a minute in a background tab. STUN runs on the page when the worker says so.
 - **The Worker** (`src/worker.js`): only runs for shared result links (`/r/<code>`), to put the verdict in the
   link's preview title. Everything else is a static file.
-- **Outside this repository**: the exact UDP / QUIC test talks to 1ms.dog's two WebRTC echo servers from
-  [speed-test](https://github.com/yt1988/speed-test/tree/main/server): `rtc.1ms.dog` (Tokyo, across the border) and
-  `rtc.dog.1msapp.com` (Shanghai, inside mainland China). Each answers only the origins on its allowlist.
-  `src/rtc.mjs` is a copy of speed-test's: change both together.
+- **Outside this repository**: the exact UDP / QUIC test talks to 1ms.dog's WebRTC echo servers from
+  [speed-test](https://github.com/yt1988/speed-test/tree/main/server). Their addresses are not in this repository:
+  the site injects them in `<meta name="ms-rtc">` (comma lists, the path inside mainland China first, then across the
+  border; format in 1ms.dog's tool contract §2). Without that meta the exact test stays hidden. Each server answers
+  only the origins on its allowlist. `src/rtc.mjs` is a copy of speed-test's: change both together.
 
 ## Run it locally
 

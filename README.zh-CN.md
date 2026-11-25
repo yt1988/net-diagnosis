@@ -55,7 +55,7 @@ npm test        # public/ 是否最新、逻辑单元测试和带标签的场景
 npm run assets  # 改了标题之后重新生成 public/og/ 的预览图
 ```
 
-自己部署时，`npx wrangler deploy` 之后在 Cloudflare 控制台给 Worker 绑一个域名即可。「精确测一下」用的是本站的回声服务器，它们只接受来自 1ms.dog 的页面；要在自己的域名上用，需要自己运行回声服务器（[speed-test 的 `server/`](https://github.com/yt1988/speed-test/tree/main/server)），并改 `src/rtc.mjs` 里的地址。其余测量都不依赖本站。
+自己部署时，`npx wrangler deploy` 之后在 Cloudflare 控制台给 Worker 绑一个域名即可。「精确测一下」的回声服务器地址来自页面里的 `<meta name="ms-rtc">`（`sig`、`ice`、`wt` 都是逗号分隔的列表，国内那台在前、跨境那台在后）；没有这个 meta 时这一块隐藏。要在自己的域名上用，需要自己运行回声服务器（[speed-test 的 `server/`](https://github.com/yt1988/speed-test/tree/main/server)），并把地址写进这个 meta。其余测量都不依赖本站。
 
 ## 许可
 

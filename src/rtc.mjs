@@ -1,17 +1,31 @@
 // Copied from speed-test (src/rtc.mjs, MIT, same author): keep the two in step.
-// UDP and QUIC to our two servers (server/main.go): rtc.1ms.dog in Tokyo (the cross-border path) and
-// rtc.dog.1msapp.com in mainland China (the domestic path). The same measurement runs against both, which tells a
+// UDP and QUIC to the echo servers this deployment measures. The addresses are not in this file: the site injects
+// them in <meta name="ms-rtc">, whose sig/ice/wt are comma lists — the path inside mainland China first, then the one
+// across the border (format in 1ms.dog's tool contract §2). The same measurement runs against each, which tells a
 // network that limits UDP at home from one that limits it only across the border. Little traffic each: 50 packets of
 // 12 bytes a second while the test runs (with WebRTC's own acknowledgements about 130 UDP packets and 10 KB a second
 // each way, 0.4-0.7 MB a test), then 10 echoes over QUIC and 10 over TCP. Both together: 0.8-1.4 MB.
 //
+//   rtcSides(doc)  what the page was given: [{ sig, wt, ice }] in the injected order, [] without the meta
 //   udp(sig)       a WebRTC data channel, unreliable and unordered (as calls and games send): .phase(0|1|2) tags
 //                  what follows as idle, download or upload; .stop() gives { state, family, phases: [{ loss, up, down, jit }] }
 //   quic(sig,wt)   WebTransport datagrams against a WebSocket to the same server: is QUIC let through, and as fast?
 //
-// Pure helpers (lossOf, quicVerdict, compareSides) are unit-tested; the rest needs a browser.
-export const RTC = "https://rtc.1ms.dog", RTC_CN = "https://rtc.dog.1msapp.com";
-export const SIG = RTC + ":2087", WT = RTC + ":40101/wt", SIG_CN = RTC_CN + ":2087", WT_CN = RTC_CN + ":40101/wt";
+// Pure helpers (rtcSides, lossOf, quicVerdict, compareSides) are unit-tested; the rest needs a browser.
+import { endpoints } from './egress.js';
+
+export function rtcSides(doc = globalThis.document) {
+  const e = endpoints('ms-rtc', doc);
+  const list = (v) => String(v || '').split(',').map((x) => x.trim()).filter(Boolean);
+  // sig is the signaling origin (https), wt a WebTransport URL or just host:port (the contract writes the latter)
+  const sig = list(e.sig).map((v) => (/^https?:\/\//.test(v) ? v.replace(/\/+$/, '') : 'https://' + v));
+  const wt = list(e.wt).map((v) => {
+    if (!/^https?:\/\//.test(v)) return 'https://' + v + '/wt';
+    try { return new URL(v).pathname === '/' ? v.replace(/\/+$/, '') + '/wt' : v; } catch { return v; }
+  });
+  const ice = list(e.ice);
+  return sig.map((s, i) => ({ sig: s, wt: wt[i] || '', ice: ice[i] || '' })).filter((s) => s.sig && s.wt);
+}
 export const RATE_MS = 20, WAIT_MS = 1500;
 const PHASES = 3;
 
@@ -53,7 +67,7 @@ export function compareSides(cn, os) {
 
 const timeout = (p, ms) => Promise.race([p, new Promise((_, j) => setTimeout(() => j(new Error("timeout")), ms))]);
 
-export function udp(sig = SIG) {
+export function udp(sig) {
   const pc = new RTCPeerConnection();
   const dc = pc.createDataChannel("u", { ordered: false, maxRetransmits: 0 });
   dc.binaryType = "arraybuffer";
@@ -131,7 +145,7 @@ export function udp(sig = SIG) {
 }
 
 // 10 echoes over each, 100 ms apart, the first of each not counted (it opens the way)
-export async function quic(sig = SIG, wt = WT) {
+export async function quic(sig, wt) {
   const api = typeof WebTransport === "function";
   const n = 10, gap = 100;
   const ws = await (async () => {

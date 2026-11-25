@@ -5,7 +5,7 @@
 // exact UDP / QUIC test against both echoes, Shanghai and Tokyo (src/rtc.mjs).
 import { NEAR, META, DIRECT, FAR, SERVICES, STUN, STUN_DIRECT, GATEWAYS } from './targets.mjs';
 import { stun, stunOverhead, meta } from './probes.mjs';
-import { udp as rtcUdp, quic as rtcQuic, SIG, WT, SIG_CN, WT_CN } from './rtc.mjs';
+import { udp as rtcUdp, quic as rtcQuic, rtcSides } from './rtc.mjs';
 import { encode as encodeShare, decode as decodeShare, sharePath, LANES, CELLS, squeeze } from './share.mjs';
 import {
   WINDOW_MS, windowStats, statusOf, udpStatusOf, stunLoss, attribute, mos, mosLevel, gaming, pageLevel, Incidents, confidence,
@@ -549,27 +549,28 @@ function onLoaded(m) {
   S.load.grade = bloatGrade(S.load.rise);
   drawExtras();
 }
-// The exact test against both of 1ms.dog's echoes at once — Shanghai (the path inside mainland China, "domestic")
-// and Tokyo (across the border) — so the two see the same conditions. 12-byte packets: the two flows do not fill the
-// line. Each side reports its own loss both ways and whether QUIC gets through; they run together, so it is still
-// about 20 seconds.
-const UDPX_SIDES = [{ k: 'cn', sig: SIG_CN, wt: WT_CN }, { k: 'os', sig: SIG, wt: WT }];
+// The exact test runs against every echo the site injected in <meta name="ms-rtc">, at once — the one inside
+// mainland China first, then the one across the border — so they see the same conditions. 12-byte packets: the flows
+// do not fill the line. Each side reports its own loss both ways and whether QUIC gets through; they run together, so
+// it is still about 20 seconds. Without the meta (a self-hosted copy that set none) there are no echoes: the block
+// stays hidden and the rest of the diagnosis runs as usual.
+const RTC_SIDES = rtcSides();
+const UDPX_K = ['cn', 'os'];
 const udpSideLoss = (s) => s?.p?.loss ?? null;
 // one headline number: the worst path that was measured (the exact test's own number; STUN estimates the rest)
 function udpxLoss(u) {
-  const a = [udpSideLoss(u?.cn), udpSideLoss(u?.os)].filter((x) => x != null);
+  const a = (u?.sides || []).map(udpSideLoss).filter((x) => x != null);
   return a.length ? Math.max(...a) : null;
 }
 async function startUdpx() {
-  if (S.udpx?.run) return;
+  if (S.udpx?.run || !RTC_SIDES.length) return;
   S.udpx = { run: true };
   drawExtras();
-  const us = UDPX_SIDES.map((s) => rtcUdp(s.sig));
+  const us = RTC_SIDES.map((s) => rtcUdp(s.sig));
   await sleep(20000);
   const rs = await Promise.all(us.map((u) => u.stop()));
-  const qs = await Promise.all(UDPX_SIDES.map((s) => rtcQuic(s.sig, s.wt).catch(() => ({ verdict: 'down' }))));
-  const side = (i) => ({ state: rs[i].state, p: rs[i].phases?.[0] || null, q: qs[i].verdict, fam: rs[i].family });
-  S.udpx = { run: false, cn: side(0), os: side(1) };
+  const qs = await Promise.all(RTC_SIDES.map((s) => rtcQuic(s.sig, s.wt).catch(() => ({ verdict: 'down' }))));
+  S.udpx = { run: false, sides: rs.map((r, i) => ({ state: r.state, p: r.phases?.[0] || null, q: qs[i].verdict, fam: r.family })) };
   drawExtras();
 }
 // the description the page was built with, put back once a run of the exact test has been replaced
@@ -657,24 +658,27 @@ function numbers(sc) {
 // UDP loss (estimated, or exact once rtc.1ms.dog was asked) and loaded latency, each with its own button
 function drawExtras() {
   const u = S.udpx, card = $('[data-c="udp"]');
-  const done = u && !u.run && u.cn && u.os, ex = done ? udpxLoss(u) : null;
+  const ub = $('#udpxBtn'), out = $('#udpxOut'), has = RTC_SIDES.length > 0;
+  // no injected echoes: no exact test to offer (the UDP number stays the STUN estimate)
+  ub.hidden = out.hidden = !has;
+  const done = has && u && !u.run && u.sides, ex = done ? udpxLoss(u) : null;
   card.querySelector('b').textContent = ex != null ? pct(ex) : lastScores?.loss == null ? '–' : pct(lastScores.loss);
-  const ub = $('#udpxBtn');
-  ub.disabled = !!u?.run;
-  // one line per echo, each with its own loss and its own QUIC verdict: a single mixed line reads as if both
-  // were the same ("Shanghai 13.7% · Tokyo 4.2% · QUIC unreachable" says nothing about which one failed)
-  const sideLine = (s, k) => (s?.p
-    ? t(`udpx_${k}_side`, { loss: pct(s.p.loss), q: t('q_' + s.q) })
-    : t(`udpx_${k}_na`, { why: t('q_' + (s?.state === 'blocked' ? 'blocked' : 'down')) }));
-  const measured = done && (u.cn.p || u.os.p);
-  ub.textContent = u?.run ? t('udpx_run') : done && !measured ? t('udpx_na') : t('udpx_btn');
-  // the two echoes get a line each, in their own full-width row: two names and two verdicts do not fit the tile.
-  // The row exists before the test too, so its two lines already have their room when the numbers arrive.
-  $('#udpxOut').textContent = measured ? `${sideLine(u.cn, 'cn')}\n${sideLine(u.os, 'os')}` : ' ';
-  ub.dataset.tip = measured ? t('udpx_tip', {
-    cup: u.cn.p ? pct(u.cn.p.up) : '–', cdown: u.cn.p ? pct(u.cn.p.down) : '–', cq: t('q_' + u.cn.q),
-    oup: u.os.p ? pct(u.os.p.up) : '–', odown: u.os.p ? pct(u.os.p.down) : '–', oq: t('q_' + u.os.q),
-  }) : UDPX_TIP;
+  if (has) {
+    ub.disabled = !!u?.run;
+    // one line per echo, each with its own loss and its own QUIC verdict: a single mixed line reads as if both
+    // were the same ("Shanghai 13.7% · Tokyo 4.2% · QUIC unreachable" says nothing about which one failed)
+    const sideLine = (s, k) => (s?.p
+      ? t(`udpx_${k}_side`, { loss: pct(s.p.loss), q: t('q_' + s.q) })
+      : t(`udpx_${k}_na`, { why: t('q_' + (s?.state === 'blocked' ? 'blocked' : 'down')) }));
+    const sides = done ? u.sides : [], measured = sides.some((s) => s.p);
+    ub.textContent = u?.run ? t('udpx_run') : done && !measured ? t('udpx_na') : t('udpx_btn');
+    // one line each, under the button they belong to; the row exists before the test, so its lines have their room
+    out.textContent = measured ? sides.map((s, i) => sideLine(s, UDPX_K[i] || 'os')).join('\n') : ' ';
+    ub.dataset.tip = measured && sides.length > 1 ? t('udpx_tip', {
+      cup: pct(sides[0].p?.up), cdown: pct(sides[0].p?.down), cq: t('q_' + sides[0].q),
+      oup: pct(sides[1].p?.up), odown: pct(sides[1].p?.down), oq: t('q_' + sides[1].q),
+    }) : UDPX_TIP;
+  }
   const ld = S.load, li = $('[data-s="load"]');
   const lb = $('#loadBtn');
   li.dataset.lv = ld?.done ? bloatLevel(ld.grade) || '' : '';
