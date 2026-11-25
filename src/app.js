@@ -655,7 +655,7 @@ function numbers(sc) {
   drawExtras();
 }
 
-// UDP loss (estimated, or exact once rtc.1ms.dog was asked) and loaded latency, each with its own button
+// UDP loss (estimated, or exact once the echo host was asked) and loaded latency, each with its own button
 function drawExtras() {
   const u = S.udpx, card = $('[data-c="udp"]');
   const ub = $('#udpxBtn'), out = $('#udpxOut'), has = RTC_SIDES.length > 0;
