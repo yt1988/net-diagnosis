@@ -67,6 +67,52 @@ export function compareSides(cn, os) {
 
 const timeout = (p, ms) => Promise.race([p, new Promise((_, j) => setTimeout(() => j(new Error("timeout")), ms))]);
 
+// Endpoint auth (1ms.dog's tool contract, 「端点鉴权」): the shell signs a short-lived token into the page as
+// <meta name="ms-auth">, and our signaling carries it — a header on the request, a query parameter on the WebSocket
+// (a browser cannot set headers there). A token under a minute from expiry, or a 401, is replaced once from the
+// same-origin /_ms/token and the request retried once; if it still fails the path degrades like an unreachable
+// server. A page without the meta (a self-hosted copy, or a deployment with no secret) sends nothing.
+export function authToken(doc = globalThis.document) {
+  const el = doc && doc.querySelector ? doc.querySelector('meta[name="ms-auth"]') : null;
+  return (el && el.getAttribute("content")) || "";
+}
+// v1.<exp>.<nonce>.<scope>.<hmac>: exp in seconds since the epoch
+export function tokenFresh(t, now = Math.floor(Date.now() / 1000)) {
+  const exp = Number(String(t || "").split(".")[1]);
+  return Number.isFinite(exp) && exp - now >= 60;
+}
+export async function refreshToken(doc = globalThis.document, fetchImpl = fetch) {
+  try {
+    const r = await fetchImpl("/_ms/token", { cache: "no-store", credentials: "same-origin" });
+    if (!r.ok) return "";
+    const j = await r.json();
+    const t = typeof j?.token === "string" ? j.token : "";
+    const el = t && doc && doc.querySelector ? doc.querySelector('meta[name="ms-auth"]') : null;
+    if (el) el.setAttribute("content", t);
+    return t;
+  } catch (e) { return ""; }
+}
+// the token to send now: the page's own, or a fresh one when it is about to expire (nothing when that fails)
+export async function ensureToken(doc = globalThis.document, fetchImpl = fetch) {
+  const t = authToken(doc);
+  if (!t || tokenFresh(t)) return t;
+  return (await refreshToken(doc, fetchImpl)) || "";
+}
+export function wsUrl(url, t) {
+  return t ? url + (url.includes("?") ? "&" : "?") + "token=" + encodeURIComponent(t) : url;
+}
+// POST /offer with the token; a 401 gets one refresh and one retry, never a loop
+export async function offerWithAuth(url, init, { token = "", refresh } = {}, fetchImpl = fetch) {
+  const send = (t) => fetchImpl(url, { ...init, headers: { ...((init && init.headers) || {}), ...(t ? { authorization: "Bearer " + t } : {}) } });
+  let t = token;
+  let res = await send(t);
+  if (res.status === 401 && t && refresh) {
+    const n = await refresh();
+    if (n) { t = n; res = await send(t); }
+  }
+  return { res, token: t };
+}
+
 export function udp(sig) {
   const pc = new RTCPeerConnection();
   const dc = pc.createDataChannel("u", { ordered: false, maxRetransmits: 0 });
@@ -96,7 +142,10 @@ export function udp(sig) {
   const open = new Promise((res, rej) => { dc.onopen = res; pc.onconnectionstatechange = () => pc.connectionState === "failed" && rej(new Error("failed")); });
   const ready = (async () => {
     await pc.setLocalDescription(await pc.createOffer());
-    const r = await timeout(fetch(sig + "/offer", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(pc.localDescription), cache: "no-store" }), 6000);
+    const token = await ensureToken();
+    const { res: r } = await timeout(offerWithAuth(sig + "/offer",
+      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(pc.localDescription), cache: "no-store" },
+      { token, refresh: () => refreshToken() }), 6000);
     if (!r.ok) throw new Error("HTTP " + r.status);
     await pc.setRemoteDescription(await r.json());
     reached = true;                 // the server answered over HTTPS: if the channel doesn't open now, UDP is blocked
@@ -149,7 +198,7 @@ export async function quic(sig, wt) {
   const api = typeof WebTransport === "function";
   const n = 10, gap = 100;
   const ws = await (async () => {
-    const s = new WebSocket(sig.replace(/^http/, "ws") + "/ws"); s.binaryType = "arraybuffer";
+    const s = new WebSocket(wsUrl(sig.replace(/^http/, "ws") + "/ws", await ensureToken())); s.binaryType = "arraybuffer";
     try {
       await timeout(new Promise((res, rej) => { s.onopen = res; s.onerror = rej; }), 5000);
       const rtts = [];
