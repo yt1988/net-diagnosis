@@ -805,7 +805,7 @@ $$('[data-mode]').forEach((b) => {
 // It makes the link short, draws the card's frame (logo, name, QR code, date) and offers copy, download and the
 // system share sheet; this page gives the link, the card's middle and the footer. The box adds the country and the
 // Cloudflare location to both; no address or network is ever in either.
-const SHARE_JS = '/assets/share/share.js?v=10';
+const SHARE_JS = '/assets/share/share.js?v=11';
 let SHARED = null, RECV = null;
 const laneShown = (k) => !$(`[data-lane="${k}"]`).hidden;
 // this run as a share record: the headline verdict, its numbers, and each lane's windows
@@ -891,7 +891,9 @@ function drawCard(x, kit, R) {
 $('#shareBtn').onclick = async () => {
   const R = record();
   if (!R) return;
-  const { share } = await import(SHARE_JS);
+  const shareMod = await import(SHARE_JS).catch(() => null);
+  if (!shareMod) { window.msShareDown && window.msShareDown(); return; }
+  const { share } = shareMod;
   share({
     lang: D.lang, name: t('app_name'), file: 'network-diagnosis',
     show: ['country', 'colo'], never: ['ip', 'isp'], canShow: !!(R.cc || R.colo),
