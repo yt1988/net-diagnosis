@@ -109,7 +109,7 @@ export async function build({ check = false } = {}) {
     const paths = Object.fromEntries(langs.map(([l, sl]) => [l, path(sl)]));
     // a lane: its name (with the followed services' icons and an edit button on the services lane), its state now
     // (the numbers in that word's tooltip), and the timeline; under them the time axis
-    const edit = `<span class="ln-ic" id="svcIcons"></span><button class="ln-edit" id="svcEdit" type="button" aria-haspopup="dialog" aria-controls="svcs" aria-label="${esc(T('svc_edit'))}" data-tip="${esc(T('svc_edit'))}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.5 2.5l3 3L6 13H3v-3z"/></svg></button>`;
+    const edit = `<span class="ln-ic" id="svcIcons"></span><button class="ln-edit" id="svcEdit" type="button" aria-haspopup="dialog" aria-controls="svcs" aria-label="${esc(T('svc_edit'))}" data-tip="${esc(T('svc_edit'))}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true"><path d="M10.5 2.5l3 3L6 13H3v-3z"/></svg></button>`;
     const lanes = LANES.map((k) => `<li data-lane="${k}"${k === 'direct' || k === 'gw' ? ' hidden' : ''}><span class="ln-h"><span class="ln-k" data-tip="${esc(T('lane_tip_' + k).replace('{ip}', ''))}" tabindex="0">${esc(T('lane_' + k))}</span>${k === 'svc' ? edit : ''}</span><span class="ln-st" data-st="none" tabindex="0">${esc(T('st_none'))}</span><span class="ln-tl"></span></li>`).join('') +
       `<li class="axis" aria-hidden="true"><span></span><span></span><span class="ax"><em>${esc(T('ax_past'))}</em><em>${esc(T('ax_now'))}</em></span></li>`;
 
