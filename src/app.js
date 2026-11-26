@@ -99,7 +99,7 @@ function wireIcons(root) {
 function drawServices() {
   $('#svcList').innerHTML = services().map((s) => {
     const mine = s.id.startsWith('c:');
-    return `<span class="chip${mine ? ' mine' : ''}"><button type="button" class="chip-b" data-svc="${esc(s.id)}" aria-pressed="${picked.has(s.id)}">${icon(s)}${esc(s.name)}</button>${mine ? `<button type="button" class="chip-x" data-rm="${esc(s.id)}" aria-label="${esc(t('svc_rm', { name: s.name }))}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 5l6 6M11 5l-6 6"/></svg></button>` : ''}</span>`;
+    return `<span class="chip${mine ? ' mine' : ''}"><button type="button" class="chip-b" data-svc="${esc(s.id)}" aria-pressed="${picked.has(s.id)}">${icon(s)}${esc(s.name)}</button>${mine ? `<button type="button" class="chip-x" data-rm="${esc(s.id)}" aria-label="${esc(t('svc_rm', { name: s.name }))}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 5l6 6M11 5l-6 6"/></svg></button>` : ''}</span>`;
   }).join('');
   wireIcons($('#svcList'));
   $$('#svcList [data-svc]').forEach((b) => {
